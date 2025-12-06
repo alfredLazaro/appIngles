@@ -70,14 +70,14 @@ class FlashcardBack extends StatelessWidget {
             Text(
               FlashcardConstants.definitionLabel,
               style: TextStyle(
-                fontSize: constraints.maxHeight * 0.04,
+                fontSize: constraints.maxHeight * 0.03,
                 fontWeight: FontWeight.bold,
                 color: textColor,
               ),
             ),
             const Spacer(),
             IconButton(
-              icon: Icon(Icons.volume_up, size: constraints.maxHeight * 0.05),
+              icon: Icon(Icons.volume_up, size: constraints.maxHeight * 0.04),
               onPressed: () => context
                   .read<FlashcardBloc>()
                   .add(SpeakFlashcardText(word.definition)),
@@ -88,10 +88,10 @@ class FlashcardBack extends StatelessWidget {
         Text(
           word.definition,
           style: TextStyle(
-            fontSize: constraints.maxHeight * 0.04,
+            fontSize: constraints.maxHeight * 0.03,
             color: textColor,
           ),
-          textAlign: TextAlign.justify,
+          textAlign: TextAlign.start,
         ),
       ],
     );
@@ -107,7 +107,7 @@ class FlashcardBack extends StatelessWidget {
             Text(
               FlashcardConstants.exampleLabel,
               style: TextStyle(
-                fontSize: constraints.maxHeight * 0.04,
+                fontSize: constraints.maxHeight * 0.03,
                 fontWeight: FontWeight.bold,
                 color: textColor,
               ),
@@ -125,11 +125,11 @@ class FlashcardBack extends StatelessWidget {
         Text(
           '"${word.sentence}"',
           style: TextStyle(
-            fontSize: constraints.maxHeight * 0.04,
+            fontSize: constraints.maxHeight * 0.03,
             fontStyle: FontStyle.italic,
             color: textColor,
           ),
-          textAlign: TextAlign.justify,
+          textAlign: TextAlign.left,
         ),
       ],
     );

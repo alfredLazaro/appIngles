@@ -200,7 +200,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Título
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.celebration, color: Colors.amber, size: 30),
