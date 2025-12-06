@@ -116,4 +116,33 @@ class WordDao {
 
     return result;
   }
+
+  Future<int> countWords() async {
+    final db = await dbHelper.database;
+    final total = await db.rawQuery('''
+      SELECT COUNT(*) FROM Word
+      ''');
+    int? count = Sqflite.firstIntValue(total);
+    return count ?? 0;
+  }
+
+  Future<List<Map<String, dynamic>>> getWordsForPractice(int limit) async {
+    final db = await dbHelper.database;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT 
+      w.id,
+      w.word,
+      w.definition,
+      w.sentence,
+      w.learn
+    FROM Word w
+    LEFT JOIN Image i ON w.id = i.wordId
+    GROUP BY w.id
+    ORDER BY w.learn ASC, w.id DESC
+    LIMIT ?
+  ''', [limit]);
+
+    return result;
+  }
 }

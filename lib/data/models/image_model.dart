@@ -1,7 +1,7 @@
 class Image_Model {
-  String? id;
+  int? id;
   int? wordId;
-  String name;
+  String? name;
   String? url;
   String? tinyurl;
   String? author;

@@ -15,7 +15,7 @@ class WordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       child: ListTile(
         leading: SizedBox(

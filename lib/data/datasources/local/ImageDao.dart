@@ -1,3 +1,5 @@
+import 'package:first_app/data/datasources/local/db_constants.dart';
+
 import '../../models/image_model.dart';
 import 'DataBaseHelper.dart';
 
@@ -63,6 +65,48 @@ class ImageDao {
       where: 'wordId = ?',
       whereArgs: [id],
     );
+    return result;
+  }
+
+  Future<Map<int, List<Image_Model>>> getImagesByWordIds(
+      List<int> wordIds) async {
+    if (wordIds.isEmpty) return {};
+
+    final db = await dbHelper.database;
+
+    // Convertir lista a string para rawQuery
+    final idsString = wordIds.join(', ');
+
+    // Consulta más eficiente con rawQuery
+    final results = await db.rawQuery('''
+    SELECT 
+      ${ImageFields.id},
+      ${ImageFields.wordId},
+      ${ImageFields.name},
+      ${ImageFields.url},
+      ${ImageFields.tinyurl},
+      ${ImageFields.author},
+      ${ImageFields.source}
+    FROM ${DBTables.image}
+    WHERE ${ImageFields.wordId} IN ($idsString)
+    ORDER BY ${ImageFields.wordId}, ${ImageFields.id}
+  ''');
+
+    return _groupImages(results);
+  }
+
+// Función helper para agrupar
+  Map<int, List<Image_Model>> _groupImages(List<Map<String, dynamic>> rows) {
+    final Map<int, List<Image_Model>> result = {};
+
+    for (final row in rows) {
+      final image = Image_Model.fromMap(row);
+      final wordId = row[ImageFields.wordId] as int;
+
+      result.putIfAbsent(wordId, () => []);
+      result[wordId]!.add(image);
+    }
+
     return result;
   }
 }

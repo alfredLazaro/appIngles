@@ -7,10 +7,11 @@ import 'package:first_app/domain/entities/flashcard_image.dart';
 class FlashcardMapper {
   static FlashcardWord toEntity(PfIng model) {
     return FlashcardWord(
+      id: model.id!,
       word: model.word,
       definition: model.definition,
       sentence: model.sentence,
-      learnCount: 0, // O tomar de tu modelo si existe
+      learnCount: model.learn,
     );
   }
 
@@ -18,7 +19,7 @@ class FlashcardMapper {
     return FlashcardImage(
       url: model.url ?? '',
       author: model.author,
-      source: null, // Agregar si existe en tu modelo
+      source: model.source,
     );
   }
 
