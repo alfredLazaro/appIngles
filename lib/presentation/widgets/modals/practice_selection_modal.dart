@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 class PracticeSelectionModal extends StatefulWidget {
   final int totalWords;
   final Function(int) onStartPractice;
-
+  final String title; // ✅ Nuevo parámetro
+  final String description;
   const PracticeSelectionModal({
     required this.totalWords,
     required this.onStartPractice,
+    this.title = 'Modo Práctica', // ✅ Valor por defecto
+    this.description = '¿Cuántas quieres practicar?',
   });
 
   @override
@@ -43,9 +46,9 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
             const SizedBox(height: 16),
 
             // ✅ Título
-            const Text(
-              'Modo Práctica',
-              style: TextStyle(
+            Text(
+              widget.title,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -75,14 +78,9 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
               ),
             ),
             const SizedBox(height: 32),
-
-            // ✅ Pregunta
-            const Text(
-              '¿Cuántas quieres practicar?',
-              style: TextStyle(fontSize: 16),
-            ),
+            Text(widget.description,
+                style: const TextStyle(fontSize: 16)), // ✅ Usar parámetr
             const SizedBox(height: 16),
-
             // ✅ Número seleccionado (grande)
             Container(
               width: 100,

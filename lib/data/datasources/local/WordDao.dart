@@ -145,4 +145,35 @@ class WordDao {
 
     return result;
   }
+
+  /// Obtiene N oraciones con menor learn para practicar
+  /// Retorna: id y sentence de las palabras menos practicadas
+  Future<List<Map<String, dynamic>>> getSentencesForPractice(int limit) async {
+    final db = await dbHelper.database;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+      SELECT 
+        id,
+        sentence
+      FROM Word
+      WHERE sentence IS NOT NULL AND sentence != ''
+      ORDER BY learn ASC, id DESC
+      LIMIT ?
+    ''', [limit]);
+
+    return result;
+  }
+
+  Future<void> updateLearn(int id, int count) async {
+    final db = await dbHelper.database;
+    await db.update(
+      'Word',
+      {
+        'learn': count,
+        'updated_at': DateTime.now().toIso8601String(),
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }

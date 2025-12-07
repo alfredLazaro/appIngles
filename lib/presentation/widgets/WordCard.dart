@@ -15,7 +15,7 @@ class WordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 0,
+      elevation: 1,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       child: ListTile(
         leading: SizedBox(
@@ -52,20 +52,25 @@ class WordCard extends StatelessWidget {
                   ),
           ),
         ),
-        title: Text(
-          word.word,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+        title: GestureDetector(
+          onTap: onSpeak, // ← Audio al tocar el título
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  word.word,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         subtitle: Text(
           word.definition,
           style: const TextStyle(fontSize: 14),
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.volume_up),
-          onPressed: onSpeak,
         ),
       ),
     );

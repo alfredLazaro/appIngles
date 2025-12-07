@@ -2,6 +2,7 @@ import 'package:first_app/data/mappers/word_with_image.dart';
 import 'package:first_app/data/models/pf_ing_model.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
+import 'package:first_app/presentation/pages/sentence_practice_page.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/data/datasources/local/WordDao.dart';
 import 'package:first_app/presentation/widgets/ListaCards.dart';
@@ -46,6 +47,11 @@ class _WordListPageState extends State<WordListPage> {
             icon: const Icon(Icons.school),
             onPressed: _showPracticeModal,
             tooltip: 'Modo práctica',
+          ),
+          IconButton(
+            icon: const Icon(Icons.sort),
+            onPressed: _showSentenceModal,
+            tooltip: 'Ordenar oraciones',
           ),
         ],
       ),
@@ -141,5 +147,37 @@ class _WordListPageState extends State<WordListPage> {
         SnackBar(content: Text('Error: $e')),
       );
     }
+  }
+
+  void _showSentenceModal() async {
+    final totalSentences =
+        await wordDao.countWords(); // O crear countSentences()
+
+    if (!mounted) return;
+
+    if (totalSentences == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay oraciones para practicar')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => PracticeSelectionModal(
+        totalWords: totalSentences,
+        title: 'Ordenar Oraciones', // ✅ Título personalizado
+        description:
+            '¿Cuántas oraciones quieres ordenar?', // ✅ Descripción personalizada
+        onStartPractice: (count) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SentencePracticePage(sentenceCount: count),
+            ),
+          );
+        },
+      ),
+    );
   }
 }

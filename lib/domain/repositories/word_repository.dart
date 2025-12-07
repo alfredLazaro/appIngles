@@ -10,4 +10,5 @@ abstract class WordRepository {
   Future<void> updateSentence(int wordId, String newSentence);
   Future<void> deleteWord(int wordId);
   Future<List<WordMeaning>> searchWordMeanings(String word);
+  Future<void> updateLearnCount(int wordId, int newLearn);
 }

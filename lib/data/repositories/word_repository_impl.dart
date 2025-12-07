@@ -66,4 +66,9 @@ class WordRepositoryImpl implements WordRepository {
       throw Exception('Error al buscar definiciones: $e');
     }
   }
+
+  @override
+  Future<void> updateLearnCount(int wordId, int newLearn) async {
+    await _wordDao.updateLearn(wordId, newLearn);
+  }
 }

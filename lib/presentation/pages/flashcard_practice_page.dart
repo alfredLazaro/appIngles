@@ -1,3 +1,6 @@
+import 'package:first_app/data/datasources/local/WordDao.dart';
+import 'package:first_app/domain/repositories/flashcard_repository.dart';
+import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/tts_service.dart';
@@ -309,9 +312,12 @@ class _FlashcardPageItem extends StatelessWidget {
     return BlocProvider(
       create: (context) {
         final ttsService = TtsService();
+        final wordDao = WordDao();
+        final wordRepository = FlashcardRepository(wordDao: wordDao);
         final bloc = FlashcardBloc(
           validateWordAnswer: ValidateWordAnswer(),
           speakText: SpeakText(ttsService),
+          wordRepository: wordRepository,
         );
 
         // ✅ Emitir estado inicial
@@ -320,7 +326,7 @@ class _FlashcardPageItem extends StatelessWidget {
             word: word,
             images: images,
             showFront: true,
-            learnCount: 0,
+            learnCount: word.learnCount,
           ));
       },
       child: BlocListener<FlashcardBloc, FlashcardState>(

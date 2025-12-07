@@ -1,3 +1,4 @@
+import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
 import 'package:first_app/domain/usecases/speak_text.dart';
@@ -7,12 +8,14 @@ import 'flashcard_state.dart';
 class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   final ValidateWordAnswer _validateWordAnswer;
   final SpeakText _speakText;
-
+  final WordRepository _wordRepository;
   FlashcardBloc({
     required ValidateWordAnswer validateWordAnswer,
     required SpeakText speakText,
+    required WordRepository wordRepository,
   })  : _validateWordAnswer = validateWordAnswer,
         _speakText = speakText,
+        _wordRepository = wordRepository,
         super(FlashcardInitial()) {
     on<FlipFlashcard>(_onFlipFlashcard);
     on<IncrementLearnCount>(_onIncrementLearnCount);
@@ -29,17 +32,27 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   }
 
   void _onIncrementLearnCount(
-      IncrementLearnCount event, Emitter<FlashcardState> emit) {
+      IncrementLearnCount event, Emitter<FlashcardState> emit) async {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
-      emit(currentState.copyWith(learnCount: currentState.learnCount + 1));
+      final newCount = currentState.learnCount + 1;
+      emit(currentState.copyWith(learnCount: newCount));
+      await _wordRepository.updateLearnCount(
+        currentState.word.id!,
+        newCount,
+      );
     }
   }
 
-  void _onResetLearnCount(ResetLearnCount event, Emitter<FlashcardState> emit) {
+  void _onResetLearnCount(
+      ResetLearnCount event, Emitter<FlashcardState> emit) async {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       emit(currentState.copyWith(learnCount: 0));
+      await _wordRepository.updateLearnCount(
+        currentState.word.id!,
+        0,
+      );
     }
   }
 

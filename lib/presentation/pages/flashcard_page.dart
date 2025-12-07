@@ -1,3 +1,5 @@
+import 'package:first_app/data/repositories/word_repository_impl.dart';
+import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/tts_service.dart';
@@ -27,9 +29,11 @@ class FlashcardPage extends StatelessWidget {
       body: BlocProvider(
         create: (context) {
           final ttsService = TtsService();
+          final wordRepository = context.read<WordRepository>();
           final bloc = FlashcardBloc(
             validateWordAnswer: ValidateWordAnswer(),
             speakText: SpeakText(ttsService),
+            wordRepository: wordRepository,
           );
 
           // Inicializar estado
