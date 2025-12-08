@@ -13,10 +13,11 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     required ValidateWordAnswer validateWordAnswer,
     required SpeakText speakText,
     required WordRepository wordRepository,
+    FlashcardState? initialState,
   })  : _validateWordAnswer = validateWordAnswer,
         _speakText = speakText,
         _wordRepository = wordRepository,
-        super(FlashcardInitial()) {
+        super(initialState ?? FlashcardInitial()) {
     on<FlipFlashcard>(_onFlipFlashcard);
     on<IncrementLearnCount>(_onIncrementLearnCount);
     on<ResetLearnCount>(_onResetLearnCount);
@@ -38,7 +39,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final newCount = currentState.learnCount + 1;
       emit(currentState.copyWith(learnCount: newCount));
       await _wordRepository.updateLearnCount(
-        currentState.word.id!,
+        currentState.word.id,
         newCount,
       );
     }
@@ -50,7 +51,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final currentState = state as FlashcardLoaded;
       emit(currentState.copyWith(learnCount: 0));
       await _wordRepository.updateLearnCount(
-        currentState.word.id!,
+        currentState.word.id,
         0,
       );
     }
