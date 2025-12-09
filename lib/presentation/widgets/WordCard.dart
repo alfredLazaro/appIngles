@@ -16,61 +16,73 @@ class WordCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 1,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      child: ListTile(
-        leading: SizedBox(
-          width: 56,
-          height: 56,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: word.tinyImageUrl != null && word.tinyImageUrl!.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: word.tinyImageUrl!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
+      margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+      child: Padding(
+        padding: const EdgeInsets.all(2),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Imagen
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: SizedBox(
+                width: 75,
+                height: 75,
+                child: word.tinyImageUrl != null &&
+                        word.tinyImageUrl!.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: word.tinyImageUrl!,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey,
+                            size: 24,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        color: Colors.grey[300],
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey,
+                          size: 24,
+                        ),
                       ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      color: Colors.grey[300],
-                      child: const Icon(
-                        Icons.image_not_supported,
-                        color: Colors.grey,
-                        size: 24,
-                      ),
-                    ),
-                  )
-                : Container(
-                    color: Colors.grey[300],
-                    child: const Icon(
-                      Icons.image_not_supported,
-                      color: Colors.grey,
-                      size: 24,
-                    ),
-                  ),
-          ),
-        ),
-        title: GestureDetector(
-          onTap: onSpeak, // ← Audio al tocar el título
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  word.word,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
               ),
-            ],
-          ),
-        ),
-        subtitle: Text(
-          word.definition,
-          style: const TextStyle(fontSize: 14),
+            ),
+            const SizedBox(width: 12), // Espacio entre imagen y texto
+            // Contenido
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: onSpeak,
+                    child: Text(
+                      word.word,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    word.definition,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

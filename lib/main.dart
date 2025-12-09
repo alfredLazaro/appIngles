@@ -1,4 +1,3 @@
-import 'package:first_app/core/services/deep_ai_service.dart';
 import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +23,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "assets/.env"); //Cargar variables de entorno
   //sqfliteFfinit();
-  await DeepSeekApiService().initialize(); // Inicializa el servicio de API
   runApp(MyApp());
 }
 
@@ -85,15 +83,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-/* 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Pagina1(), //pantalla de inicio
-    );
-  }
-} */

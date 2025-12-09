@@ -197,6 +197,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
       label: Text(label ?? '$count'),
       selected: isSelected,
       selectedColor: Colors.deepPurple,
+      showCheckmark: false,
       labelStyle: TextStyle(
         color: isSelected ? Colors.white : Colors.black,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

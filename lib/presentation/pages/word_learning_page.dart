@@ -7,10 +7,10 @@ import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dar
 import 'package:first_app/presentation/bloc/word_learning/word_learning_event.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_state.dart';
 import 'package:first_app/presentation/widgets/word_input_section.dart';
-import 'package:first_app/presentation/widgets/word_list_section.dart';
+import 'package:first_app/presentation/widgets/listshort/word_list_section.dart';
 import 'package:first_app/presentation/widgets/Dialog_inform.dart';
 import 'package:first_app/presentation/widgets/Dialog_Image.dart';
-import 'package:first_app/presentation/widgets/EditDialog.dart';
+import 'package:first_app/presentation/widgets/listshort/EditDialog.dart';
 
 /// Página principal refactorizada (antes Pagina1)
 class WordLearningPage extends StatefulWidget {
