@@ -167,7 +167,29 @@ class _WordLearningPageState extends State<WordLearningPage> {
     List<Map<String, dynamic>> images,
   ) async {
     if (_tempSelectedDefinition == null) return;
-// Mostrar dialog de selección de imagen
+
+    if (images.isEmpty) {
+      // Si no hay imágenes, preguntar si quiere continuar sin imágenes
+      final shouldContinue = await _showNoImagesDialog();
+
+      if (!shouldContinue) {
+        _tempSelectedDefinition = null;
+        return;
+      }
+
+      // Guardar palabra SIN imágenes
+      context.read<WordLearningBloc>().add(
+            SaveNewWordEvent(
+              wordData: _tempSelectedDefinition!,
+              selectedImages: [], // Lista vacía
+            ),
+          );
+
+      _tempSelectedDefinition = null;
+      return;
+    }
+
+    // Si hay imágenes, mostrar selector normal
     final selectedImages = await showDialog<List<Map<String, dynamic>>>(
       context: context,
       builder: (_) => ImageSelectorDialog(
@@ -178,7 +200,6 @@ class _WordLearningPageState extends State<WordLearningPage> {
 
     if (selectedImages == null || selectedImages.isEmpty) return;
 
-// Guardar palabra con imágenes
     context.read<WordLearningBloc>().add(
           SaveNewWordEvent(
             wordData: _tempSelectedDefinition!,
@@ -187,6 +208,28 @@ class _WordLearningPageState extends State<WordLearningPage> {
         );
 
     _tempSelectedDefinition = null;
+  }
+
+  Future<bool> _showNoImagesDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('No se encontraron imágenes'),
+            content: const Text(
+                '¿Deseas guardar la palabra sin imágenes? Puedes añadirlas después.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Guardar sin imágenes'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 
   void _showEditDialog(word) {

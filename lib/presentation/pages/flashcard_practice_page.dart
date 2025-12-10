@@ -1,6 +1,5 @@
 import 'package:first_app/data/datasources/local/WordDao.dart';
 import 'package:first_app/domain/repositories/flashcard_repository.dart';
-import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/tts_service.dart';
@@ -314,24 +313,23 @@ class _FlashcardPageItem extends StatelessWidget {
         final ttsService = TtsService();
         final wordDao = WordDao();
         final wordRepository = FlashcardRepository(wordDao: wordDao);
-        final bloc = FlashcardBloc(
+        final initialState = FlashcardLoaded(
+          word: word,
+          images: images,
+          showFront: true,
+          learnCount: word.learnCount,
+        );
+        // Emitir estado inicial
+        return FlashcardBloc(
           validateWordAnswer: ValidateWordAnswer(),
           speakText: SpeakText(ttsService),
           wordRepository: wordRepository,
+          initialState: initialState,
         );
-
-        // ✅ Emitir estado inicial
-        return bloc
-          ..emit(FlashcardLoaded(
-            word: word,
-            images: images,
-            showFront: true,
-            learnCount: word.learnCount,
-          ));
       },
       child: BlocListener<FlashcardBloc, FlashcardState>(
         listener: (context, state) {
-          // ✅ Escuchar validación de respuesta
+          // Escuchar validación de respuesta
           if (state is FlashcardAnswerValidated) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
