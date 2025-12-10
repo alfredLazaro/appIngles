@@ -12,12 +12,13 @@ class EnglishFlashCard extends StatelessWidget {
   final Color cardColor;
   final Color textColor;
   final double borderRadius;
-
+  final double? maxWidth; // Nuevo parámetro
   const EnglishFlashCard({
     super.key,
     this.cardColor = Colors.white,
     this.textColor = Colors.black,
     this.borderRadius = FlashcardConstants.defaultBorderRadius,
+    this.maxWidth = 450.0, // Valor por defecto: 600px
   });
 
   @override
@@ -31,34 +32,42 @@ class EnglishFlashCard extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        return GestureDetector(
-          onTap: () => context.read<FlashcardBloc>().add(FlipFlashcard()),
-          child: Card(
-            elevation: 5.0,
-            margin: EdgeInsets.all(isPortrait ? 8.0 : 4.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(borderRadius),
+        return Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: maxWidth ?? double.infinity,
             ),
-            color: cardColor,
-            child: AnimatedSwitcher(
-              duration: const Duration(
-                milliseconds: FlashcardConstants.flipAnimationDuration,
+            child: GestureDetector(
+              onTap: () => context.read<FlashcardBloc>().add(FlipFlashcard()),
+              child: Card(
+                elevation: 5.0,
+                margin: EdgeInsets.all(isPortrait ? 8.0 : 4.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                ),
+                color: cardColor,
+                child: AnimatedSwitcher(
+                  duration: const Duration(
+                    milliseconds: FlashcardConstants.flipAnimationDuration,
+                  ),
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  child: state.showFront
+                      ? FlashcardFront(
+                          key: const ValueKey('front'),
+                          word: state.word,
+                          images: state.images,
+                          textColor: textColor,
+                        )
+                      : FlashcardBack(
+                          key: const ValueKey('back'),
+                          word: state.word,
+                          textColor: textColor,
+                        ),
+                ),
               ),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-              child: state.showFront
-                  ? FlashcardFront(
-                      key: const ValueKey('front'),
-                      word: state.word,
-                      images: state.images,
-                      textColor: textColor,
-                    )
-                  : FlashcardBack(
-                      key: const ValueKey('back'),
-                      word: state.word,
-                      textColor: textColor,
-                    ),
             ),
           ),
         );

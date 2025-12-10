@@ -68,7 +68,7 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
                               },
                               child: Stack(fit: StackFit.expand, children: [
                                 CachedNetworkImage(
-                                    imageUrl: imageUrl['url']['regular'] ?? '',
+                                    imageUrl: imageUrl['url']['thumb'] ?? '',
                                     fit: BoxFit.cover,
                                     placeholder: (context, url) => const Center(
                                           child: CircularProgressIndicator(),

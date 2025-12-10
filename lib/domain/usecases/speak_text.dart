@@ -7,6 +7,6 @@ class SpeakText {
   SpeakText(this._ttsService);
 
   Future<void> call(String text) async {
-    await _ttsService.speak(text, language: 'en-US');
+    await _ttsService.speak(text);
   }
 }

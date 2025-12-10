@@ -44,7 +44,7 @@ class ImageRepositoryImpl implements ImageRepository {
               ? imageData['user']['name']
               : imageData['user'] ?? 'Desconocido',
           url: imageData['url']['regular'],
-          tinyurl: imageData['url']['small'],
+          tinyurl: imageData['url']['thumb'],
           source: imageData['source'] ?? 'Desconocida',
         );
 

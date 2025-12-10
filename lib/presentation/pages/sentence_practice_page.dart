@@ -276,165 +276,173 @@ class _SentenceBuilderWidgetState extends State<_SentenceBuilderWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
+      child: Stack(
         children: [
-          // ✅ Botón de audio (pista)
-          Card(
-            color: Colors.blue.shade50,
-            child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.tips_and_updates, color: Colors.blue),
-                  const SizedBox(width: 5),
-                  const Expanded(
-                    child: Text(
-                      'Escucha y ordena las palabras:',
-                      style: TextStyle(fontSize: 16),
+          Column(
+            children: [
+              // ✅ Botón de audio (pista)
+              Card(
+                color: Colors.blue.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.tips_and_updates, color: Colors.blue),
+                      const SizedBox(width: 5),
+                      const Expanded(
+                        child: Text(
+                          'Escucha y ordena las palabras:',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.volume_up, size: 28),
+                        color: Colors.blue,
+                        onPressed: () {
+                          widget.ttsService.speak(
+                            widget.originalSentence,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // ✅ Área de construcción de oración
+              Container(
+                width: double.infinity,
+                height: 160,
+                constraints: const BoxConstraints(minHeight: 120),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300, width: 2),
+                  borderRadius: BorderRadius.circular(12),
+                  color: _showResult
+                      ? (_isCorrect ? Colors.green.shade50 : Colors.red.shade50)
+                      : Colors.white,
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(1.0),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: -6,
+                      children: _userSentence.isEmpty
+                          ? [
+                              const Center(
+                                child: Text(
+                                  'Toca las palabras para formar la oración',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              )
+                            ]
+                          : _userSentence.asMap().entries.map((entry) {
+                              return _WordChip(
+                                word: entry.value,
+                                color: Colors.blue,
+                                onTap: () {
+                                  setState(() {
+                                    _shuffledWords.add(entry.value);
+                                    _userSentence.removeAt(entry.key);
+                                    _showResult = false;
+                                  });
+                                },
+                              );
+                            }).toList(),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.volume_up, size: 28),
-                    color: Colors.blue,
-                    onPressed: () {
-                      widget.ttsService.speak(
-                        widget.originalSentence,
-                        language: 'en-US',
-                      );
-                    },
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // ✅ Palabras disponibles
+              const Text(
+                'Palabras disponibles:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                height: 260, // Altura máxima
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  //border: Border.all(color: Colors.grey[300]),
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(1.0),
+                    child: Wrap(
+                      spacing: 5,
+                      runSpacing: -3,
+                      children: _shuffledWords.map((word) {
+                        return _WordChip(
+                          word: word,
+                          color: const Color.fromARGB(255, 40, 37, 204),
+                          onTap: () {
+                            setState(() {
+                              _userSentence.add(word);
+                              _shuffledWords.remove(word);
+                              _showResult = false;
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ),
+              const Spacer(),
+
+              // ✅ Botones de acción
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _reset,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Reiniciar'),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _userSentence.isEmpty ? null : _checkAnswer,
+                      icon: const Icon(Icons.check),
+                      label: const Text('Verificar'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // ✅ Área de construcción de oración
-          Container(
-            width: double.infinity,
-            constraints: const BoxConstraints(minHeight: 120),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300, width: 2),
-              borderRadius: BorderRadius.circular(12),
-              color: _showResult
-                  ? (_isCorrect ? Colors.green.shade50 : Colors.red.shade50)
-                  : Colors.white,
-            ),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _userSentence.isEmpty
-                  ? [
-                      const Center(
-                        child: Text(
-                          'Toca las palabras para formar la oración',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      )
-                    ]
-                  : _userSentence.asMap().entries.map((entry) {
-                      return _WordChip(
-                        word: entry.value,
-                        color: Colors.blue,
-                        onTap: () {
-                          setState(() {
-                            _shuffledWords.add(entry.value);
-                            _userSentence.removeAt(entry.key);
-                            _showResult = false;
-                          });
-                        },
-                      );
-                    }).toList(),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // ✅ Palabras disponibles
-          const Text(
-            'Palabras disponibles:',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            height: 260, // Altura máxima
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
-              //border: Border.all(color: Colors.grey[300]),
-            ),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(3.0),
-                child: Wrap(
-                  spacing: 5,
-                  runSpacing: 1,
-                  children: _shuffledWords.map((word) {
-                    return _WordChip(
-                      word: word,
-                      color: const Color.fromARGB(255, 40, 37, 204),
-                      onTap: () {
-                        setState(() {
-                          _userSentence.add(word);
-                          _shuffledWords.remove(word);
-                          _showResult = false;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          ),
-          const Spacer(),
-
-          // ✅ Botones de acción
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _reset,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Reiniciar'),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: _userSentence.isEmpty ? null : _checkAnswer,
-                  icon: const Icon(Icons.check),
-                  label: const Text('Verificar'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                  ),
-                ),
-              ),
             ],
           ),
-
           // ✅ Mostrar respuesta correcta si falla
           if (_showResult && !_isCorrect)
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
+            Positioned(
+              top: 0, // lo coloca arriba
+              left: 0,
+              right: 0,
               child: Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
                   color: Colors.green.shade50,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.green),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.lightbulb, color: Colors.green),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Correcto: ${widget.originalSentence}',
-                        style: const TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  widget.originalSentence,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16.0,
+                  ),
+                  textScaler: const TextScaler.linear(0.9),
+                  //softWrap: true,
+                  //overflow: TextOverflow.visible,
                 ),
               ),
             ),
@@ -470,7 +478,7 @@ class _WordChip extends StatelessWidget {
           ),
         ),
         backgroundColor: color,
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 0),
       ),
     );
   }

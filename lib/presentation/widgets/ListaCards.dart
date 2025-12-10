@@ -1,8 +1,7 @@
-import 'package:first_app/data/datasources/local/WordDao.dart';
+import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/presentation/widgets/WordCard.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:logger/logger.dart';
 
 class ListaCards extends StatefulWidget {
@@ -17,8 +16,7 @@ class ListaCards extends StatefulWidget {
 }
 
 class _ListaCardState extends State<ListaCards> {
-  FlutterTts flutterTts = FlutterTts();
-  final WordDao wordDao = WordDao();
+  final TtsService _ttsService = TtsService();
   final log = Logger();
   late List<WordWithImage> _lisWords;
   @override
@@ -26,17 +24,29 @@ class _ListaCardState extends State<ListaCards> {
     super.initState();
 
     _lisWords = widget.lswords;
-    flutterTts.setLanguage('en-US');
-    flutterTts.setPitch(1.0);
-    flutterTts.setSpeechRate(0.5);
+    _initializeTts();
+  }
+
+  Future<void> _initializeTts() async {
+    await _ttsService.initialize(
+      language: 'en-US',
+      pitch: 1.0,
+      speechRate: 0.5,
+    );
   }
 
   Future<void> speakf(String text) async {
     try {
-      await flutterTts.speak(text);
+      await _ttsService.speak(text);
     } catch (e) {
       log.e('Error al leer el texto: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    _ttsService.stop(); // ← Detener al destruir
+    super.dispose();
   }
 
   @override

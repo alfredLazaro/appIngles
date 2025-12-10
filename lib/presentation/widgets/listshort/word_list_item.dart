@@ -27,10 +27,11 @@ class WordListItem extends StatelessWidget {
             icon: const Icon(Icons.edit),
             onPressed: onEdit,
           ),
+          /* 
           IconButton(
             icon: const Icon(Icons.copy),
             onPressed: onCopy,
-          ),
+          ), */
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: onDelete,

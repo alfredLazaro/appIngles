@@ -37,14 +37,6 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ✅ Ícono
-            const Icon(
-              Icons.school,
-              size: 60,
-              color: Colors.deepPurple,
-            ),
-            const SizedBox(height: 16),
-
             // ✅ Título
             Text(
               widget.title,
@@ -53,54 +45,50 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 14),
 
             // ✅ Total de palabras
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.deepPurple.withOpacity(0.1),
+                color: const Color.fromARGB(255, 129, 170, 209),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.library_books, color: Colors.deepPurple),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Tienes ${widget.totalWords} palabras',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            Text(widget.description,
-                style: const TextStyle(fontSize: 16)), // ✅ Usar parámetr
-            const SizedBox(height: 16),
-            // ✅ Número seleccionado (grande)
-            Container(
-              width: 100,
-              height: 100,
-              decoration: const BoxDecoration(
-                color: Colors.deepPurple,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  '$_selectedCount',
-                  style: const TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+              child: Text(
+                'Tienes ${widget.totalWords} palabras',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
             const SizedBox(height: 16),
+            Row(children: [
+              Expanded(
+                child: Text(widget.description,
+                    style: const TextStyle(fontSize: 16)),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                width: 25,
+                height: 25,
+                decoration: const BoxDecoration(
+                  color: Colors.deepPurple,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    '$_selectedCount',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+            const SizedBox(height: 10),
 
             // ✅ Slider
             Slider(
@@ -140,7 +128,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 14),
 
             // ✅ Botones de acceso rápido
             Wrap(
@@ -151,10 +139,10 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                 if (widget.totalWords >= 10) _buildQuickButton(10),
                 if (widget.totalWords >= 20) _buildQuickButton(20),
                 if (widget.totalWords >= 50) _buildQuickButton(50),
-                _buildQuickButton(widget.totalWords, label: 'Todas'),
+                //_buildQuickButton(widget.totalWords, label: 'Todas'),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
 
             // ✅ Botones de acción
             Row(
@@ -197,6 +185,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
       label: Text(label ?? '$count'),
       selected: isSelected,
       selectedColor: Colors.deepPurple,
+      showCheckmark: false,
       labelStyle: TextStyle(
         color: isSelected ? Colors.white : Colors.black,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
