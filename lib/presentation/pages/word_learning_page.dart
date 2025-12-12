@@ -61,6 +61,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
     }
 // 1. Buscar definiciones
     context.read<WordLearningBloc>().add(SearchWordDefinitionEvent(word));
+    //context.read<WordLearningBloc>().add(SearchWordImagesEvent(word));
   }
 
   void _showError(String message) {
@@ -138,56 +139,12 @@ class _WordLearningPageState extends State<WordLearningPage> {
     );
   }
 
-// Manejo de definiciones cargadas
-  Future<void> handleDefinitionsLoaded(
-    List<Map<String, dynamic>> meanings,
-  ) async {
-// Mostrar dialog de selección de definición
-    final selectedDefinition = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (context) => DefinitionSelector(meanings: meanings),
-    );
-    if (selectedDefinition == null) return;
-
-// Agregar la palabra al mapa
-    selectedDefinition['word'] = _wordController.text;
-
-// Buscar imágenes
-    context
-        .read<WordLearningBloc>()
-        .add(SearchWordImagesEvent(_wordController.text));
-
-// Guardar temporalmente la definición seleccionada
-    _tempSelectedDefinition = selectedDefinition;
-  }
-
   Map<String, dynamic>? _tempSelectedDefinition;
 // Manejo de imágenes cargadas
   Future<void> _handleImagesLoaded(
     List<Map<String, dynamic>> images,
   ) async {
     if (_tempSelectedDefinition == null) return;
-
-    if (images.isEmpty) {
-      // Si no hay imágenes, preguntar si quiere continuar sin imágenes
-      final shouldContinue = await _showNoImagesDialog();
-
-      if (!shouldContinue) {
-        _tempSelectedDefinition = null;
-        return;
-      }
-
-      // Guardar palabra SIN imágenes
-      context.read<WordLearningBloc>().add(
-            SaveNewWordEvent(
-              wordData: _tempSelectedDefinition!,
-              selectedImages: [], // Lista vacía
-            ),
-          );
-
-      _tempSelectedDefinition = null;
-      return;
-    }
 
     // Si hay imágenes, mostrar selector normal
     final selectedImages = await showDialog<List<Map<String, dynamic>>>(
@@ -198,7 +155,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
       ),
     );
 
-    if (selectedImages == null || selectedImages.isEmpty) return;
+    if (selectedImages == null) return;
 
     context.read<WordLearningBloc>().add(
           SaveNewWordEvent(
@@ -210,35 +167,13 @@ class _WordLearningPageState extends State<WordLearningPage> {
     _tempSelectedDefinition = null;
   }
 
-  Future<bool> _showNoImagesDialog() async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('No se encontraron imágenes'),
-            content: const Text(
-                '¿Deseas guardar la palabra sin imágenes? Puedes añadirlas después.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Guardar sin imágenes'),
-              ),
-            ],
-          ),
-        ) ??
-        false;
-  }
-
   void _showEditDialog(word) {
     showDialog(
       context: context,
       builder: (dialogContext) => EditSentenceDialog(
         initialSentence: word.sentence,
         onUpdate: (newSentence) {
-          this.context.read<WordLearningBloc>().add(
+          context.read<WordLearningBloc>().add(
                 UpdateWordSentenceEvent(
                   wordId: word.id!,
                   newSentence: newSentence,
@@ -262,13 +197,13 @@ class _WordLearningPageState extends State<WordLearningPage> {
         content: const Text('¿Estás seguro de eliminar esta palabra?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancelar'),
           ),
           TextButton(
             onPressed: () {
-              this.context.read<WordLearningBloc>().add(DeleteWordEvent(id));
-              Navigator.pop(context);
+              context.read<WordLearningBloc>().add(DeleteWordEvent(id));
+              Navigator.pop(dialogContext);
             },
             child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
           ),
@@ -288,7 +223,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
     if (selectedDefinition == null) return;
 
     selectedDefinition['word'] = _wordController.text;
-
+    if (!mounted) return;
     context.read<WordLearningBloc>().add(
           SearchWordImagesEvent(_wordController.text),
         );
