@@ -125,26 +125,15 @@ class _DefinitionSelectorState extends State<DefinitionSelector> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final screenWidth = MediaQuery.of(context).size.width;
-                      final bool esPequeno = screenWidth < 400;
-
-                      // Si el diálogo es muy pequeño, la Row también lo será
-                      if (constraints.maxWidth < 180) {
-                        // Un umbral más bajo para solo iconos
-                        // Botón Cancelar (solo Icono)
-                        return TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Icon(Icons.close),
-                        );
-                      }
-
-                      // Diseño responsivo basado en LayoutBuilder:
+                  Builder(
+                    builder: (context) {
+                      // Obtener el ancho real disponible del diálogo
+                      final dialogWidth = MediaQuery.of(context).size.width *
+                          0.8; // Mismo que tu ConstrainedBox
+                      final bool esPequeno = dialogWidth < 400;
 
                       return Row(
-                        mainAxisSize: MainAxisSize
-                            .min, // Importante para que la Row se ajuste al contenido
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
@@ -161,20 +150,15 @@ class _DefinitionSelectorState extends State<DefinitionSelector> {
 
                                     Navigator.pop(context, {
                                       'partOfSpeech': partOfSpeech,
-
                                       'definition': selectedDef['definition'],
-
                                       'example': selectedDef['example'],
-
-                                      'synonyms': selectedDef['synonyms'] ??
-                                          [], // Lista de sinónimos
-
+                                      'synonyms': selectedDef['synonyms'] ?? [],
                                       'antonyms': selectedDef['antonyms'] ?? [],
                                     });
                                   }
                                 : null,
                             child: esPequeno
-                                ? const Icon(Icons.arrow_forward)
+                                ? const Icon(Icons.check)
                                 : const Text('Siguiente'),
                           ),
                         ],
