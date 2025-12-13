@@ -18,12 +18,13 @@ class CombinedWordDialog extends StatefulWidget {
 }
 
 class _CombinedWordDialogState extends State<CombinedWordDialog> {
-  int _currentStep = 0; // 0 = definiciones, 1 = imágenes
+  int _currentStep = 0;
   int _selectedMeaningIndex = 0;
   int? _selectedDefinitionIndex;
-  bool _multipleSelection = false; // Toggle para selección múltiple
-  final List<Map<String, dynamic>> _selectedImageUrls =
-      []; // Set para múltiples imágenes
+  bool _multipleSelection = false;
+
+  // CAMBIO CRÍTICO: Guardar índices en lugar de objetos completos
+  final Set<int> _selectedImageIndices = {};
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +62,6 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Indicador de progreso
                   LinearProgressIndicator(
                     value: (_currentStep + 1) / 2,
                     backgroundColor: Colors.grey[200],
@@ -69,25 +69,13 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                         const AlwaysStoppedAnimation<Color>(Colors.blue),
                   ),
                   const SizedBox(height: 16),
-
-                  // Contenido según el paso actual
                   if (_currentStep == 0) ...[
-                    _buildDefinitionStep(
-                      definitions,
-                      esPequeno,
-                    ),
+                    _buildDefinitionStep(definitions, esPequeno),
                   ] else ...[
                     _buildImageStep(esPequeno),
                   ],
-
                   const SizedBox(height: 16),
-
-                  // Botones de acción
-                  _buildActionButtons(
-                    definitions,
-                    partOfSpeech,
-                    esPequeno,
-                  ),
+                  _buildActionButtons(definitions, partOfSpeech, esPequeno),
                 ],
               ),
             ),
@@ -97,15 +85,11 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
     );
   }
 
-  Widget _buildDefinitionStep(
-    List<dynamic> definitions,
-    bool esPequeno,
-  ) {
+  Widget _buildDefinitionStep(List<dynamic> definitions, bool esPequeno) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Part of Speech Selector
           DropdownButtonFormField<int>(
             value: _selectedMeaningIndex,
             decoration: const InputDecoration(
@@ -126,16 +110,12 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
               });
             },
           ),
-
           const SizedBox(height: 16),
-
-          // Definitions Section
           const Text(
             'Selecciona una definición:',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: 8),
-
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -149,10 +129,8 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                   final isSelected = _selectedDefinitionIndex == index;
 
                   return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     color: isSelected ? Colors.blue[50] : null,
                     elevation: isSelected ? 2 : 0,
                     child: InkWell(
@@ -166,35 +144,25 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                if (isSelected)
-                                  const Icon(
-                                    Icons.check_circle,
-                                    color: Colors.blue,
-                                    size: 20,
-                                  ),
-                                if (isSelected) const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    '${definition['definition']}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              definition['definition'],
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                              ),
                             ),
                             if (definition['example'] != null)
-                              Text(
-                                'Ej: "${definition['example']}"',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontStyle: FontStyle.italic,
-                                  color: Colors.grey[700],
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  'Ej: "${definition['example']}"',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.grey[700],
+                                  ),
                                 ),
                               ),
                           ],
@@ -230,11 +198,11 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                 onChanged: (value) {
                   setState(() {
                     _multipleSelection = value;
-                    // Si desactiva múltiple, mantener solo la primera seleccionada
-                    if (!value && _selectedImageUrls.length > 1) {
-                      final first = _selectedImageUrls.first;
-                      _selectedImageUrls.clear();
-                      _selectedImageUrls.add(first);
+                    // Si desactiva múltiple, mantener solo la primera
+                    if (!value && _selectedImageIndices.length > 1) {
+                      final first = _selectedImageIndices.first;
+                      _selectedImageIndices.clear();
+                      _selectedImageIndices.add(first);
                     }
                   });
                 },
@@ -242,32 +210,51 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
             ],
           ),
           const SizedBox(height: 8),
+
+          // Contador de imágenes seleccionadas
+          if (_selectedImageIndices.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.blue[200]!),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle, size: 16, color: Colors.blue[700]),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${_selectedImageIndices.length} imagen(es) seleccionada(s)',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue[700],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 8),
+
           if (widget.images.isEmpty)
             Expanded(
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.image_not_supported,
-                      size: 64,
-                      color: Colors.grey[400],
-                    ),
+                    Icon(Icons.image_not_supported,
+                        size: 64, color: Colors.grey[400]),
                     const SizedBox(height: 16),
                     Text(
                       'No hay imágenes disponibles',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Puedes continuar sin imagen',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[500],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                     ),
                   ],
                 ),
@@ -275,120 +262,119 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
             )
           else
             Expanded(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: GridView.builder(
-                        padding: const EdgeInsets.all(8),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                        ),
-                        itemCount: widget.images.length,
-                        itemBuilder: (context, index) {
-                          final imageUrl = widget.images[index];
-                          final isSelected =
-                              _selectedImageUrls.contains(imageUrl);
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(8),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: widget.images.length,
+                  itemBuilder: (context, index) {
+                    // CAMBIO CRÍTICO: Usar el índice para comparar
+                    final isSelected = _selectedImageIndices.contains(index);
+                    final imageData = widget.images[index];
+                    final imageUrl = imageData['url']['thumb'] ?? '';
 
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (_multipleSelection) {
-                                  // Modo múltiple: agregar/quitar de la lista
-                                  if (isSelected) {
-                                    _selectedImageUrls.remove(imageUrl);
-                                  } else {
-                                    _selectedImageUrls.add(imageUrl);
-                                  }
-                                } else {
-                                  // Modo simple: solo una imagen
-                                  if (isSelected) {
-                                    _selectedImageUrls.clear();
-                                  } else {
-                                    _selectedImageUrls.clear();
-                                    _selectedImageUrls.add(imageUrl);
-                                  }
-                                }
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: isSelected
-                                      ? Colors.blue
-                                      : Colors.grey.shade300,
-                                  width: isSelected ? 3 : 1,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(6),
-                                    child: Image.network(
-                                      imageUrl['url']['thumb'] ?? '',
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) =>
-                                          const Icon(Icons.broken_image),
-                                    ),
-                                  ),
-                                  if (isSelected)
-                                    Positioned(
-                                      top: 4,
-                                      right: 4,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.blue,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.check,
-                                          color: Colors.white,
-                                          size: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  // Número de orden en selección múltiple
-                                  if (isSelected &&
-                                      _multipleSelection &&
-                                      _selectedImageUrls.length > 1)
-                                    Positioned(
-                                      top: 4,
-                                      left: 4,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(6),
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue[700],
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Text(
-                                          '${_selectedImageUrls.toList().indexOf(imageUrl) + 1}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          Logger().i(
+                              'Tap en imagen index: $index, isSelected: $isSelected');
+
+                          if (_multipleSelection) {
+                            // Modo múltiple
+                            if (isSelected) {
+                              _selectedImageIndices.remove(index);
+                            } else {
+                              _selectedImageIndices.add(index);
+                            }
+                          } else {
+                            // Modo simple
+                            if (isSelected) {
+                              _selectedImageIndices.clear();
+                            } else {
+                              _selectedImageIndices.clear();
+                              _selectedImageIndices.add(index);
+                            }
+                          }
+
+                          Logger().i(
+                              'Índices seleccionados: $_selectedImageIndices');
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color:
+                                isSelected ? Colors.blue : Colors.grey.shade300,
+                            width: isSelected ? 3 : 1,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    const Icon(Icons.broken_image),
                               ),
                             ),
-                          );
-                        },
+                            if (isSelected)
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.blue,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                            // Número de orden
+                            if (isSelected &&
+                                _multipleSelection &&
+                                _selectedImageIndices.length > 1)
+                              Positioned(
+                                top: 4,
+                                left: 4,
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[700],
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    '${_selectedImageIndices.toList().indexOf(index) + 1}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                ],
+                    );
+                  },
+                ),
               ),
             ),
         ],
@@ -401,74 +387,91 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
     String partOfSpeech,
     bool esPequeno,
   ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Botón atrás (solo en paso 2)
-        if (_currentStep == 1)
-          TextButton.icon(
-            onPressed: () {
-              setState(() {
-                _currentStep = 0;
-              });
-            },
-            icon: const Icon(Icons.arrow_back),
-            label: esPequeno ? const SizedBox.shrink() : const Text('Atrás'),
-          )
-        else
-          const SizedBox.shrink(),
-
-        // Botones de la derecha
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child:
-                  esPequeno ? const Icon(Icons.close) : const Text('Cancelar'),
-            ),
-            const SizedBox(width: 8),
-
-            // Botón Siguiente o Guardar
-            if (_currentStep == 0)
-              ElevatedButton.icon(
-                onPressed: _selectedDefinitionIndex != null
-                    ? () {
-                        setState(() {
-                          _currentStep = 1;
-                        });
-                      }
-                    : null,
-                icon: const Icon(Icons.arrow_forward, size: 18),
-                label: esPequeno
-                    ? const SizedBox.shrink()
-                    : const Text('Siguiente'),
-              )
-            else
-              ElevatedButton.icon(
-                onPressed: () {
-                  final selectedDef = definitions[_selectedDefinitionIndex!];
-
-                  // Convertir las URLs seleccionadas a List<Map<String, dynamic>>
-                  Logger().i('Imagenes seleccionadas: $_selectedImageUrls');
-                  Navigator.pop(context, {
-                    'word': widget.word,
-                    'partOfSpeech': partOfSpeech,
-                    'definition': selectedDef['definition'],
-                    'example': selectedDef['example'],
-                    'synonyms': selectedDef['synonyms'] ?? [],
-                    'antonyms': selectedDef['antonyms'] ?? [],
-                    'images':
-                        _selectedImageUrls, // Ahora es List<Map<String, dynamic>>
-                  });
-                },
-                icon: const Icon(Icons.save, size: 18),
-                label:
-                    esPequeno ? const SizedBox.shrink() : const Text('Guardar'),
-              ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.white.withOpacity(0.0),
+            Colors.white.withOpacity(0.95),
+            Colors.white,
           ],
+          stops: const [0.0, 0.3, 1.0],
         ),
-      ],
+      ),
+      padding: const EdgeInsets.only(top: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          if (_currentStep == 1)
+            TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  _currentStep = 0;
+                });
+              },
+              icon: const Icon(Icons.arrow_back),
+              label: esPequeno ? const SizedBox.shrink() : const Text('Atrás'),
+            )
+          else
+            const SizedBox.shrink(),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: esPequeno
+                    ? const Icon(Icons.close)
+                    : const Text('Cancelar'),
+              ),
+              const SizedBox(width: 8),
+              if (_currentStep == 0)
+                ElevatedButton.icon(
+                  onPressed: _selectedDefinitionIndex != null
+                      ? () {
+                          setState(() {
+                            _currentStep = 1;
+                          });
+                        }
+                      : null,
+                  icon: const Icon(Icons.arrow_forward, size: 18),
+                  label: esPequeno
+                      ? const SizedBox.shrink()
+                      : const Text('Siguiente'),
+                )
+              else
+                ElevatedButton.icon(
+                  onPressed: () {
+                    final selectedDef = definitions[_selectedDefinitionIndex!];
+
+                    // CAMBIO CRÍTICO: Convertir índices a objetos
+                    final selectedImages = _selectedImageIndices
+                        .map((index) => widget.images[index])
+                        .toList();
+
+                    Logger().i('Índices seleccionados: $_selectedImageIndices');
+                    Logger().i('Imágenes seleccionadas: $selectedImages');
+
+                    Navigator.pop(context, {
+                      'word': widget.word,
+                      'partOfSpeech': partOfSpeech,
+                      'definition': selectedDef['definition'],
+                      'example': selectedDef['example'],
+                      'synonyms': selectedDef['synonyms'] ?? [],
+                      'antonyms': selectedDef['antonyms'] ?? [],
+                      'images': selectedImages,
+                    });
+                  },
+                  icon: const Icon(Icons.save, size: 18),
+                  label: esPequeno
+                      ? const SizedBox.shrink()
+                      : const Text('Guardar'),
+                ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
