@@ -129,13 +129,6 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
 
           const SizedBox(height: 16),
 
-          // Definitions Section
-          const Text(
-            'Selecciona una definición:',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-          ),
-          const SizedBox(height: 8),
-
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -168,13 +161,6 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                           children: [
                             Row(
                               children: [
-                                if (isSelected)
-                                  const Icon(
-                                    Icons.check_circle,
-                                    color: Colors.blue,
-                                    size: 20,
-                                  ),
-                                if (isSelected) const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     '${definition['definition']}',
@@ -220,24 +206,27 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
             children: [
               const Expanded(
                 child: Text(
-                  'Selecciona imagen(es):',
+                  'imagenes:',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
               const SizedBox(width: 8),
-              Switch(
-                value: _multipleSelection,
-                onChanged: (value) {
-                  setState(() {
-                    _multipleSelection = value;
-                    // Si desactiva múltiple, mantener solo la primera seleccionada
-                    if (!value && _selectedImageUrls.length > 1) {
-                      final first = _selectedImageUrls.first;
-                      _selectedImageUrls.clear();
-                      _selectedImageUrls.add(first);
-                    }
-                  });
-                },
+              Transform.scale(
+                scale: MediaQuery.of(context).size.width < 400 ? 0.8 : 1.0,
+                child: Switch(
+                  value: _multipleSelection,
+                  onChanged: (value) {
+                    setState(() {
+                      _multipleSelection = value;
+                      // Si desactiva múltiple, mantener solo la primera seleccionada
+                      if (!value && _selectedImageUrls.length > 1) {
+                        final first = _selectedImageUrls.first;
+                        _selectedImageUrls.clear();
+                        _selectedImageUrls.add(first);
+                      }
+                    });
+                  },
+                ),
               ),
             ],
           ),
@@ -423,6 +412,13 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextButton(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 4), // menos alto
+                minimumSize: const Size(0, 32), // altura mínima reducida
+                tapTargetSize:
+                    MaterialTapTargetSize.shrinkWrap, // quita espacio extra
+              ),
               onPressed: () => Navigator.pop(context),
               child:
                   esPequeno ? const Icon(Icons.close) : const Text('Cancelar'),
@@ -432,6 +428,13 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
             // Botón Siguiente o Guardar
             if (_currentStep == 0)
               ElevatedButton.icon(
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 4), // menos alto
+                  minimumSize: const Size(0, 32), // altura mínima reducida
+                  tapTargetSize:
+                      MaterialTapTargetSize.shrinkWrap, // quita espacio extra
+                ),
                 onPressed: _selectedDefinitionIndex != null
                     ? () {
                         setState(() {
@@ -446,6 +449,13 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
               )
             else
               ElevatedButton.icon(
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 4), // menos alto
+                  minimumSize: const Size(0, 32), // altura mínima reducida
+                  tapTargetSize:
+                      MaterialTapTargetSize.shrinkWrap, // quita espacio extra
+                ),
                 onPressed: () {
                   final selectedDef = definitions[_selectedDefinitionIndex!];
 
