@@ -45,7 +45,7 @@ class ImageRepositoryImpl implements ImageRepository {
               : imageData['user'] ?? 'Desconocido',
           url: imageData['url']['regular'],
           tinyurl: imageData['url']['thumb'],
-          source: imageData['source'] ?? 'Desconocida',
+          source: imageData['alt_description'] ?? 'Desconocida',
         );
 
         final id = await _imageDao.insertImage(imageModel);

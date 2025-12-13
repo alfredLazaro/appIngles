@@ -34,7 +34,7 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
                 children: [
                   Text(
                     'Seleccina imagenes',
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 16),
                   Expanded(
@@ -92,21 +92,46 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
                   ),
                   const SizedBox(height: 16),
                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Cancelar'),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: _selectedImages.isNotEmpty
-                          ? () {
-                              Logger().i(
-                                  'Imagenes seleccionadas: $_selectedImages');
-                              Navigator.of(context).pop(_selectedImages);
-                            }
-                          : null,
-                      child: const Text('confirmar'),
-                    ),
+                    LayoutBuilder(builder: (context, constraints) {
+                      final screenWidth = MediaQuery.of(context).size.width;
+                      final bool esPequeno = screenWidth < 600;
+
+                      // Si el diálogo es muy pequeño, la Row también lo será
+                      if (constraints.maxWidth < 180) {
+                        // Un umbral más bajo para solo iconos
+                        // Botón Cancelar (solo Icono)
+                        return TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Icon(Icons.close),
+                        );
+                      }
+                      return Row(
+                          mainAxisSize: MainAxisSize
+                              .min, // Importante para que la Row se ajuste al contenido
+                          children: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: esPequeno
+                                  ? const Icon(Icons.close)
+                                  : const Text('Cancelar'),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: (_selectedImages.isNotEmpty ||
+                                      widget.imageUrls.isEmpty)
+                                  ? () {
+                                      Logger().i(
+                                          'Imagenes seleccionadas: $_selectedImages');
+                                      Navigator.of(context)
+                                          .pop(_selectedImages);
+                                    }
+                                  : null,
+                              child: esPequeno
+                                  ? const Icon(Icons.save)
+                                  : const Text('confirmar'),
+                            ),
+                          ]);
+                    }),
                   ])
                 ],
               ))),
