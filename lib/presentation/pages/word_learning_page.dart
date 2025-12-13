@@ -1,4 +1,5 @@
 import 'package:first_app/domain/entities/word_sumary.dart';
+import 'package:first_app/presentation/widgets/combine_word_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/speech_to_text_service.dart';
@@ -23,6 +24,8 @@ class _WordLearningPageState extends State<WordLearningPage> {
   final TextEditingController _wordController = TextEditingController();
   final PageController _pageController = PageController();
   final SpeechToTextService _speechService = SpeechToTextService();
+  List<Map<String, dynamic>>? _tempDefinitions;
+  List<Map<String, dynamic>>? _tempImages;
   @override
   void initState() {
     super.initState();
@@ -61,7 +64,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
     }
 // 1. Buscar definiciones
     context.read<WordLearningBloc>().add(SearchWordDefinitionEvent(word));
-    //context.read<WordLearningBloc>().add(SearchWordImagesEvent(word));
+    context.read<WordLearningBloc>().add(SearchWordImagesEvent(word));
   }
 
   void _showError(String message) {
@@ -90,9 +93,11 @@ class _WordLearningPageState extends State<WordLearningPage> {
           if (state is WordLearningError) {
             _showError(state.message);
           } else if (state is DefinitionsLoaded) {
-            _handleDefinitionsLoaded(state.meanings);
+            _tempDefinitions = state.meanings;
+            _checkAndShowCombinedDialog();
           } else if (state is ImagesLoaded) {
-            _handleImagesLoaded(state.images);
+            _tempImages = state.images;
+            _checkAndShowCombinedDialog();
           } else if (state is WordSaved) {
             _showSuccess(
               'Palabra guardada con ${state.imagesCount} imagen(es)',
@@ -229,5 +234,46 @@ class _WordLearningPageState extends State<WordLearningPage> {
         );
 
     _tempSelectedDefinition = selectedDefinition;
+  }
+
+  void _checkAndShowCombinedDialog() {
+    // Solo mostrar cuando AMBOS resultados estén listos
+    if (_tempDefinitions != null && _tempImages != null) {
+      _showCombinedDialog();
+    }
+  }
+
+  Future<void> _showCombinedDialog() async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => CombinedWordDialog(
+        word: _wordController.text,
+        meanings: _tempDefinitions!,
+        images: _tempImages!,
+      ),
+    );
+
+    if (result != null && mounted) {
+      // Preparar las imágenes en el formato esperado
+      final selectedImages = result['imageUrl'] != null
+          ? [
+              {'url': result['imageUrl']}
+            ]
+          : <Map<String, dynamic>>[];
+
+      context.read<WordLearningBloc>().add(
+            SaveNewWordEvent(
+              wordData: result,
+              selectedImages: selectedImages,
+            ),
+          );
+    }
+
+    _resetTempData();
+  }
+
+  void _resetTempData() {
+    _tempDefinitions = null;
+    _tempImages = null;
   }
 }
