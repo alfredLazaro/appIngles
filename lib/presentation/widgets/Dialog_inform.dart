@@ -68,7 +68,7 @@ class _DefinitionSelectorState extends State<DefinitionSelector> {
               // Lista de definitiones con tamaño fijo
               const Text(
                 'definitiones:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
               ),
               const SizedBox(height: 8),
               Expanded(

@@ -93,9 +93,11 @@ class _WordLearningPageState extends State<WordLearningPage> {
           if (state is WordLearningError) {
             _showError(state.message);
           } else if (state is DefinitionsLoaded) {
+            //_handleDefinitionsLoaded(state.meanings);
             _tempDefinitions = state.meanings;
             _checkAndShowCombinedDialog();
           } else if (state is ImagesLoaded) {
+            //_handleImagesLoaded(state.images);
             _tempImages = state.images;
             _checkAndShowCombinedDialog();
           } else if (state is WordSaved) {
@@ -255,11 +257,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
 
     if (result != null && mounted) {
       // Preparar las imágenes en el formato esperado
-      final selectedImages = result['imageUrl'] != null
-          ? [
-              {'url': result['imageUrl']}
-            ]
-          : <Map<String, dynamic>>[];
+      final selectedImages = result['images'] ?? <Map<String, dynamic>>[];
 
       context.read<WordLearningBloc>().add(
             SaveNewWordEvent(

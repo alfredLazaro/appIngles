@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 class CombinedWordDialog extends StatefulWidget {
   final String word;
@@ -17,9 +18,12 @@ class CombinedWordDialog extends StatefulWidget {
 }
 
 class _CombinedWordDialogState extends State<CombinedWordDialog> {
+  int _currentStep = 0; // 0 = definiciones, 1 = imágenes
   int _selectedMeaningIndex = 0;
   int? _selectedDefinitionIndex;
-  String? _selectedImageUrl;
+  bool _multipleSelection = false; // Toggle para selección múltiple
+  final List<Map<String, dynamic>> _selectedImageUrls =
+      []; // Set para múltiples imágenes
 
   @override
   Widget build(BuildContext context) {
@@ -57,259 +61,32 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Header
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Nueva palabra: ${widget.word}',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
+                  // Indicador de progreso
+                  LinearProgressIndicator(
+                    value: (_currentStep + 1) / 2,
+                    backgroundColor: Colors.grey[200],
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.blue),
                   ),
-                  const Divider(),
-                  const SizedBox(height: 12),
-
-                  // Part of Speech Selector
-                  DropdownButtonFormField<int>(
-                    value: _selectedMeaningIndex,
-                    decoration: const InputDecoration(
-                      labelText: 'Categoría Gramatical',
-                      border: OutlineInputBorder(),
-                      isDense: true,
-                    ),
-                    items: List.generate(widget.meanings.length, (index) {
-                      return DropdownMenuItem<int>(
-                        value: index,
-                        child: Text(widget.meanings[index]['partOfSpeech']),
-                      );
-                    }),
-                    onChanged: (int? newIndex) {
-                      setState(() {
-                        _selectedMeaningIndex = newIndex!;
-                        _selectedDefinitionIndex = null;
-                      });
-                    },
-                  ),
-
                   const SizedBox(height: 16),
 
-                  // Definitions Section
-                  const Text(
-                    'Definiciones:',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: definitions.length,
-                        itemBuilder: (context, index) {
-                          final definition =
-                              definitions[index] as Map<String, dynamic>;
-                          final isSelected = _selectedDefinitionIndex == index;
-
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            color: isSelected ? Colors.blue[50] : null,
-                            elevation: isSelected ? 2 : 0,
-                            child: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  _selectedDefinitionIndex = index;
-                                });
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        if (isSelected)
-                                          const Icon(
-                                            Icons.check_circle,
-                                            color: Colors.blue,
-                                            size: 20,
-                                          ),
-                                        if (isSelected)
-                                          const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            '${index + 1}. ${definition['definition']}',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: isSelected
-                                                  ? FontWeight.w600
-                                                  : FontWeight.normal,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    if (definition['example'] != null)
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          top: 8.0,
-                                          left: 28,
-                                        ),
-                                        child: Text(
-                                          'Ej: "${definition['example']}"',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontStyle: FontStyle.italic,
-                                            color: Colors.grey[700],
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                  // Contenido según el paso actual
+                  if (_currentStep == 0) ...[
+                    _buildDefinitionStep(
+                      definitions,
+                      esPequeno,
                     ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Images Section
-                  if (widget.images.isNotEmpty) ...[
-                    const Text(
-                      'Seleccionar imagen (opcional):',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    const SizedBox(height: 8),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: GridView.builder(
-                          padding: const EdgeInsets.all(8),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: esPequeno ? 2 : 3,
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 8,
-                          ),
-                          itemCount: widget.images.length,
-                          itemBuilder: (context, index) {
-                            final image = widget.images[index];
-                            final imageUrl =
-                                image['url']['thumb'] ?? image['thumb'];
-                            final isSelected = _selectedImageUrl == imageUrl;
-
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _selectedImageUrl =
-                                      isSelected ? null : imageUrl;
-                                });
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? Colors.blue
-                                        : Colors.grey.shade300,
-                                    width: isSelected ? 3 : 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(6),
-                                      child: Image.network(
-                                        imageUrl,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) =>
-                                            const Icon(Icons.broken_image),
-                                      ),
-                                    ),
-                                    if (isSelected)
-                                      Positioned(
-                                        top: 4,
-                                        right: 4,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: const BoxDecoration(
-                                            color: Colors.blue,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(
-                                            Icons.check,
-                                            color: Colors.white,
-                                            size: 16,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+                  ] else ...[
+                    _buildImageStep(esPequeno),
                   ],
 
                   const SizedBox(height: 16),
 
-                  // Action Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: esPequeno
-                            ? const Icon(Icons.close)
-                            : const Text('Cancelar'),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: _selectedDefinitionIndex != null
-                            ? () {
-                                final selectedDef =
-                                    definitions[_selectedDefinitionIndex!];
-
-                                Navigator.pop(context, {
-                                  'word': widget.word,
-                                  'partOfSpeech': partOfSpeech,
-                                  'definition': selectedDef['definition'],
-                                  'example': selectedDef['example'],
-                                  'synonyms': selectedDef['synonyms'] ?? [],
-                                  'antonyms': selectedDef['antonyms'] ?? [],
-                                  'imageUrl': _selectedImageUrl,
-                                });
-                              }
-                            : null,
-                        child: esPequeno
-                            ? const Icon(Icons.save)
-                            : const Text('Guardar'),
-                      ),
-                    ],
+                  // Botones de acción
+                  _buildActionButtons(
+                    definitions,
+                    partOfSpeech,
+                    esPequeno,
                   ),
                 ],
               ),
@@ -317,6 +94,381 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildDefinitionStep(
+    List<dynamic> definitions,
+    bool esPequeno,
+  ) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Part of Speech Selector
+          DropdownButtonFormField<int>(
+            value: _selectedMeaningIndex,
+            decoration: const InputDecoration(
+              labelText: 'Categoría Gramatical',
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            items: List.generate(widget.meanings.length, (index) {
+              return DropdownMenuItem<int>(
+                value: index,
+                child: Text(widget.meanings[index]['partOfSpeech']),
+              );
+            }),
+            onChanged: (int? newIndex) {
+              setState(() {
+                _selectedMeaningIndex = newIndex!;
+                _selectedDefinitionIndex = null;
+              });
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Definitions Section
+          const Text(
+            'Selecciona una definición:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+          ),
+          const SizedBox(height: 8),
+
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ListView.builder(
+                itemCount: definitions.length,
+                itemBuilder: (context, index) {
+                  final definition = definitions[index] as Map<String, dynamic>;
+                  final isSelected = _selectedDefinitionIndex == index;
+
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    color: isSelected ? Colors.blue[50] : null,
+                    elevation: isSelected ? 2 : 0,
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedDefinitionIndex = index;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                if (isSelected)
+                                  const Icon(
+                                    Icons.check_circle,
+                                    color: Colors.blue,
+                                    size: 20,
+                                  ),
+                                if (isSelected) const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '${definition['definition']}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (definition['example'] != null)
+                              Text(
+                                'Ej: "${definition['example']}"',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageStep(bool esPequeno) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Selecciona imagen(es):',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Switch(
+                value: _multipleSelection,
+                onChanged: (value) {
+                  setState(() {
+                    _multipleSelection = value;
+                    // Si desactiva múltiple, mantener solo la primera seleccionada
+                    if (!value && _selectedImageUrls.length > 1) {
+                      final first = _selectedImageUrls.first;
+                      _selectedImageUrls.clear();
+                      _selectedImageUrls.add(first);
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (widget.images.isEmpty)
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.image_not_supported,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No hay imágenes disponibles',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Puedes continuar sin imagen',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            Expanded(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: GridView.builder(
+                        padding: const EdgeInsets.all(8),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
+                        itemCount: widget.images.length,
+                        itemBuilder: (context, index) {
+                          final imageUrl = widget.images[index];
+                          final isSelected =
+                              _selectedImageUrls.contains(imageUrl);
+
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (_multipleSelection) {
+                                  // Modo múltiple: agregar/quitar de la lista
+                                  if (isSelected) {
+                                    _selectedImageUrls.remove(imageUrl);
+                                  } else {
+                                    _selectedImageUrls.add(imageUrl);
+                                  }
+                                } else {
+                                  // Modo simple: solo una imagen
+                                  if (isSelected) {
+                                    _selectedImageUrls.clear();
+                                  } else {
+                                    _selectedImageUrls.clear();
+                                    _selectedImageUrls.add(imageUrl);
+                                  }
+                                }
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: isSelected
+                                      ? Colors.blue
+                                      : Colors.grey.shade300,
+                                  width: isSelected ? 3 : 1,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: Image.network(
+                                      imageUrl['url']['thumb'] ?? '',
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          const Icon(Icons.broken_image),
+                                    ),
+                                  ),
+                                  if (isSelected)
+                                    Positioned(
+                                      top: 4,
+                                      right: 4,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.blue,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.check,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  // Número de orden en selección múltiple
+                                  if (isSelected &&
+                                      _multipleSelection &&
+                                      _selectedImageUrls.length > 1)
+                                    Positioned(
+                                      top: 4,
+                                      left: 4,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue[700],
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Text(
+                                          '${_selectedImageUrls.toList().indexOf(imageUrl) + 1}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(
+    List<dynamic> definitions,
+    String partOfSpeech,
+    bool esPequeno,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Botón atrás (solo en paso 2)
+        if (_currentStep == 1)
+          TextButton.icon(
+            onPressed: () {
+              setState(() {
+                _currentStep = 0;
+              });
+            },
+            icon: const Icon(Icons.arrow_back),
+            label: esPequeno ? const SizedBox.shrink() : const Text('Atrás'),
+          )
+        else
+          const SizedBox.shrink(),
+
+        // Botones de la derecha
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child:
+                  esPequeno ? const Icon(Icons.close) : const Text('Cancelar'),
+            ),
+            const SizedBox(width: 8),
+
+            // Botón Siguiente o Guardar
+            if (_currentStep == 0)
+              ElevatedButton.icon(
+                onPressed: _selectedDefinitionIndex != null
+                    ? () {
+                        setState(() {
+                          _currentStep = 1;
+                        });
+                      }
+                    : null,
+                icon: const Icon(Icons.arrow_forward, size: 18),
+                label: esPequeno
+                    ? const SizedBox.shrink()
+                    : const Text('Siguiente'),
+              )
+            else
+              ElevatedButton.icon(
+                onPressed: () {
+                  final selectedDef = definitions[_selectedDefinitionIndex!];
+
+                  // Convertir las URLs seleccionadas a List<Map<String, dynamic>>
+                  Logger().i('Imagenes seleccionadas: $_selectedImageUrls');
+                  Navigator.pop(context, {
+                    'word': widget.word,
+                    'partOfSpeech': partOfSpeech,
+                    'definition': selectedDef['definition'],
+                    'example': selectedDef['example'],
+                    'synonyms': selectedDef['synonyms'] ?? [],
+                    'antonyms': selectedDef['antonyms'] ?? [],
+                    'images':
+                        _selectedImageUrls, // Ahora es List<Map<String, dynamic>>
+                  });
+                },
+                icon: const Icon(Icons.save, size: 18),
+                label:
+                    esPequeno ? const SizedBox.shrink() : const Text('Guardar'),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }
