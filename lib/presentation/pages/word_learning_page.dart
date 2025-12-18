@@ -23,6 +23,9 @@ class _WordLearningPageState extends State<WordLearningPage> {
   final TextEditingController _wordController = TextEditingController();
   final PageController _pageController = PageController();
   final SpeechToTextService _speechService = SpeechToTextService();
+  // Cache to keep the last loaded list so it doesn't disappear while searching
+  List<WordSummary> _cachedWords = [];
+  int _cachedPage = 0;
   @override
   void initState() {
     super.initState();
@@ -93,6 +96,10 @@ class _WordLearningPageState extends State<WordLearningPage> {
             _handleDefinitionsLoaded(state.meanings);
           } else if (state is ImagesLoaded) {
             _handleImagesLoaded(state.images);
+          } else if (state is WordsLoaded) {
+            // Update cache whenever words are (re)loaded
+            _cachedWords = state.words;
+            _cachedPage = state.currentPage;
           } else if (state is WordSaved) {
             _showSuccess(
               'Palabra guardada con ${state.imagesCount} imagen(es)',
@@ -102,34 +109,47 @@ class _WordLearningPageState extends State<WordLearningPage> {
         },
         child: BlocBuilder<WordLearningBloc, WordLearningState>(
           builder: (context, state) {
-            if (state is WordLearningLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+            final bool isLoading = state is WordLearningLoading;
             final List<WordSummary> words =
-                state is WordsLoaded ? state.words : [];
-            final currentPage = state is WordsLoaded ? state.currentPage : 0;
+                state is WordsLoaded ? state.words : _cachedWords;
+            final currentPage = state is WordsLoaded ? state.currentPage : _cachedPage;
 
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            return Stack(
               children: [
-                WordInputSection(
-                  controller: _wordController,
-                  isListening: _speechService.isListening,
-                  onListen: _toggleListening,
-                  onSave: _handleSaveWord,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    WordInputSection(
+                      controller: _wordController,
+                      isListening: _speechService.isListening,
+                      onListen: _toggleListening,
+                      onSave: _handleSaveWord,
+                    ),
+                    const SizedBox(height: 10),
+                    if (words.isNotEmpty)
+                      WordListSection(
+                        words: words,
+                        currentPage: currentPage,
+                        pageController: _pageController,
+                        onEdit: (word) => _showEditDialog(word),
+                        onCopy: (sentence) => _copySentence(sentence),
+                        onDelete: (id) => _deleteWord(id),
+                        onPageChanged: (page) => context
+                            .read<WordLearningBloc>()
+                            .add(ChangePageEvent(page)),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 10),
-                if (words.isNotEmpty)
-                  WordListSection(
-                    words: words,
-                    currentPage: currentPage,
-                    pageController: _pageController,
-                    onEdit: (word) => _showEditDialog(word),
-                    onCopy: (sentence) => _copySentence(sentence),
-                    onDelete: (id) => _deleteWord(id),
-                    onPageChanged: (page) => context
-                        .read<WordLearningBloc>()
-                        .add(ChangePageEvent(page)),
+                if (isLoading)
+                  const Positioned.fill(
+                    child: IgnorePointer(
+                      child: ColoredBox(
+                        color: Color(0x55FFFFFF),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    ),
                   ),
               ],
             );
