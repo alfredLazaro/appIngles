@@ -71,8 +71,6 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
           Expanded(
             child: PageView.builder(
               controller: _pageController,
-              /* physics:
-                  const NeverScrollableScrollPhysics(), // ✅ Solo con botones */
               itemCount: widget.words.length,
               onPageChanged: (index) {
                 setState(() {
