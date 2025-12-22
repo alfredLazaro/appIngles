@@ -358,11 +358,6 @@ class _SentenceBuilderWidgetState extends State<_SentenceBuilderWidget> {
               const SizedBox(height: 24),
 
               // ✅ Palabras disponibles
-              const Text(
-                'Palabras disponibles:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
               Container(
                 height: 260, // Altura máxima
                 decoration: BoxDecoration(
