@@ -77,14 +77,14 @@ class FlashcardBack extends StatelessWidget {
             ),
             const Spacer(),
             IconButton(
-              icon: Icon(Icons.volume_up, size: constraints.maxHeight * 0.04),
+              icon: Icon(Icons.volume_up, size: constraints.maxHeight * 0.05),
               onPressed: () => context
                   .read<FlashcardBloc>()
                   .add(SpeakFlashcardText(word.definition)),
             ),
           ],
         ),
-        SizedBox(height: constraints.maxHeight * 0.005),
+        SizedBox(height: constraints.maxHeight * 0.003),
         Text(
           word.definition,
           style: TextStyle(
@@ -121,7 +121,7 @@ class FlashcardBack extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: constraints.maxHeight * 0.005),
+        SizedBox(height: constraints.maxHeight * 0.003),
         Text(
           '"${word.sentence}"',
           style: TextStyle(
