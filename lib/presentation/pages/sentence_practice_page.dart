@@ -363,7 +363,8 @@ class _SentenceBuilderWidgetState extends State<_SentenceBuilderWidget> {
                 decoration: BoxDecoration(
                   color: Colors.grey[50],
                   borderRadius: BorderRadius.circular(12),
-                  //border: Border.all(color: Colors.grey[300]),
+                  border:
+                      Border.all(color: const Color.fromARGB(255, 46, 41, 41)),
                 ),
                 child: SingleChildScrollView(
                   child: Padding(
@@ -389,7 +390,6 @@ class _SentenceBuilderWidgetState extends State<_SentenceBuilderWidget> {
                 ),
               ),
               const Spacer(),
-
               // ✅ Botones de acción
               Row(
                 children: [
