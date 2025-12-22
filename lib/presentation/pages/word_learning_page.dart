@@ -9,8 +9,6 @@ import 'package:first_app/presentation/bloc/word_learning/word_learning_event.da
 import 'package:first_app/presentation/bloc/word_learning/word_learning_state.dart';
 import 'package:first_app/presentation/widgets/word_input_section.dart';
 import 'package:first_app/presentation/widgets/listshort/word_list_section.dart';
-import 'package:first_app/presentation/widgets/Dialog_inform.dart';
-import 'package:first_app/presentation/widgets/Dialog_Image.dart';
 import 'package:first_app/presentation/widgets/listshort/EditDialog.dart';
 
 /// Página principal refactorizada (antes Pagina1)
@@ -65,7 +63,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
       _showError('Por favor escribe una palabra');
       return;
     }
-// 1. Buscar definiciones
+    // 1. Buscar definiciones
     context.read<WordLearningBloc>().add(SearchWordDefinitionEvent(word));
     context.read<WordLearningBloc>().add(SearchWordImagesEvent(word));
   }
@@ -100,7 +98,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
             _tempDefinitions = state.meanings;
             _checkAndShowCombinedDialog();
           } else if (state is ImagesLoaded) {
-            _handleImagesLoaded(state.images);
+            _checkAndShowCombinedDialog();
           } else if (state is WordsLoaded) {
             // Update cache whenever words are (re)loaded
             _cachedWords = state.words;
@@ -165,34 +163,6 @@ class _WordLearningPageState extends State<WordLearningPage> {
     );
   }
 
-  Map<String, dynamic>? _tempSelectedDefinition;
-// Manejo de imágenes cargadas
-  Future<void> _handleImagesLoaded(
-    List<Map<String, dynamic>> images,
-  ) async {
-    if (_tempSelectedDefinition == null) return;
-
-    // Si hay imágenes, mostrar selector normal
-    final selectedImages = await showDialog<List<Map<String, dynamic>>>(
-      context: context,
-      builder: (_) => ImageSelectorDialog(
-        imageUrls: images,
-        allowMultipleSelection: false,
-      ),
-    );
-
-    if (selectedImages == null) return;
-
-    context.read<WordLearningBloc>().add(
-          SaveNewWordEvent(
-            wordData: _tempSelectedDefinition!,
-            selectedImages: selectedImages,
-          ),
-        );
-
-    _tempSelectedDefinition = null;
-  }
-
   void _showEditDialog(word) {
     showDialog(
       context: context,
@@ -236,25 +206,6 @@ class _WordLearningPageState extends State<WordLearningPage> {
         ],
       ),
     );
-  }
-
-  Future<void> _handleDefinitionsLoaded(
-    List<Map<String, dynamic>> meanings,
-  ) async {
-    final selectedDefinition = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (_) => DefinitionSelector(meanings: meanings),
-    );
-
-    if (selectedDefinition == null) return;
-
-    selectedDefinition['word'] = _wordController.text;
-    if (!mounted) return;
-    context.read<WordLearningBloc>().add(
-          SearchWordImagesEvent(_wordController.text),
-        );
-
-    _tempSelectedDefinition = selectedDefinition;
   }
 
   void _checkAndShowCombinedDialog() {
