@@ -62,7 +62,7 @@ class ImageService {
         throw Exception('No se encontraron imageners para "$nImg"');
       }
       final List<Map<String, dynamic>> images =
-          (response.data['results'] as List).map((photo) {
+      (response.data['results'] as List).map((photo) {
         return {
           'id': photo['id'],
           'url': {
@@ -72,7 +72,7 @@ class ImageService {
             'thumb': photo['urls']?['thumb'] ?? 'https://default-image-url.com',
           },
           'user': {'name': photo['user']?['name'] ?? 'Autor desconocido'},
-          'alt_description': photo['alt_description'] ?? 'Imagen de $nImg',
+          'alt_description': 'Unsplash',
         };
       }).toList();
       return images;
