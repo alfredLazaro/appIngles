@@ -22,6 +22,7 @@ class SentenceBuilderWidget extends StatefulWidget {
 
 class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
   late List<String> _shuffledWords;
+    late List<bool> _wordVisibility;
   late List<String> _userSentence;
   bool _isCorrect = false;
   bool _showResult = false;
@@ -35,9 +36,8 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
   void _initializeWords() {
     // Dividir oración en palabras
     final words = widget.originalSentence.split(' ');
-
-    // Mezclar palabras
     _shuffledWords = List.from(words)..shuffle(Random());
+    _wordVisibility = List.filled(_shuffledWords.length, true);
     _userSentence = [];
     _isCorrect = false;
     _showResult = false;
@@ -140,7 +140,10 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
                                 color: Colors.blue,
                                 onTap: () {
                                   setState(() {
-                                    _shuffledWords.add(entry.value);
+                                    final originalIndex = _shuffledWords.indexOf(entry.value);
+                                    if (originalIndex != -1) {
+                                      _wordVisibility[originalIndex] = true;
+                                    }
                                     _userSentence.removeAt(entry.key);
                                     _showResult = false;
                                   });
@@ -168,17 +171,26 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
                     child: Wrap(
                       spacing: 5,
                       runSpacing: -3,
-                      children: _shuffledWords.map((word) {
-                        return _WordChip(
-                          word: word,
-                          color: const Color.fromARGB(255, 40, 37, 204),
-                          onTap: () {
-                            setState(() {
-                              _userSentence.add(word);
-                              _shuffledWords.remove(word);
-                              _showResult = false;
-                            });
-                          },
+                      children: _shuffledWords.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final word = entry.value;
+                        
+                        return Visibility(
+                          visible: _wordVisibility[index], // ✅ Control de visibilidad
+                          maintainSize: true,              // ✅ Mantiene el espacio
+                          maintainAnimation: true,
+                          maintainState: true,
+                          child: _WordChip(
+                            word: word,
+                            color: const Color.fromARGB(255, 40, 37, 204),
+                            onTap: () {
+                              setState(() {
+                                _userSentence.add(word);
+                                _wordVisibility[index] = false; // ✅ Ocultar, no eliminar
+                                _showResult = false;
+                              });
+                            },
+                          ),
                         );
                       }).toList(),
                     ),
