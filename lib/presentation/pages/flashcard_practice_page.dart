@@ -294,7 +294,10 @@ class _FlashcardPageItem extends StatelessWidget {
                 backgroundColor: state.isCorrect ? Colors.green : Colors.red,
                 duration: const Duration(seconds: 1),
               ),
-            );
+            ).closed.then((_) {
+              // ✅ Voltear la tarjeta cuando el SnackBar termine
+              context.read<FlashcardBloc>().add(FlipFlashcard());
+            });
           }
 
           // ✅ Actualizar contador cuando cambie learnCount
