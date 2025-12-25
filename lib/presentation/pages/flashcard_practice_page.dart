@@ -41,8 +41,11 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
-      appBar: AppBar(
+      appBar: isKeyboardVisible
+        ? null
+        : AppBar(
         title: Text('Práctica (${_currentIndex + 1}/${widget.words.length})'),
         actions: [
           Center(
@@ -60,12 +63,13 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
       body: Column(
         children: [
           // ✅ Barra de progreso
-          LinearProgressIndicator(
-            value: (_currentIndex + 1) / widget.words.length,
-            minHeight: 6,
-            backgroundColor: Colors.grey[300],
-            valueColor: const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
-          ),
+          if (!isKeyboardVisible)
+            LinearProgressIndicator(
+              value: (_currentIndex + 1) / widget.words.length,
+              minHeight: 6,
+              backgroundColor: Colors.grey[300],
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+            ),
 
           // ✅ PageView con flashcards
           Expanded(
@@ -95,44 +99,45 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
           ),
 
           // ✅ Controles de navegación (ahora reutilizable)
-          PageNavigationControls(
-            currentIndex: _currentIndex,
-            totalPages: widget.words.length,
-            onPrevious: () {
-              _pageController.previousPage(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            },
-            onNext: _currentIndex < widget.words.length - 1
-                ? () {
-                    _pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  }
-                : () => _showCompletionDialog(),
-            centerWidget: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${_currentIndex + 1} / ${widget.words.length}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (_scores.isNotEmpty)
+          if (!isKeyboardVisible)
+            PageNavigationControls(
+              currentIndex: _currentIndex,
+              totalPages: widget.words.length,
+              onPrevious: () {
+                _pageController.previousPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              },
+              onNext: _currentIndex < widget.words.length - 1
+                  ? () {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  : () => _showCompletionDialog(),
+              centerWidget: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Text(
-                    '${_scores.values.where((s) => s > 0).length} aprendidas',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
+                    '${_currentIndex + 1} / ${widget.words.length}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-              ],
+                  if (_scores.isNotEmpty)
+                    Text(
+                      '${_scores.values.where((s) => s > 0).length} aprendidas',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );
