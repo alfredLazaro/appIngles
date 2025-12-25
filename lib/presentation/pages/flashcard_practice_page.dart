@@ -94,90 +94,42 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             ),
           ),
 
-          // ✅ Controles de navegación
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -3),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // ✅ Controles de navegación (ahora reutilizable)
+          PageNavigationControls(
+            currentIndex: _currentIndex,
+            totalPages: widget.words.length,
+            onPrevious: () {
+              _pageController.previousPage(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            },
+            onNext: _currentIndex < widget.words.length - 1
+                ? () {
+                    _pageController.nextPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  }
+                : () => _showCompletionDialog(),
+            centerWidget: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Botón Anterior
-                ElevatedButton.icon(
-                  onPressed: _currentIndex > 0
-                      ? () {
-                          _pageController.previousPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      : null,
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Anterior'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                Text(
+                  '${_currentIndex + 1} / ${widget.words.length}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-
-                // Contador
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${_currentIndex + 1} / ${widget.words.length}',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                if (_scores.isNotEmpty)
+                  Text(
+                    '${_scores.values.where((s) => s > 0).length} aprendidas',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
                     ),
-                    if (_scores.isNotEmpty)
-                      Text(
-                        '${_scores.values.where((s) => s > 0).length} aprendidas',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                  ],
-                ),
-
-                // Botón Siguiente/Finalizar
-                ElevatedButton.icon(
-                  onPressed: _currentIndex < widget.words.length - 1
-                      ? () {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      : () => _showCompletionDialog(),
-                  icon: Icon(
-                    _currentIndex < widget.words.length - 1
-                        ? Icons.arrow_forward
-                        : Icons.check_circle,
                   ),
-                  label: Text(
-                    _currentIndex < widget.words.length - 1
-                        ? 'Siguiente'
-                        : 'Finalizar',
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _currentIndex < widget.words.length - 1
-                        ? null
-                        : Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
-                  ),
-                ),
               ],
             ),
           ),
