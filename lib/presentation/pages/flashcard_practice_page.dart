@@ -1,5 +1,7 @@
 import 'package:first_app/data/datasources/local/WordDao.dart';
 import 'package:first_app/domain/repositories/flashcard_repository.dart';
+import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
+import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/tts_service.dart';
@@ -44,22 +46,23 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
       appBar: isKeyboardVisible
-        ? null
-        : AppBar(
-        title: Text('Práctica (${_currentIndex + 1}/${widget.words.length})'),
-        actions: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Text(
-                '${((_currentIndex + 1) / widget.words.length * 100).toInt()}%',
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+          ? null
+          : AppBar(
+              title: Text(
+                  'Práctica (${_currentIndex + 1}/${widget.words.length})'),
+              actions: [
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: Text(
+                      '${((_currentIndex + 1) / widget.words.length * 100).toInt()}%',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
       body: Column(
         children: [
           // ✅ Barra de progreso
@@ -68,7 +71,8 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
               value: (_currentIndex + 1) / widget.words.length,
               minHeight: 6,
               backgroundColor: Colors.grey[300],
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
             ),
 
           // ✅ PageView con flashcards
@@ -160,9 +164,9 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.celebration, color: Colors.amber, size: 30),
-                  const SizedBox(width: 8),
-                  const Text(
+                  Icon(Icons.celebration, color: Colors.amber, size: 30),
+                  SizedBox(width: 8),
+                  Text(
                     '¡Práctica completada!',
                     style: TextStyle(
                       fontSize: 20,
@@ -286,15 +290,19 @@ class _FlashcardPageItem extends StatelessWidget {
         listener: (context, state) {
           // Escuchar validación de respuesta
           if (state is FlashcardAnswerValidated) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.isCorrect ? '¡Correcto! ✅' : 'Incorrecto ❌',
-                ),
-                backgroundColor: state.isCorrect ? Colors.green : Colors.red,
-                duration: const Duration(seconds: 1),
-              ),
-            ).closed.then((_) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      state.isCorrect ? '¡Correcto! ✅' : 'Incorrecto ❌',
+                    ),
+                    backgroundColor:
+                        state.isCorrect ? Colors.green : Colors.red,
+                    duration: const Duration(seconds: 1),
+                  ),
+                )
+                .closed
+                .then((_) {
               // ✅ Voltear la tarjeta cuando el SnackBar termine
               context.read<FlashcardBloc>().add(FlipFlashcard());
             });

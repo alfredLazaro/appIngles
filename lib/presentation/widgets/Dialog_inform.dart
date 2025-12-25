@@ -43,7 +43,7 @@ class _DefinitionSelectorState extends State<DefinitionSelector> {
 
               // Selector de Part of Speech
               DropdownButtonFormField<int>(
-                value: _selectedMeaningIndex,
+                initialValue: _selectedMeaningIndex,
                 decoration: const InputDecoration(
                   labelText: 'Cat. Gramatical',
                   border: OutlineInputBorder(),

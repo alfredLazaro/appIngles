@@ -6,6 +6,7 @@ class PracticeSelectionModal extends StatefulWidget {
   final String title; // ✅ Nuevo parámetro
   final String description;
   const PracticeSelectionModal({
+    super.key,
     required this.totalWords,
     required this.onStartPractice,
     this.title = 'Modo Práctica', // ✅ Valor por defecto

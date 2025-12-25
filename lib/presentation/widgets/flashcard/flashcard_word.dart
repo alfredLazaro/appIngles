@@ -1,3 +1,6 @@
+import 'package:first_app/domain/entities/flashcard_image.dart';
+import 'package:first_app/domain/entities/flashcard_word.dart';
+import 'package:first_app/presentation/widgets/flashcard/flashcard_image.dart';
 import 'package:flutter/material.dart';
 
 /// Widget Flashcard simple - muestra toda la info en el frente
@@ -46,9 +49,9 @@ class WordFlashcard extends StatelessWidget {
                   images: images,
                   height: constraints.maxHeight * 0.35,
                 ),
-                
+
                 SizedBox(height: constraints.maxHeight * 0.02),
-                
+
                 // ✅ Palabra principal
                 Center(
                   child: FittedBox(
@@ -64,9 +67,9 @@ class WordFlashcard extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 SizedBox(height: constraints.maxHeight * 0.02),
-                
+
                 // ✅ Definición
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -109,9 +112,9 @@ class WordFlashcard extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 SizedBox(height: constraints.maxHeight * 0.015),
-                
+
                 // ✅ Oración de ejemplo
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -155,9 +158,9 @@ class WordFlashcard extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 const Spacer(),
-                
+
                 // ✅ Contador de aprendizaje (opcional, en la parte inferior)
                 if (word.learnCount > 0)
                   Center(
