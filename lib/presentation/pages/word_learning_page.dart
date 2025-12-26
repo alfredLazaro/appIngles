@@ -98,6 +98,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
             _tempDefinitions = state.meanings;
             _checkAndShowCombinedDialog();
           } else if (state is ImagesLoaded) {
+            _tempImages = state.images;
             _checkAndShowCombinedDialog();
           } else if (state is WordsLoaded) {
             // Update cache whenever words are (re)loaded
@@ -162,6 +163,37 @@ class _WordLearningPageState extends State<WordLearningPage> {
       ),
     );
   }
+  void _checkAndShowCombinedDialog() {
+    // Solo mostrar cuando AMBOS resultados estén listos
+    if (_tempDefinitions != null && _tempImages != null) {
+      _showCombinedDialog();
+    }
+  }
+
+  Future<void> _showCombinedDialog() async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => CombinedWordDialog(
+        word: _wordController.text,
+        meanings: _tempDefinitions!,
+        images: _tempImages!,
+      ),
+    );
+
+    if (result != null && mounted) {
+      // Preparar las imágenes en el formato esperado
+      final selectedImages = result['images'] ?? <Map<String, dynamic>>[];
+
+      context.read<WordLearningBloc>().add(
+            SaveNewWordEvent(
+              wordData: result,
+              selectedImages: selectedImages,
+            ),
+          );
+    }
+
+    _resetTempData();
+  }
 
   void _showEditDialog(word) {
     showDialog(
@@ -208,37 +240,6 @@ class _WordLearningPageState extends State<WordLearningPage> {
     );
   }
 
-  void _checkAndShowCombinedDialog() {
-    // Solo mostrar cuando AMBOS resultados estén listos
-    if (_tempDefinitions != null && _tempImages != null) {
-      _showCombinedDialog();
-    }
-  }
-
-  Future<void> _showCombinedDialog() async {
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (_) => CombinedWordDialog(
-        word: _wordController.text,
-        meanings: _tempDefinitions!,
-        images: _tempImages!,
-      ),
-    );
-
-    if (result != null && mounted) {
-      // Preparar las imágenes en el formato esperado
-      final selectedImages = result['images'] ?? <Map<String, dynamic>>[];
-
-      context.read<WordLearningBloc>().add(
-            SaveNewWordEvent(
-              wordData: result,
-              selectedImages: selectedImages,
-            ),
-          );
-    }
-
-    _resetTempData();
-  }
 
   void _resetTempData() {
     _tempDefinitions = null;
