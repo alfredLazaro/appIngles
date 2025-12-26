@@ -458,7 +458,7 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                 ),
                 onPressed: () {
                   final selectedDef = definitions[_selectedDefinitionIndex!];
-
+                  String phonethics = definitions['phonethic']; //debo actualizar esto
                   // Convertir las URLs seleccionadas a List<Map<String, dynamic>>
                   Logger().i('Imagenes seleccionadas: $_selectedImageUrls');
                   Navigator.pop(context, {
