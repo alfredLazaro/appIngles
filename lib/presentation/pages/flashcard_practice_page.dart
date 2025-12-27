@@ -65,7 +65,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             ),
       body: Column(
         children: [
-          // ✅ Barra de progreso
+          // Barra de progreso
           if (!isKeyboardVisible)
             LinearProgressIndicator(
               value: (_currentIndex + 1) / widget.words.length,
@@ -75,7 +75,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                   const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
             ),
 
-          // ✅ PageView con flashcards
+          // PageView con flashcards
           Expanded(
             child: PageView.builder(
               controller: _pageController,
@@ -102,7 +102,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             ),
           ),
 
-          // ✅ Controles de navegación (ahora reutilizable)
+          // Controles de navegación (ahora reutilizable)
           if (!isKeyboardVisible)
             PageNavigationControls(
               currentIndex: _currentIndex,
@@ -175,7 +175,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   }
 }
 
-// ✅ Widget individual para cada flashcard con su propio BLoC
+// Widget individual para cada flashcard con su propio BLoC
 class _FlashcardPageItem extends StatelessWidget {
   final FlashcardWord word;
   final List<FlashcardImage> images;
@@ -226,12 +226,12 @@ class _FlashcardPageItem extends StatelessWidget {
                 )
                 .closed
                 .then((_) {
-              // ✅ Voltear la tarjeta cuando el SnackBar termine
+              // Voltear la tarjeta cuando el SnackBar termine
               context.read<FlashcardBloc>().add(FlipFlashcard());
             });
           }
 
-          // ✅ Actualizar contador cuando cambie learnCount
+          // Actualizar contador cuando cambie learnCount
           if (state is FlashcardLoaded) {
             onLearnedUpdated(state.learnCount);
           }

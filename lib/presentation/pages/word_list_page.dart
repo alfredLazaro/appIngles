@@ -22,7 +22,7 @@ class WordListPage extends StatefulWidget {
 
 class _WordListPageState extends State<WordListPage> {
   final WordDao wordDao = WordDao();
-  final ImageDao imageDao = ImageDao(); // ✅ AGREGAR ESTO
+  final ImageDao imageDao = ImageDao(); 
   late Future<List<WordWithImage>> _futureWords;
   Logger log = Logger();
   @override
@@ -42,7 +42,6 @@ class _WordListPageState extends State<WordListPage> {
       appBar: AppBar(
         title: const Text("My Words"),
         actions: [
-          // ✅ AGREGAR ESTE BOTÓN
           IconButton(
             icon: const Icon(Icons.school),
             onPressed: _showPracticeModal,
