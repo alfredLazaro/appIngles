@@ -1,4 +1,4 @@
-import 'package:first_app/data/models/pf_ing_model.dart';
+import 'package:first_app/data/models/word_model.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:logger/logger.dart';
@@ -6,7 +6,7 @@ import 'package:logger/logger.dart';
 /// Convierte entre modelo de datos y entidad de dominio
 class WordMapper {
   static final _logger = Logger();
-  static Word toEntity(PfIng model) {
+  static Word toEntity(WordModel model) {
     // ✅ Debug: Ver qué datos llegan
     _logger.d('Parseando palabra: ${model.word}');
     _logger.d('createdAt: "${model.createdAt}"');
@@ -22,8 +22,8 @@ class WordMapper {
     );
   }
 
-  static PfIng toModel(Word entity) {
-    return PfIng(
+  static WordModel toModel(Word entity) {
+    return WordModel(
       id: entity.id,
       word: entity.word,
       definition: entity.definition,
@@ -34,7 +34,7 @@ class WordMapper {
     );
   }
 
-  static List<Word> toEntityList(List<PfIng> models) {
+  static List<Word> toEntityList(List<WordModel> models) {
     return models.map((model) => toEntity(model)).toList();
   }
 

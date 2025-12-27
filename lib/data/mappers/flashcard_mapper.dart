@@ -1,11 +1,11 @@
-import 'package:first_app/data/models/pf_ing_model.dart';
+import 'package:first_app/data/models/word_model.dart';
 import 'package:first_app/data/models/image_model.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
 
 /// Convierte modelos de datos a entidades de dominio
 class FlashcardMapper {
-  static FlashcardWord toEntity(PfIng model) {
+  static FlashcardWord toEntity(WordModel model) {
     return FlashcardWord(
       id: model.id!,
       word: model.word,

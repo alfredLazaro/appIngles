@@ -1,5 +1,5 @@
 import 'package:first_app/data/mappers/word_with_image.dart';
-import 'package:first_app/data/models/pf_ing_model.dart';
+import 'package:first_app/data/models/word_model.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/presentation/pages/sentence_practice_page.dart';
@@ -22,7 +22,7 @@ class WordListPage extends StatefulWidget {
 
 class _WordListPageState extends State<WordListPage> {
   final WordDao wordDao = WordDao();
-  final ImageDao imageDao = ImageDao(); 
+  final ImageDao imageDao = ImageDao();
   late Future<List<WordWithImage>> _futureWords;
   Logger log = Logger();
   @override
@@ -109,7 +109,7 @@ class _WordListPageState extends State<WordListPage> {
 
       // 5. Convertir a entidades FlashcardWord
       final flashcardWords = selectedMaps.map((map) {
-        final pfIng = PfIng(
+        final pfIng = WordModel(
           id: map['id'],
           word: map['word'] ?? '',
           definition: map['definition'] ?? '',
@@ -118,7 +118,7 @@ class _WordListPageState extends State<WordListPage> {
           createdAt: map['createdAt'] ?? DateTime.now().toIso8601String(),
           updatedAt: map['updatedAt'] ?? DateTime.now().toIso8601String(),
         );
-        return FlashcardMapper.toEntity(pfIng); //recibe PfIng model
+        return FlashcardMapper.toEntity(pfIng); //recibe WordModel model
       }).toList();
 
       // 6. Convertir imágenes a entidades

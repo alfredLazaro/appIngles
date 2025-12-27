@@ -1,4 +1,4 @@
-class PfIng {
+class WordModel {
   final int? id;
   final String word;
   final String definition;
@@ -7,7 +7,7 @@ class PfIng {
   String createdAt;
   String updatedAt;
 
-  PfIng({
+  WordModel({
     this.id,
     required this.word,
     required this.definition,
@@ -17,7 +17,7 @@ class PfIng {
     required this.updatedAt,
   });
 
-  PfIng copyWith({
+  WordModel copyWith({
     int? id,
     String? word,
     String? definition,
@@ -26,7 +26,7 @@ class PfIng {
     String? createdAt,
     String? updatedAt,
   }) {
-    return PfIng(
+    return WordModel(
       id: id ?? this.id,
       word: word ?? this.word,
       definition: definition ?? this.definition,
@@ -37,7 +37,7 @@ class PfIng {
     );
   }
 
-  PfIng.partial({
+  WordModel.partial({
     this.id,
     required this.word,
     required this.sentence,
@@ -46,8 +46,8 @@ class PfIng {
         createdAt = '',
         updatedAt = '';
 
-  factory PfIng.fromMap(Map<String, dynamic> map) {
-    return PfIng(
+  factory WordModel.fromMap(Map<String, dynamic> map) {
+    return WordModel(
       id: map['id'],
       definition: map['definition'],
       word: map['word'],
@@ -57,8 +57,8 @@ class PfIng {
       updatedAt: map['updated_at'],
     );
   }
-  factory PfIng.fromPartialMap(Map<String, dynamic> map) {
-    return PfIng.partial(
+  factory WordModel.fromPartialMap(Map<String, dynamic> map) {
+    return WordModel.partial(
       id: map['id'],
       word: map['word'],
       sentence: map['sentence'],
@@ -75,8 +75,8 @@ class PfIng {
     };
   }
 
-  factory PfIng.fromJson(Map<String, dynamic> json) {
-    return PfIng(
+  factory WordModel.fromJson(Map<String, dynamic> json) {
+    return WordModel(
       id: json['id'],
       definition: json['definition'],
       word: json['word'],

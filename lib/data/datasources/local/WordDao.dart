@@ -1,11 +1,11 @@
 import "package:sqflite/sqflite.dart";
-import "../../models/pf_ing_model.dart";
+import "../../models/word_model.dart";
 import "DataBaseHelper.dart";
 
 class WordDao {
   final dbHelper = DatabaseService();
 
-  Future<int> insertWord(PfIng pfIng) async {
+  Future<int> insertWord(WordModel pfIng) async {
     final db = await dbHelper.database;
     final id = await db.insert(
       'Word',
@@ -15,16 +15,16 @@ class WordDao {
     return id;
   }
 
-  Future<List<PfIng>> getAllPfIng() async {
+  Future<List<WordModel>> getAllPfIng() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query('Word');
 
     return List.generate(maps.length, (i) {
-      return PfIng.fromMap(maps[i]);
+      return WordModel.fromMap(maps[i]);
     });
   }
 
-  Future<List<PfIng>> getAllWordBasic() async {
+  Future<List<WordModel>> getAllWordBasic() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'Word',
@@ -36,11 +36,11 @@ class WordDao {
     );
 
     return List.generate(maps.length, (i) {
-      return PfIng.fromPartialMap(maps[i]); // Usa un constructor adaptado
+      return WordModel.fromPartialMap(maps[i]); // Usa un constructor adaptado
     });
   }
 
-/*   Future<List<PfIng>> getLastPfIngBasic() async {
+/*   Future<List<WordModel>> getLastPfIngBasic() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'Word',
@@ -50,7 +50,7 @@ class WordDao {
     );
 
     return List.generate(maps.length, (i) {
-      return PfIng.fromPartialMap(maps[i]);
+      return WordModel.fromPartialMap(maps[i]);
     });
   } */
 
@@ -66,7 +66,7 @@ class WordDao {
     return maps;
   }
 
-  Future<void> updatePfIng(PfIng pfIng) async {
+  Future<void> updatePfIng(WordModel pfIng) async {
     final db = await dbHelper.database;
     pfIng.updatedAt = DateTime.now().toIso8601String();
     await db.update(
