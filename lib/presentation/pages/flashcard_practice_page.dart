@@ -154,99 +154,22 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => Dialog(
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Título
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.celebration, color: Colors.amber, size: 30),
-                  SizedBox(width: 8),
-                  Text(
-                    '¡Práctica completada!',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Contenido
-              Text(
-                'Has practicado $totalWords palabras.',
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 16),
-
-              // Caja de palabras aprendidas
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.green),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        '$learnedCount palabras marcadas como aprendidas',
-                        style: const TextStyle(fontWeight: FontWeight.w500),
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.visible,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Botones
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.pop(dialogContext); // Cerrar dialog
-                        Navigator.pop(context); // Volver
-                      },
-                      child: const Text('Finalizar'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(dialogContext);
-                        setState(() {
-                          _currentIndex = 0;
-                          _scores.clear();
-                          _pageController.jumpToPage(0);
-                        });
-                      },
-                      icon: const Icon(Icons.replay),
-                      label: const Text('Repetir'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+      builder: (dialogContext) => CompletionDialog(
+        totalItems: totalWords,
+        learnedCount: learnedCount,
+        itemName: 'palabras',
+        onFinish: () => Navigator.pop(dialogContext),
+        onRepeat: () {
+          Navigator.pop(dialogContext);
+          setState(() {
+            _currentIndex = 0;
+            _scores.clear();
+            _pageController.jumpToPage(0);
+          });
+        },
+        // Opcional: personalización
+        customTitle: '¡Lección completada!',
+        primaryColor: Theme.of(dialogContext).colorScheme.secondary,
       ),
     );
   }
