@@ -1,5 +1,5 @@
 import 'package:first_app/domain/entities/word_sumary.dart';
-import 'package:first_app/presentation/widgets/combine_word_dialog.dart';
+import 'package:first_app/presentation/widgets/dialogs/combine_word_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/speech_to_text_service.dart';
@@ -163,6 +163,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
       ),
     );
   }
+
   void _checkAndShowCombinedDialog() {
     // Solo mostrar cuando AMBOS resultados estén listos
     if (_tempDefinitions != null && _tempImages != null) {
@@ -239,7 +240,6 @@ class _WordLearningPageState extends State<WordLearningPage> {
       ),
     );
   }
-
 
   void _resetTempData() {
     _tempDefinitions = null;

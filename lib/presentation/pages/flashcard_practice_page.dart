@@ -2,6 +2,7 @@ import 'package:first_app/data/datasources/local/WordDao.dart';
 import 'package:first_app/domain/repositories/flashcard_repository.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
+import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/tts_service.dart';

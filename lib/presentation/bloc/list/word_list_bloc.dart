@@ -1,3 +1,4 @@
+import 'package:first_app/data/mappers/word_with_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/data/repositories/word_repository_impl.dart';
 import 'word_list_event.dart';
@@ -12,17 +13,18 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   }
 
 //no funciona por que no tengo el metodo implementado en wordRepository
-  Future<void> _onLoadWords(LoadWordsEvent event, Emitter<WordListState> emit) async {
+  Future<void> _onLoadWords(
+      LoadWordsEvent event, Emitter<WordListState> emit) async {
     emit(WordListLoading());
-    try {
+    /* try {
       // Usamos el repositorio que ya limpia los datos del DAO
       // Nota: Asegúrate que tu repositorio tenga este método o usa el UseCase directamente
       final maps = await wordRepository.wordDao.getAllWordsWithImages();
       final words = WordWithImageMapper.fromMapList(maps);
-      
+
       emit(WordListLoaded(words));
     } catch (e) {
       emit(WordListError("Error al cargar palabras: ${e.toString()}"));
-    }
+    } */
   }
 }
