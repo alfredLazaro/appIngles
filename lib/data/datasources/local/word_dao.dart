@@ -222,4 +222,124 @@ class WordDao {
       debugPrint('   Context: $context');
     }
   }
+
+  Future<WordModel?> getWordById(int id) async {
+    try {
+      final db = await dbHelper.database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        'Word',
+        where: 'id = ?',
+        whereArgs: [id],
+        limit: 1,
+      );
+
+      if (maps.isEmpty) return null;
+      return WordModel.fromMap(maps.first);
+    } catch (e) {
+      _logError('getWordById', e, {'id': id});
+      return null;
+    }
+  }
+
+  Future<bool> wordExists(String word) async {
+    try {
+      final db = await dbHelper.database;
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) FROM Word WHERE LOWER(word) = LOWER(?)',
+        [word.trim()],
+      );
+
+      final count = Sqflite.firstIntValue(result) ?? 0;
+      return count > 0;
+    } catch (e) {
+      _logError('wordExists', e, {'word': word});
+      return false;
+    }
+  }
+
+  Future<void> batchUpdateLearnCounts(Map<int, int> updates) async {
+    try {
+      final db = await dbHelper.database;
+      final batch = db.batch();
+      final now = DateTime.now().toIso8601String();
+
+      updates.forEach((id, count) {
+        batch.update(
+          'Word',
+          {
+            'learn': count,
+            'updated_at': now,
+          },
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+      });
+
+      await batch.commit(noResult: true);
+    } catch (e) {
+      _logError('batchUpdateLearnCounts', e, {'updatesCount': updates.length});
+      rethrow;
+    }
+  }
+
+  Future<List<WordModel>> searchWords(String query) async {
+    try {
+      final db = await dbHelper.database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        'Word',
+        where: 'word LIKE ? OR definition LIKE ? OR sentence LIKE ?',
+        whereArgs: ['%$query%', '%$query%', '%$query%'],
+      );
+
+      return maps.map((map) => WordModel.fromMap(map)).toList();
+    } catch (e) {
+      _logError('searchWords', e, {'query': query});
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getWordsWithImagesPaginated({
+    required int page,
+    required int pageSize,
+    String? searchQuery,
+  }) async {
+    try {
+      final db = await dbHelper.database;
+      final offset = (page - 1) * pageSize;
+
+      String whereClause = '';
+      List<dynamic> whereArgs = [];
+
+      // Add search filter if provided
+      if (searchQuery != null && searchQuery.trim().isNotEmpty) {
+        whereClause = 'WHERE w.word LIKE ? OR w.definition LIKE ?';
+        whereArgs = ['%$searchQuery%', '%$searchQuery%'];
+      }
+
+      // Build the query with pagination
+      final List<Map<String, dynamic>> result = await db.rawQuery('''
+      SELECT 
+        w.id,
+        w.word,
+        w.definition,
+        MIN(i.tinyurl) as tinyImageUrl,
+        w.learn,
+        w.sentence,
+        w.created_at,
+        w.updated_at
+      FROM Word w
+      LEFT JOIN Image i ON w.id = i.wordId
+      $whereClause
+      GROUP BY w.id
+      ORDER BY w.id DESC
+      LIMIT ? OFFSET ?
+    ''', [...whereArgs, pageSize, offset]);
+
+      return result;
+    } catch (e) {
+      _logError('getAllWordsWithImagesPaginated', e,
+          {'page': page, 'pageSize': pageSize, 'searchQuery': searchQuery});
+      return [];
+    }
+  }
 }
