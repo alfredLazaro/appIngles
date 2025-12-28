@@ -1,4 +1,4 @@
-import 'package:first_app/data/datasources/local/WordDao.dart';
+import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';

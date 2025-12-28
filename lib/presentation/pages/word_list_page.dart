@@ -4,7 +4,7 @@ import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/presentation/pages/sentence_practice_page.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/data/datasources/local/WordDao.dart';
+import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/presentation/widgets/ListaCards.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/mappers/flashcard_mapper.dart';

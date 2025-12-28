@@ -1,4 +1,4 @@
-import 'package:first_app/data/datasources/local/WordDao.dart';
+import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/domain/repositories/flashcard_repository.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';

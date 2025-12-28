@@ -1,6 +1,6 @@
 import 'package:first_app/presentation/widgets/sentence/sentence_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/data/datasources/local/WordDao.dart';
+import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/core/services/tts_service.dart';
 
 class SentencePracticePage extends StatefulWidget {

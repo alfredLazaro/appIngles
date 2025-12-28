@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/dictonary_service.dart';
 import 'package:first_app/core/services/apiImage.dart';
-import 'package:first_app/data/datasources/local/WordDao.dart';
+import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/repositories/word_repository_impl.dart';
 import 'package:first_app/data/repositories/image_repository_impl.dart';
