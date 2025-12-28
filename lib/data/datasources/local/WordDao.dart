@@ -87,11 +87,11 @@ class WordDao {
         'id',
         'word',
         'sentence'
-      ], // Solo estas columnas serán recuperadas
+      ], 
     );
 
     return List.generate(maps.length, (i) {
-      return WordModel.fromPartialMap(maps[i]); // Usa un constructor adaptado
+      return WordModel.fromPartialMap(maps[i]); 
     });
   }
 
@@ -100,8 +100,8 @@ class WordDao {
     final List<Map<String, dynamic>> maps = await db.query(
       'Word',
       columns: ['id', 'word', 'sentence'],
-      orderBy: 'id DESC', // Ordena por los más recientes
-      limit: 9, // Solo los últimos 9
+      orderBy: 'id DESC', 
+      limit: 9, 
     );
 
     return maps;
