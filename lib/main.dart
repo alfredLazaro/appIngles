@@ -18,13 +18,12 @@ import 'package:first_app/domain/usecases/image/save_word_images.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/pages/main_navigation_page.dart';
 
-//import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // ✅ Cargar .env en background (no bloquear el UI)
+  // Cargar .env en background (no bloquear el UI)
   runApp(const AppLoader());
 
-  // ✅ Cargar .env DESPUÉS de mostrar la UI
+  // Cargar .env DESPUÉS de mostrar la UI
   await dotenv.load(fileName: "assets/.env");
 }
 
@@ -60,7 +59,7 @@ class AppLoader extends StatelessWidget {
             );
           }
 
-          // ✅ Una vez cargado, mostrar app real
+          // Una vez cargado, mostrar app real
           return const MyApp();
         },
       ),
@@ -73,7 +72,7 @@ class AppLoader extends StatelessWidget {
       await dotenv.load(fileName: "assets/.env");
     }
 
-    // ✅ Dar tiempo para que la UI se renderice
+    // Dar tiempo para que la UI se renderice
     await Future.delayed(const Duration(milliseconds: 100));
   }
 }
@@ -99,7 +98,7 @@ class Dependencies {
   late final SaveWordImagesUseCase saveWordImages;
 
   Dependencies._() {
-    // ✅ Inicializar UNA SOLA VEZ
+    // Inicializar UNA SOLA VEZ
     wordDao = WordDao();
     imageDao = ImageDao();
     wordService = WordService();
@@ -136,7 +135,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Obtener dependencias del singleton (no crear nuevas)
+    //Obtener dependencias del singleton (no crear nuevas)
     final deps = Dependencies.instance;
 
     return MaterialApp(
@@ -144,11 +143,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         textTheme: const TextTheme(
-          bodyMedium: TextStyle(
-              fontSize: 16, color: Colors.black), // bodyText1 -> bodyMedium
-          displayLarge: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold), // headline1 -> displayLarge
+          bodyMedium: TextStyle(fontSize: 16, color: Colors.black),
+          displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
         ),
       ),
       home: BlocProvider(

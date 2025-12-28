@@ -165,9 +165,9 @@ class _WordListPageState extends State<WordListPage> {
       context: context,
       builder: (context) => PracticeSelectionModal(
         totalWords: totalSentences,
-        title: 'Ordenar Oraciones', // ✅ Título personalizado
+        title: 'Ordenar Oraciones', // Título personalizado
         description:
-            '¿Cuántas oraciones quieres ordenar?', // ✅ Descripción personalizada
+            '¿Cuántas oraciones quieres ordenar?', //Descripción personalizada
         onStartPractice: (count) {
           Navigator.push(
             context,

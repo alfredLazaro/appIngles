@@ -1,11 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
-import 'package:first_app/domain/entities/word_with_image.dart';
-import 'package:first_app/domain/entities/flashcard_word.dart';
-import 'package:first_app/domain/entities/flashcard_image.dart';
-import 'package:first_app/data/mappers/flashcard_mapper.dart';
 
 import 'word_list_event.dart';
 import 'word_list_state.dart';
@@ -37,7 +32,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     emit(const WordListLoading());
 
     try {
-      final words = await _wordRepository.getWordsWithImages();
+      final words = await _wordRepository.getAllWordsWithImages();
       emit(WordListLoaded(words: words));
     } catch (e) {
       emit(WordListError(e.toString()));
@@ -49,7 +44,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     Emitter<WordListState> emit,
   ) async {
     try {
-      final words = await _wordRepository.getWordsWithImages();
+      final words = await _wordRepository.getAllWordsWithImages();
 
       if (state is WordListLoaded) {
         final currentState = state as WordListLoaded;
@@ -71,7 +66,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   ) async {
     try {
       await _wordRepository.deleteWord(event.wordId);
-      await _imageRepository.deleteImagesByWordId(event.wordId);
+      //await _imageRepository.deleteImagesByWordId(event.wordId);
 
       // Actualizar lista
       add(const RefreshWordsEvent());
