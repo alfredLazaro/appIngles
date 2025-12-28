@@ -15,7 +15,7 @@ class WordDao {
     return id;
   }
 
-  Future<void> updatePfIng(WordModel word) async {
+  Future<void> updateWord(WordModel word) async {
     final db = await dbHelper.database;
     word.updatedAt = DateTime.now().toIso8601String();
     await db.update(
@@ -52,7 +52,7 @@ class WordDao {
     );
   }
 
-  Future<void> deletePfIng(int id) async {
+  Future<void> deleteWord(int id) async {
     final db = await dbHelper.database;
     await db.delete(
       'Word',
@@ -70,7 +70,7 @@ class WordDao {
     return count ?? 0;
   }
 
-  Future<List<WordModel>> getAllPfIng() async {
+  Future<List<WordModel>> getAllWords() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query('Word');
 
@@ -83,25 +83,21 @@ class WordDao {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'Word',
-      columns: [
-        'id',
-        'word',
-        'sentence'
-      ], 
+      columns: ['id', 'word', 'sentence'],
     );
 
     return List.generate(maps.length, (i) {
-      return WordModel.fromPartialMap(maps[i]); 
+      return WordModel.fromPartialMap(maps[i]);
     });
   }
 
-  Future<List<Map<String, dynamic>>> getLastPfIngBasic() async {
+  Future<List<Map<String, dynamic>>> getLastWordBasic() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'Word',
       columns: ['id', 'word', 'sentence'],
-      orderBy: 'id DESC', 
-      limit: 9, 
+      orderBy: 'id DESC',
+      limit: 9,
     );
 
     return maps;

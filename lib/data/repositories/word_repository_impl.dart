@@ -19,13 +19,13 @@ class WordRepositoryImpl implements WordRepository {
 
 /*   @override
   Future<List<Word>> getRecentWords({int limit = 10}) async {
-    final models = await _wordDao.getLastPfIngBasic();
+    final models = await _wordDao.getLastWordBasic();
     return WordMapper.toEntityList(models);
   } */
 
   @override
   Future<List<WordSummary>> getRecentWordsSummary({int limit = 9}) async {
-    final models = await _wordDao.getLastPfIngBasic();
+    final models = await _wordDao.getLastWordBasic();
     return WordMapper.toSummaryList(models);
   }
 
@@ -42,7 +42,7 @@ class WordRepositoryImpl implements WordRepository {
 
   @override
   Future<void> deleteWord(int wordId) async {
-    await _wordDao.deletePfIng(wordId);
+    await _wordDao.deleteWord(wordId);
   }
 
   @override

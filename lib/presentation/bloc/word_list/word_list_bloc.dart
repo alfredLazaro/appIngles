@@ -7,8 +7,8 @@ import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/data/mappers/flashcard_mapper.dart';
 
-part 'word_list_event.dart';
-part 'word_list_state.dart';
+import 'word_list_event.dart';
+import 'word_list_state.dart';
 
 class WordListBloc extends Bloc<WordListEvent, WordListState> {
   final WordRepository _wordRepository;
@@ -21,7 +21,6 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   })  : _wordRepository = wordRepository,
         _imageRepository = imageRepository,
         super(const WordListInitial()) {
-    
     on<LoadWordsEvent>(_onLoadWords);
     on<RefreshWordsEvent>(_onRefreshWords);
     on<DeleteWordEvent>(_onDeleteWord);
@@ -36,7 +35,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     Emitter<WordListState> emit,
   ) async {
     emit(const WordListLoading());
-    
+
     try {
       final words = await _wordRepository.getWordsWithImages();
       emit(WordListLoaded(words: words));
@@ -51,7 +50,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   ) async {
     try {
       final words = await _wordRepository.getWordsWithImages();
-      
+
       if (state is WordListLoaded) {
         final currentState = state as WordListLoaded;
         emit(currentState.copyWith(words: words));
@@ -73,7 +72,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     try {
       await _wordRepository.deleteWord(event.wordId);
       await _imageRepository.deleteImagesByWordId(event.wordId);
-      
+
       // Actualizar lista
       add(const RefreshWordsEvent());
     } catch (e) {
@@ -86,15 +85,15 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     Emitter<WordListState> emit,
   ) {
     if (state is! WordListLoaded) return;
-    
+
     final currentState = state as WordListLoaded;
-    
+
     if (_selectedWordIds.contains(event.wordId)) {
       _selectedWordIds.remove(event.wordId);
     } else {
       _selectedWordIds.add(event.wordId);
     }
-    
+
     emit(currentState.copyWith(selectedCount: _selectedWordIds.length));
   }
 
@@ -103,7 +102,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     Emitter<WordListState> emit,
   ) {
     if (state is! WordListLoaded) return;
-    
+
     final currentState = state as WordListLoaded;
     emit(currentState.copyWith(filterQuery: event.query));
   }
@@ -113,7 +112,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     Emitter<WordListState> emit,
   ) {
     if (state is! WordListLoaded) return;
-    
+
     final currentState = state as WordListLoaded;
     emit(currentState.copyWith(sortType: event.sortType));
   }
@@ -123,7 +122,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     Emitter<WordListState> emit,
   ) {
     _selectedWordIds.clear();
-    
+
     if (state is WordListLoaded) {
       final currentState = state as WordListLoaded;
       emit(currentState.copyWith(selectedCount: 0));
