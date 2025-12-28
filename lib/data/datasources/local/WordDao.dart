@@ -5,14 +5,69 @@ import "DataBaseHelper.dart";
 class WordDao {
   final dbHelper = DatabaseService();
 
-  Future<int> insertWord(WordModel pfIng) async {
+  Future<int> insertWord(WordModel word) async {
     final db = await dbHelper.database;
     final id = await db.insert(
       'Word',
-      pfIng.toMap(),
+      word.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     return id;
+  }
+
+  Future<void> updatePfIng(WordModel word) async {
+    final db = await dbHelper.database;
+    word.updatedAt = DateTime.now().toIso8601String();
+    await db.update(
+      'Word',
+      word.toMap(),
+      where: 'id = ?',
+      whereArgs: [word.id],
+    );
+  }
+
+  Future<void> updateSentence(int id, String sentence) async {
+    final db = await dbHelper.database;
+    await db.update(
+      'Word',
+      {
+        'sentence': sentence,
+        'updated_at': DateTime.now().toIso8601String(),
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> updateLearn(int id, int count) async {
+    final db = await dbHelper.database;
+    await db.update(
+      'Word',
+      {
+        'learn': count,
+        'updated_at': DateTime.now().toIso8601String(),
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> deletePfIng(int id) async {
+    final db = await dbHelper.database;
+    await db.delete(
+      'Word',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> countWords() async {
+    final db = await dbHelper.database;
+    final total = await db.rawQuery('''
+      SELECT COUNT(*) FROM Word
+      ''');
+    int? count = Sqflite.firstIntValue(total);
+    return count ?? 0;
   }
 
   Future<List<WordModel>> getAllPfIng() async {
@@ -40,20 +95,6 @@ class WordDao {
     });
   }
 
-/*   Future<List<WordModel>> getLastPfIngBasic() async {
-    final db = await dbHelper.database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'Word',
-      columns: ['id', 'word', 'sentence'],
-      orderBy: 'id DESC', // Ordena por los más recientes
-      limit: 9, // Solo los últimos 9
-    );
-
-    return List.generate(maps.length, (i) {
-      return WordModel.fromPartialMap(maps[i]);
-    });
-  } */
-
   Future<List<Map<String, dynamic>>> getLastPfIngBasic() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -64,39 +105,6 @@ class WordDao {
     );
 
     return maps;
-  }
-
-  Future<void> updatePfIng(WordModel pfIng) async {
-    final db = await dbHelper.database;
-    pfIng.updatedAt = DateTime.now().toIso8601String();
-    await db.update(
-      'Word',
-      pfIng.toMap(),
-      where: 'id = ?',
-      whereArgs: [pfIng.id],
-    );
-  }
-
-  Future<void> updateSentence(int id, String sentence) async {
-    final db = await dbHelper.database;
-    await db.update(
-      'Word',
-      {
-        'sentence': sentence,
-        'updated_at': DateTime.now().toIso8601String(),
-      },
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-  Future<void> deletePfIng(int id) async {
-    final db = await dbHelper.database;
-    await db.delete(
-      'Word',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
   }
 
   Future<List<Map<String, dynamic>>> getAllWordsWithImages() async {
@@ -115,15 +123,6 @@ class WordDao {
     ''');
 
     return result;
-  }
-
-  Future<int> countWords() async {
-    final db = await dbHelper.database;
-    final total = await db.rawQuery('''
-      SELECT COUNT(*) FROM Word
-      ''');
-    int? count = Sqflite.firstIntValue(total);
-    return count ?? 0;
   }
 
   Future<List<Map<String, dynamic>>> getWordsForPractice(int limit) async {
@@ -146,8 +145,6 @@ class WordDao {
     return result;
   }
 
-  /// Obtiene N oraciones con menor learn para practicar
-  /// Retorna: id y sentence de las palabras menos practicadas
   Future<List<Map<String, dynamic>>> getSentencesForPractice(int limit) async {
     final db = await dbHelper.database;
 
@@ -162,18 +159,5 @@ class WordDao {
     ''', [limit]);
 
     return result;
-  }
-
-  Future<void> updateLearn(int id, int count) async {
-    final db = await dbHelper.database;
-    await db.update(
-      'Word',
-      {
-        'learn': count,
-        'updated_at': DateTime.now().toIso8601String(),
-      },
-      where: 'id = ?',
-      whereArgs: [id],
-    );
   }
 }
