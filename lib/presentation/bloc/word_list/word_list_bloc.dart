@@ -9,7 +9,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   final WordRepository _wordRepository;
   final ImageRepository _imageRepository;
   final Set<int> _selectedWordIds = {};
-
+  final int _pageSize = 20;
   WordListBloc({
     required WordRepository wordRepository,
     required ImageRepository imageRepository,
@@ -32,8 +32,11 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     emit(const WordListLoading());
 
     try {
-      final words = await _wordRepository.getAllWordsWithImages();
-      emit(WordListLoaded(words: words));
+      final words = await _wordRepository.getWordsWithImagesPaginated(
+        page: 1,
+        pageSize: _pageSize,
+      );
+      emit(WordListLoaded(words: words.items));
     } catch (e) {
       emit(WordListError(e.toString()));
     }

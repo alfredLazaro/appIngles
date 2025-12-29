@@ -128,14 +128,14 @@ class WordDao {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getLastWordBasic() async {
+  Future<List<Map<String, dynamic>>> getLastWordBasic({int limit = 9}) async {
     try {
       final db = await dbHelper.database;
       final List<Map<String, dynamic>> maps = await db.query(
         'Word',
         columns: ['id', 'word', 'sentence'],
         orderBy: 'id DESC',
-        limit: 9,
+        limit: limit,
       );
 
       return maps;
