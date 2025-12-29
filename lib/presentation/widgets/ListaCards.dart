@@ -1,30 +1,30 @@
 import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
+import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
+import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
+import 'package:first_app/presentation/bloc/word_list/word_list_state.dart';
 import 'package:first_app/presentation/widgets/WordCard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
 class ListaCards extends StatefulWidget {
-  final List<WordWithImage> lswords;
-  const ListaCards({
-    super.key,
-    required this.lswords,
-  });
+  const ListaCards({super.key});
 
   @override
-  State<ListaCards> createState() => _ListaCardState();
+  State<ListaCards> createState() => _ListaCardsState();
 }
 
-class _ListaCardState extends State<ListaCards> {
+class _ListaCardsState extends State<ListaCards> {
   final TtsService _ttsService = TtsService();
+  final ScrollController _scrollController = ScrollController();
   final log = Logger();
-  late List<WordWithImage> _lisWords;
+
   @override
   void initState() {
     super.initState();
-
-    _lisWords = widget.lswords;
     _initializeTts();
+    _scrollController.addListener(_onScroll);
   }
 
   Future<void> _initializeTts() async {
@@ -33,6 +33,24 @@ class _ListaCardState extends State<ListaCards> {
       pitch: 1.0,
       speechRate: 0.5,
     );
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      final state = context.read<WordListBloc>().state;
+      if (state is WordListLoaded && 
+          state.hasMorePages && 
+          !state.isLoadingMore) {
+        context.read<WordListBloc>().add(const LoadMoreWordsEvent());
+      }
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
   }
 
   Future<void> speakf(String text) async {
@@ -45,24 +63,58 @@ class _ListaCardState extends State<ListaCards> {
 
   @override
   void dispose() {
-    _ttsService.stop(); // ← Detener al destruir
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    _ttsService.stop();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_lisWords.isEmpty) {
-      return const Center(child: Text('No hay palabras en esta sección.'));
-    }
-    return ListView.builder(
-      itemCount: _lisWords.length,
-      itemBuilder: (context, index) {
-        final word = _lisWords[index];
-        return WordCard(
-          word: word,
-          onSpeak: () => speakf(word.word),
-        );
+    return BlocBuilder<WordListBloc, WordListState>(
+      builder: (context, state) {
+        if (state is WordListLoaded) {
+          if (state.words.isEmpty) {
+            return const Center(
+              child: Text('No hay palabras en esta sección.'),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              context.read<WordListBloc>().add(const RefreshWordsEvent());
+              await Future.delayed(const Duration(milliseconds: 500));
+            },
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: state.words.length + (state.hasMorePages ? 1 : 0),
+              itemBuilder: (context, index) {
+                // Loading indicator at bottom
+                if (index >= state.words.length) {
+                  return _buildLoadingIndicator();
+                }
+
+                final word = state.words[index];
+                return WordCard(
+                  word: word,
+                  onSpeak: () => speakf(word.word),
+                );
+              },
+            ),
+          );
+        }
+
+        return const SizedBox.shrink();
       },
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 }
