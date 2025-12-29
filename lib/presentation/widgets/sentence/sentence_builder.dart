@@ -22,7 +22,7 @@ class SentenceBuilderWidget extends StatefulWidget {
 
 class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
   late List<String> _shuffledWords;
-    late List<bool> _wordVisibility;
+  late List<bool> _wordVisibility;
   late List<String> _userSentence;
   bool _isCorrect = false;
   bool _showResult = false;
@@ -109,7 +109,7 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
               // ✅ Área de construcción de oración
               Container(
                 width: double.infinity,
-                height: 160,
+                height: 210,
                 constraints: const BoxConstraints(minHeight: 120),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -140,7 +140,8 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
                                 color: Colors.blue,
                                 onTap: () {
                                   setState(() {
-                                    final originalIndex = _shuffledWords.indexOf(entry.value);
+                                    final originalIndex =
+                                        _shuffledWords.indexOf(entry.value);
                                     if (originalIndex != -1) {
                                       _wordVisibility[originalIndex] = true;
                                     }
@@ -156,14 +157,12 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
               ),
               const SizedBox(height: 24),
 
-              // ✅ Palabras disponibles
+              // Palabras disponibles
               Container(
                 height: 260, // Altura máxima
                 decoration: BoxDecoration(
                   color: Colors.grey[50],
                   borderRadius: BorderRadius.circular(12),
-                  border:
-                      Border.all(color: const Color.fromARGB(255, 46, 41, 41)),
                 ),
                 child: SingleChildScrollView(
                   child: Padding(
@@ -174,10 +173,11 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
                       children: _shuffledWords.asMap().entries.map((entry) {
                         final index = entry.key;
                         final word = entry.value;
-                        
+
                         return Visibility(
-                          visible: _wordVisibility[index], // ✅ Control de visibilidad
-                          maintainSize: true,              // ✅ Mantiene el espacio
+                          visible:
+                              _wordVisibility[index], // Control de visibilidad
+                          maintainSize: true, // Mantiene el espacio
                           maintainAnimation: true,
                           maintainState: true,
                           child: _WordChip(
@@ -186,7 +186,8 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
                             onTap: () {
                               setState(() {
                                 _userSentence.add(word);
-                                _wordVisibility[index] = false; // ✅ Ocultar, no eliminar
+                                _wordVisibility[index] =
+                                    false; // Ocultar, no eliminar
                                 _showResult = false;
                               });
                             },
@@ -198,7 +199,7 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
                 ),
               ),
               const Spacer(),
-              // ✅ Botones de acción
+              // Botones de acción
               Row(
                 children: [
                   Expanded(
@@ -224,7 +225,7 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
               ),
             ],
           ),
-          // ✅ Mostrar respuesta correcta si falla
+          // Mostrar respuesta correcta si falla
           if (_showResult && !_isCorrect)
             Positioned(
               top: 0, // lo coloca arriba
@@ -255,7 +256,7 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
   }
 }
 
-// ✅ Widget de palabra clickeable
+// Widget de palabra clickeable
 class _WordChip extends StatelessWidget {
   final String word;
   final Color color;
