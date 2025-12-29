@@ -4,4 +4,6 @@ abstract class ImageRepository {
   Future<List<Map<String, dynamic>>> searchImages(String query);
   Future<List<int>> saveImages(List<Map<String, dynamic>> images, int wordId);
   Future<List<WordImage>> getImagesByWordId(int wordId);
+
+  Future<dynamic> getImagesByWordIds(List<int> wordIds) async {}
 }

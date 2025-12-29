@@ -1,4 +1,5 @@
 import 'package:first_app/data/datasources/local/word_dao.dart';
+import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
@@ -87,7 +88,7 @@ class FlashcardRepository implements WordRepository {
   }
 
   @override
-  Future<List<Word>> getWordsForPractice({int limit = 10}) {
+  Future<List<FlashcardWord>> getWordsForPractice(int limit) {
     // TODO: implement getWordsForPractice
     throw UnimplementedError();
   }

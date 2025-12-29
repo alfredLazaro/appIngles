@@ -10,7 +10,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   final ImageRepository _imageRepository;
   final Set<int> _selectedWordIds = {};
   final int _pageSize = 20;
-  
+
   WordListBloc({
     required WordRepository wordRepository,
     required ImageRepository imageRepository,
@@ -23,7 +23,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     on<DeleteWordEvent>(_onDeleteWord);
     on<ToggleWordSelectionEvent>(_onToggleWordSelection);
     on<FilterWordsEvent>(_onFilterWords);
-    on<SortWordsEvent>(_onSortWords);
+/*     on<SortWordsEvent>(_onSortWords); */
     on<ClearSelectionEvent>(_onClearSelection);
   }
 
@@ -39,7 +39,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         pageSize: _pageSize,
         searchQuery: event.searchQuery,
       );
-      
+
       emit(WordListLoaded(
         words: result.items,
         currentPage: 1,
@@ -57,9 +57,9 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     Emitter<WordListState> emit,
   ) async {
     if (state is! WordListLoaded) return;
-    
+
     final currentState = state as WordListLoaded;
-    
+
     // Don't load if already loading or no more pages
     if (currentState.isLoadingMore || !currentState.hasMorePages) return;
 
@@ -139,10 +139,10 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   ) async {
     try {
       await _wordRepository.deleteWord(event.wordId);
-      
+
       // Remove from selection if selected
       _selectedWordIds.remove(event.wordId);
-      
+
       // Refresh the list
       add(const RefreshWordsEvent());
     } catch (e) {
@@ -173,14 +173,14 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   ) async {
     // Trigger new search with filter
     emit(const WordListLoading());
-    
+
     try {
       final result = await _wordRepository.getWordsWithImagesPaginated(
         page: 1,
         pageSize: _pageSize,
         searchQuery: event.query,
       );
-      
+
       emit(WordListLoaded(
         words: result.items,
         currentPage: 1,
@@ -192,7 +192,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     }
   }
 
-  void _onSortWords(
+/*   void _onSortWords(
     SortWordsEvent event,
     Emitter<WordListState> emit,
   ) {
@@ -200,7 +200,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
 
     final currentState = state as WordListLoaded;
     emit(currentState.copyWith(sortType: event.sortType));
-  }
+  } */
 
   void _onClearSelection(
     ClearSelectionEvent event,

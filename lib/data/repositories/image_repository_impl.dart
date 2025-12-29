@@ -63,4 +63,17 @@ class ImageRepositoryImpl implements ImageRepository {
     // Implementar si necesitas obtener imágenes de una palabra
     throw UnimplementedError();
   }
+
+  @override
+  Future<Map<int, List<Image_Model>>> getImagesByWordIds(
+      List<int> wordIds) async {
+    try {
+      final Map<int, List<Image_Model>> imags =
+          await _imageDao.getImagesByWordIds(wordIds);
+      return imags;
+    } catch (e) {
+      _logger.e('Error guardando imagen: $e');
+      return {}; //map vacio
+    }
+  }
 }

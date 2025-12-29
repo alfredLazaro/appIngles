@@ -1,3 +1,4 @@
+import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
@@ -151,10 +152,10 @@ class WordRepositoryImpl implements WordRepository {
   }
 
   @override
-  Future<List<Word>> getWordsForPractice({int limit = 10}) async {
+  Future<List<FlashcardWord>> getWordsForPractice(int limit) async {
     try {
       final maps = await _wordDao.getWordsForPractice(limit);
-      return maps.map((map) => WordMapper.fromMapToEntity(map)).toList();
+      return maps.map((map) => WordMapper.toFlashcardWord(map)).toList();
     } catch (e) {
       throw Exception('Error al obtener palabras para practicar: $e');
     }

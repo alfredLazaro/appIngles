@@ -1,3 +1,4 @@
+import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
@@ -21,7 +22,7 @@ abstract class WordRepository {
     int pageSize,
     String? searchQuery,
   });
-  Future<List<Word>> getWordsForPractice({int limit});
+  Future<List<FlashcardWord>> getWordsForPractice(int limit);
   Future<List<String>> getSentencesForPractice({int limit});
   Future<List<Word>> searchWords(String query);
   Future<int> getTotalWordCount();

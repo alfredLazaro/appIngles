@@ -1,4 +1,5 @@
 import 'package:first_app/data/models/word_model.dart';
+import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
@@ -43,7 +44,6 @@ class WordMapper {
       id: map['id'],
       word: map['word'] ?? '',
       sentence: map['sentence'] ?? '',
-      tinyImageUrl: map['tinyImageUrl'], //Si haces JOIN con images
     );
   }
 
@@ -74,6 +74,16 @@ class WordMapper {
       learnCount: map['learn'] as int? ?? 0,
       createdAt: DateTime.now(), // You might need to parse from map
       updatedAt: DateTime.now(), // You might need to parse from map
+    );
+  }
+
+  static FlashcardWord toFlashcardWord(Map<String, dynamic> map) {
+    return FlashcardWord(
+      id: map['id'] as int,
+      word: map['word'] as String,
+      definition: map['definition'] as String,
+      sentence: map['sentence'],
+      learnCount: map['learn'],
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'package:first_app/presentation/bloc/practice/practice_event.dart';
+import 'package:first_app/presentation/bloc/practice/practice_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
@@ -28,7 +30,7 @@ class PracticeSelectionPage extends StatelessWidget {
             );
             Navigator.pop(context);
           }
-          
+
           if (state is PracticeReady) {
             _navigateToPractice(context, state);
           }
@@ -73,11 +75,11 @@ class PracticeSelectionPage extends StatelessWidget {
     final route = practiceType == PracticeType.flashcard
         ? '/flashcard-practice'
         : '/sentence-practice';
-
-    Navigator.pushReplacementNamed(
+    //diferentes practicas reciben diferente tipos de datos
+    /* Navigator.pushReplacementNamed(
       context,
       route,
-      arguments: state.practiceData,
-    );
+      arguments: state.,
+    ); */
   }
 }

@@ -7,18 +7,20 @@ abstract class WordListEvent extends Equatable {
 
 class LoadWordsEvent extends WordListEvent {
   final String? searchQuery;
-  
+
   const LoadWordsEvent({this.searchQuery});
-  
+
   @override
   List<Object?> get props => [searchQuery];
 }
+
 class LoadMoreWordsEvent extends WordListEvent {
   const LoadMoreWordsEvent();
-  
+
   @override
   List<Object?> get props => [];
 }
+
 class RefreshWordsEvent extends WordListEvent {
   const RefreshWordsEvent();
 

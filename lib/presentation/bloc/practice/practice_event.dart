@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:first_app/presentation/pages/practice_selection_page.dart';
+
 abstract class PracticeEvent extends Equatable {
   const PracticeEvent();
 }
@@ -6,7 +8,7 @@ abstract class PracticeEvent extends Equatable {
 class LoadPracticeDataEvent extends PracticeEvent {
   final PracticeType type;
   const LoadPracticeDataEvent(this.type);
-  
+
   @override
   List<Object> get props => [type];
 }
@@ -14,9 +16,9 @@ class LoadPracticeDataEvent extends PracticeEvent {
 class StartPracticeEvent extends PracticeEvent {
   final int count;
   final PracticeType type;
-  
+
   const StartPracticeEvent(this.count, this.type);
-  
+
   @override
   List<Object> get props => [count, type];
 }
