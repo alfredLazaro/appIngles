@@ -1,3 +1,5 @@
+import 'package:first_app/domain/repositories/image_repository.dart';
+import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/presentation/bloc/practice/practice_event.dart';
 import 'package:first_app/presentation/bloc/practice/practice_state.dart';
 import 'package:flutter/material.dart';
@@ -9,18 +11,21 @@ enum PracticeType { flashcard, sentence }
 
 class PracticeSelectionPage extends StatelessWidget {
   final PracticeType practiceType;
-
+  final WordRepository wordRepository; // Add this
+  final ImageRepository imageRepository; // Add this
   const PracticeSelectionPage({
     super.key,
     required this.practiceType,
+    required this.wordRepository, // Add to constructor
+    required this.imageRepository,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => PracticeBloc(
-        wordRepository: context.read(),
-        imageRepository: context.read(),
+        wordRepository: wordRepository,
+        imageRepository: imageRepository,
       )..add(LoadPracticeDataEvent(practiceType)),
       child: BlocConsumer<PracticeBloc, PracticeState>(
         listener: (context, state) {

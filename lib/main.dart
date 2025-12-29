@@ -1,7 +1,6 @@
 import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/dictonary_service.dart';
 import 'package:first_app/core/services/apiImage.dart';
 import 'package:first_app/data/datasources/local/word_dao.dart';
@@ -15,7 +14,6 @@ import 'package:first_app/domain/usecases/word/update_sentence.dart';
 import 'package:first_app/domain/usecases/word/search_word_definition.dart';
 import 'package:first_app/domain/usecases/image/search_images.dart';
 import 'package:first_app/domain/usecases/image/save_word_images.dart';
-import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/pages/main_navigation_page.dart';
 
 void main() async {
@@ -147,18 +145,7 @@ class MyApp extends StatelessWidget {
           displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
         ),
       ),
-      home: BlocProvider(
-        create: (context) => WordLearningBloc(
-          getRecentWords: deps.getRecentWords,
-          saveWord: deps.saveWord,
-          deleteWord: deps.deleteWord,
-          updateSentence: deps.updateSentence,
-          searchWordDefinition: deps.searchWordDefinition,
-          searchImages: deps.searchImages,
-          saveWordImages: deps.saveWordImages,
-        ),
-        child: const MainNavigationPage(),
-      ),
+      home: const MainNavigationPage(),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:first_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
@@ -63,33 +64,37 @@ class WordListPage extends StatelessWidget {
 
   void _navigateToPracticeSelection(BuildContext context) async {
     final bloc = context.read<WordListBloc>();
-    
+    final deps = Dependencies.instance;
     // You can pass the bloc or use a separate practice bloc
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const PracticeSelectionPage(
+        builder: (context) => PracticeSelectionPage(
           practiceType: PracticeType.flashcard,
+          wordRepository: deps.wordRepository, // Pass repository
+          imageRepository: deps.imageRepository,
         ),
       ),
     );
-    
+
     // Refresh list after returning from practice
     bloc.add(const RefreshWordsEvent());
   }
 
   void _navigateToSentencePractice(BuildContext context) async {
     final bloc = context.read<WordListBloc>();
-    
+    final deps = Dependencies.instance;
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const PracticeSelectionPage(
+        builder: (context) => PracticeSelectionPage(
           practiceType: PracticeType.sentence,
+          wordRepository: deps.wordRepository, // Pass repository
+          imageRepository: deps.imageRepository,
         ),
       ),
     );
-    
+
     // Refresh list after returning from practice
     bloc.add(const RefreshWordsEvent());
   }
