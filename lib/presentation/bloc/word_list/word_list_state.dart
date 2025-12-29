@@ -21,38 +21,53 @@ class WordListLoading extends WordListState {
 
 class WordListLoaded extends WordListState {
   final List<WordWithImage> words;
-  final int selectedCount;
+  final int currentPage;
+  final bool hasMorePages;
+  final bool isLoadingMore;
   final String? filterQuery;
-  final SortType sortType;
+  final int selectedCount;
+  final String? sortType;
 
   const WordListLoaded({
     required this.words,
-    this.selectedCount = 0,
+    this.currentPage = 1,
+    this.hasMorePages = false,
+    this.isLoadingMore = false,
     this.filterQuery,
-    this.sortType = SortType.newest,
+    this.selectedCount = 0,
+    this.sortType,
   });
+
+  WordListLoaded copyWith({
+    List<WordWithImage>? words,
+    int? currentPage,
+    bool? hasMorePages,
+    bool? isLoadingMore,
+    String? filterQuery,
+    int? selectedCount,
+    String? sortType,
+  }) {
+    return WordListLoaded(
+      words: words ?? this.words,
+      currentPage: currentPage ?? this.currentPage,
+      hasMorePages: hasMorePages ?? this.hasMorePages,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      filterQuery: filterQuery ?? this.filterQuery,
+      selectedCount: selectedCount ?? this.selectedCount,
+      sortType: sortType ?? this.sortType,
+    );
+  }
 
   @override
   List<Object?> get props => [
         words,
-        selectedCount,
+        currentPage,
+        hasMorePages,
+        isLoadingMore,
         filterQuery,
+        selectedCount,
         sortType,
       ];
-
-  WordListLoaded copyWith({
-    List<WordWithImage>? words,
-    int? selectedCount,
-    String? filterQuery,
-    SortType? sortType,
-  }) {
-    return WordListLoaded(
-      words: words ?? this.words,
-      selectedCount: selectedCount ?? this.selectedCount,
-      filterQuery: filterQuery ?? this.filterQuery,
-      sortType: sortType ?? this.sortType,
-    );
-  }
 }
 
 enum SortType {

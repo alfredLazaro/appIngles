@@ -10,6 +10,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   final ImageRepository _imageRepository;
   final Set<int> _selectedWordIds = {};
   final int _pageSize = 20;
+  
   WordListBloc({
     required WordRepository wordRepository,
     required ImageRepository imageRepository,
@@ -17,6 +18,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         _imageRepository = imageRepository,
         super(const WordListInitial()) {
     on<LoadWordsEvent>(_onLoadWords);
+    on<LoadMoreWordsEvent>(_onLoadMoreWords);
     on<RefreshWordsEvent>(_onRefreshWords);
     on<DeleteWordEvent>(_onDeleteWord);
     on<ToggleWordSelectionEvent>(_onToggleWordSelection);
@@ -32,13 +34,64 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     emit(const WordListLoading());
 
     try {
-      final words = await _wordRepository.getWordsWithImagesPaginated(
+      final result = await _wordRepository.getWordsWithImagesPaginated(
         page: 1,
         pageSize: _pageSize,
+        searchQuery: event.searchQuery,
       );
-      emit(WordListLoaded(words: words.items));
+      
+      emit(WordListLoaded(
+        words: result.items,
+        currentPage: 1,
+        hasMorePages: result.hasNextPage,
+        isLoadingMore: false,
+        filterQuery: event.searchQuery,
+      ));
     } catch (e) {
       emit(WordListError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadMoreWords(
+    LoadMoreWordsEvent event,
+    Emitter<WordListState> emit,
+  ) async {
+    if (state is! WordListLoaded) return;
+    
+    final currentState = state as WordListLoaded;
+    
+    // Don't load if already loading or no more pages
+    if (currentState.isLoadingMore || !currentState.hasMorePages) return;
+
+    // Emit loading more state
+    emit(currentState.copyWith(isLoadingMore: true));
+
+    try {
+      final nextPage = currentState.currentPage + 1;
+      final result = await _wordRepository.getWordsWithImagesPaginated(
+        page: nextPage,
+        pageSize: _pageSize,
+        searchQuery: currentState.filterQuery,
+      );
+
+      // Append new words to existing list
+      final updatedWords = [...currentState.words, ...result.items];
+
+      emit(WordListLoaded(
+        words: updatedWords,
+        currentPage: nextPage,
+        hasMorePages: result.hasNextPage,
+        isLoadingMore: false,
+        filterQuery: currentState.filterQuery,
+        selectedCount: currentState.selectedCount,
+        sortType: currentState.sortType,
+      ));
+    } catch (e) {
+      // Keep current state but show error
+      emit(currentState.copyWith(
+        isLoadingMore: false,
+      ));
+      emit(WordListError('Error al cargar más palabras: $e'));
     }
   }
 
@@ -46,17 +99,34 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     RefreshWordsEvent event,
     Emitter<WordListState> emit,
   ) async {
+    // Get current filter query if exists
+    String? searchQuery;
+    if (state is WordListLoaded) {
+      searchQuery = (state as WordListLoaded).filterQuery;
+    }
+
     try {
-      final words = await _wordRepository.getAllWordsWithImages();
+      final result = await _wordRepository.getWordsWithImagesPaginated(
+        page: 1,
+        pageSize: _pageSize,
+        searchQuery: searchQuery,
+      );
 
       if (state is WordListLoaded) {
         final currentState = state as WordListLoaded;
-        emit(currentState.copyWith(words: words));
+        emit(currentState.copyWith(
+          words: result.items,
+          currentPage: 1,
+          hasMorePages: result.hasNextPage,
+        ));
       } else {
-        emit(WordListLoaded(words: words));
+        emit(WordListLoaded(
+          words: result.items,
+          currentPage: 1,
+          hasMorePages: result.hasNextPage,
+        ));
       }
     } catch (e) {
-      // Mantener estado anterior en caso de error
       if (state is WordListLoaded) {
         emit(WordListError('Error al actualizar: $e'));
       }
@@ -69,9 +139,11 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   ) async {
     try {
       await _wordRepository.deleteWord(event.wordId);
-      //await _imageRepository.deleteImagesByWordId(event.wordId);
-
-      // Actualizar lista
+      
+      // Remove from selection if selected
+      _selectedWordIds.remove(event.wordId);
+      
+      // Refresh the list
       add(const RefreshWordsEvent());
     } catch (e) {
       emit(WordListError('Error al eliminar palabra: $e'));
@@ -98,11 +170,26 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
   void _onFilterWords(
     FilterWordsEvent event,
     Emitter<WordListState> emit,
-  ) {
-    if (state is! WordListLoaded) return;
-
-    final currentState = state as WordListLoaded;
-    emit(currentState.copyWith(filterQuery: event.query));
+  ) async {
+    // Trigger new search with filter
+    emit(const WordListLoading());
+    
+    try {
+      final result = await _wordRepository.getWordsWithImagesPaginated(
+        page: 1,
+        pageSize: _pageSize,
+        searchQuery: event.query,
+      );
+      
+      emit(WordListLoaded(
+        words: result.items,
+        currentPage: 1,
+        hasMorePages: result.hasNextPage,
+        filterQuery: event.query,
+      ));
+    } catch (e) {
+      emit(WordListError('Error al filtrar: $e'));
+    }
   }
 
   void _onSortWords(
