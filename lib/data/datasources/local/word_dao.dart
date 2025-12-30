@@ -342,4 +342,16 @@ class WordDao {
       return [];
     }
   }
+  Future<int> countSentences() async {
+    try {
+      final db = await database;
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM Word WHERE sentence IS NOT NULL AND sentence != ""'
+      );
+      return Sqflite.firstIntValue(result) ?? 0;
+    } catch (e) {
+      _logError('countSentences', e);
+      return 0;
+    }
+  }
 }

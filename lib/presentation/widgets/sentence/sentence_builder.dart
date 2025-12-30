@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:first_app/core/services/tts_service.dart';
 import 'package:flutter/material.dart';
 
-// ✅ Widget individual para cada oración
+// Widget individual para cada oración
 class SentenceBuilderWidget extends StatefulWidget {
   final int sentenceId;
   final String originalSentence;
@@ -76,7 +76,7 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
         children: [
           Column(
             children: [
-              // ✅ Botón de audio (pista)
+              // Botón de audio (pista)
               Card(
                 color: Colors.blue.shade50,
                 child: Padding(
@@ -106,7 +106,7 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
               ),
               const SizedBox(height: 12),
 
-              // ✅ Área de construcción de oración
+              // Área de construcción de oración
               Container(
                 width: double.infinity,
                 height: 210,
