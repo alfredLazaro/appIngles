@@ -18,13 +18,8 @@ class WordListPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.school),
-            onPressed: () => _navigateToPracticeSelection(context),
-            tooltip: 'Modo práctica',
-          ),
-          IconButton(
-            icon: const Icon(Icons.sort),
-            onPressed: () => _navigateToSentencePractice(context),
-            tooltip: 'Ordenar oraciones',
+            onPressed: () => _navigateToPracticeHub(context),
+            tooltip: 'Prácticas',
           ),
         ],
       ),
@@ -62,23 +57,17 @@ class WordListPage extends StatelessWidget {
     );
   }
 
-  void _navigateToPracticeSelection(BuildContext context) async {
-    final bloc = context.read<WordListBloc>();
-    final deps = Dependencies.instance;
-    // You can pass the bloc or use a separate practice bloc
+  void _navigateToPracticeHub(BuildContext context) async {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PracticeSelectionPage(
-          practiceType: PracticeType.flashcard,
-          wordRepository: deps.wordRepository, // Pass repository
-          imageRepository: deps.imageRepository,
-        ),
+        builder: (context) => const PracticeSelectionPage(),
       ),
     );
-
-    // Refresh list after returning from practice
-    bloc.add(const RefreshWordsEvent());
+    
+    if (context.mounted) {
+      context.read<WordListBloc>().add(const RefreshWordsEvent());
+    }
   }
 
   void _navigateToSentencePractice(BuildContext context) async {
@@ -89,13 +78,12 @@ class WordListPage extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => PracticeSelectionPage(
           practiceType: PracticeType.sentence,
-          wordRepository: deps.wordRepository, // Pass repository
+          wordRepository: deps.wordRepository, 
           imageRepository: deps.imageRepository,
         ),
       ),
     );
 
-    // Refresh list after returning from practice
     bloc.add(const RefreshWordsEvent());
   }
 }

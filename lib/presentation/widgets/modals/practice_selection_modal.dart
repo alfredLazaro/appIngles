@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class PracticeSelectionModal extends StatefulWidget {
   final int totalWords;
   final Function(int) onStartPractice;
-  final String title; // ✅ Nuevo parámetro
+  final String title; 
   final String description;
   const PracticeSelectionModal({
     super.key,
     required this.totalWords,
     required this.onStartPractice,
-    this.title = 'Modo Práctica', // ✅ Valor por defecto
+    this.title = 'Modo Práctica', 
     this.description = '¿Cuántas quieres practicar?',
   });
 
@@ -38,7 +38,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ✅ Título
+            //Título
             Text(
               widget.title,
               style: const TextStyle(
@@ -48,7 +48,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
             ),
             const SizedBox(height: 14),
 
-            // ✅ Total de palabras
+            //Total de palabras
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -91,7 +91,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
             ]),
             const SizedBox(height: 10),
 
-            // ✅ Slider
+            //Slider
             Slider(
               value: _selectedCount.toDouble(),
               min: 1,
@@ -106,7 +106,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
               },
             ),
 
-            // ✅ Etiquetas min/max
+            //Etiquetas min/max
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -131,21 +131,20 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
             ),
             const SizedBox(height: 14),
 
-            // ✅ Botones de acceso rápido
+            //Botones de acceso rápido
             Wrap(
               spacing: 8,
               alignment: WrapAlignment.center,
               children: [
                 if (widget.totalWords >= 5) _buildQuickButton(5),
                 if (widget.totalWords >= 10) _buildQuickButton(10),
-                if (widget.totalWords >= 20) _buildQuickButton(20),
+                if (widget.totalWords >= 30) _buildQuickButton(30),
                 if (widget.totalWords >= 50) _buildQuickButton(50),
-                //_buildQuickButton(widget.totalWords, label: 'Todas'),
               ],
             ),
             const SizedBox(height: 12),
 
-            // ✅ Botones de acción
+            //Botones de acción
             Row(
               children: [
                 Expanded(

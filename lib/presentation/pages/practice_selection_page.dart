@@ -1,90 +1,110 @@
-import 'package:first_app/domain/repositories/image_repository.dart';
-import 'package:first_app/domain/repositories/word_repository.dart';
-import 'package:first_app/presentation/bloc/practice/practice_event.dart';
-import 'package:first_app/presentation/bloc/practice/practice_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
-import 'package:first_app/presentation/widgets/modals/practice_selection_modal.dart';
+import 'package:first_app/presentation/pages/practice_config_page.dart';
 
-enum PracticeType { flashcard, sentence }
+enum PracticeType { 
+  flashcard, 
+  sentence, 
+  spelling,
+  listening,
+  // Add more practice types as needed
+}
 
 class PracticeSelectionPage extends StatelessWidget {
-  final PracticeType practiceType;
-  final WordRepository wordRepository; // Add this
-  final ImageRepository imageRepository; // Add this
-  const PracticeSelectionPage({
-    super.key,
-    required this.practiceType,
-    required this.wordRepository, // Add to constructor
-    required this.imageRepository,
-  });
+  const PracticeSelectionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => PracticeBloc(
-        wordRepository: wordRepository,
-        imageRepository: imageRepository,
-      )..add(LoadPracticeDataEvent(practiceType)),
-      child: BlocConsumer<PracticeBloc, PracticeState>(
-        listener: (context, state) {
-          if (state is PracticeError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
-            Navigator.pop(context);
-          }
-
-          if (state is PracticeReady) {
-            _navigateToPractice(context, state);
-          }
-        },
-        builder: (context, state) {
-          if (state is PracticeLoading) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
-
-          if (state is PracticeDataLoaded) {
-            return Scaffold(
-              body: Center(
-                child: PracticeSelectionModal(
-                  totalWords: state.totalCount,
-                  title: practiceType == PracticeType.flashcard
-                      ? 'Modo Práctica'
-                      : 'Ordenar Oraciones',
-                  description: practiceType == PracticeType.flashcard
-                      ? '¿Cuántas palabras quieres practicar?'
-                      : '¿Cuántas oraciones quieres ordenar?',
-                  onStartPractice: (count) {
-                    context.read<PracticeBloc>().add(
-                          StartPracticeEvent(count, practiceType),
-                        );
-                  },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Selecciona tu Práctica'),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '¿Qué deseas practicar hoy?',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            );
-          }
-
-          return const Scaffold(
-            body: Center(child: Text('Preparando práctica...')),
-          );
-        },
+              const SizedBox(height: 8),
+              const Text(
+                'Elige el tipo de práctica que mejor se adapte a tus necesidades',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Expanded(
+                child: ListView(
+                  children: [
+                    PracticeCard(
+                      icon: Icons.style,
+                      title: 'Flashcards',
+                      description: 'Practica vocabulario con tarjetas interactivas',
+                      color: Colors.blue,
+                      onTap: () => _navigateToConfig(
+                        context, 
+                        PracticeType.flashcard,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    PracticeCard(
+                      icon: Icons.sort,
+                      title: 'Ordenar Oraciones',
+                      description: 'Construye oraciones ordenando las palabras',
+                      color: Colors.green,
+                      onTap: () => _navigateToConfig(
+                        context, 
+                        PracticeType.sentence,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    PracticeCard(
+                      icon: Icons.keyboard,
+                      title: 'Spelling',
+                      description: 'Escribe correctamente las palabras que escuchas',
+                      color: Colors.orange,
+                      onTap: () => _navigateToConfig(
+                        context, 
+                        PracticeType.spelling,
+                      ),
+                      isComingSoon: true,
+                    ),
+                    const SizedBox(height: 16),
+                    PracticeCard(
+                      icon: Icons.headphones,
+                      title: 'Listening',
+                      description: 'Mejora tu comprensión auditiva',
+                      color: Colors.purple,
+                      onTap: () => _navigateToConfig(
+                        context, 
+                        PracticeType.listening,
+                      ),
+                      isComingSoon: true,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  void _navigateToPractice(BuildContext context, PracticeReady state) {
-    final route = practiceType == PracticeType.flashcard
-        ? '/flashcard-practice'
-        : '/sentence-practice';
-    //diferentes practicas reciben diferente tipos de datos
-    /* Navigator.pushReplacementNamed(
+  void _navigateToConfig(BuildContext context, PracticeType type) {
+    Navigator.push(
       context,
-      route,
-      arguments: state.,
-    ); */
+      MaterialPageRoute(
+        builder: (context) => PracticeConfigPage(practiceType: type),
+      ),
+    );
   }
 }
