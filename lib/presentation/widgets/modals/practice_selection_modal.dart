@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/presentation/pages/practice_selection_page.dart';
 
 class PracticeSelectionModal extends StatefulWidget {
   final int totalWords;
   final Function(int) onStartPractice;
-  final String title; 
-  final String description;
+  final PracticeType practiceType;
+
   const PracticeSelectionModal({
     super.key,
     required this.totalWords,
     required this.onStartPractice,
-    this.title = 'Modo Práctica', 
-    this.description = '¿Cuántas quieres practicar?',
+    required this.practiceType,
   });
 
   @override
@@ -23,7 +23,6 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
   @override
   void initState() {
     super.initState();
-    // Valor inicial: 5 o el total si hay menos
     _selectedCount = widget.totalWords < 5 ? widget.totalWords : 5;
   }
 
@@ -38,75 +37,85 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            //Título
-            Text(
-              widget.title,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 14),
+            // Header with icon
+            _buildHeader(),
+            const SizedBox(height: 20),
 
-            //Total de palabras
+            // Total words badge
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 129, 170, 209),
+                color: _getColor().withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                'Tienes ${widget.totalWords} palabras',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
+                'Tienes ${widget.totalWords} palabras disponibles',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: _getColor(),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            Row(children: [
-              Expanded(
-                child: Text(widget.description,
-                    style: const TextStyle(fontSize: 16)),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                width: 25,
-                height: 25,
-                decoration: const BoxDecoration(
-                  color: Colors.deepPurple,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
+            const SizedBox(height: 20),
+
+            // Selected count display
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
                   child: Text(
-                    '$_selectedCount',
+                    _getDescription(),
                     style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-              ),
-            ]),
-            const SizedBox(height: 10),
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: _getColor(),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$_selectedCount',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
 
-            //Slider
-            Slider(
-              value: _selectedCount.toDouble(),
-              min: 1,
-              max: widget.totalWords.toDouble(),
-              divisions: widget.totalWords > 1 ? widget.totalWords - 1 : 1,
-              label: _selectedCount.toString(),
-              activeColor: Colors.deepPurple,
-              onChanged: (value) {
-                setState(() {
-                  _selectedCount = value.toInt();
-                });
-              },
+            // Slider
+            SliderTheme(
+              data: SliderThemeData(
+                activeTrackColor: _getColor(),
+                thumbColor: _getColor(),
+                overlayColor: _getColor().withOpacity(0.2),
+              ),
+              child: Slider(
+                value: _selectedCount.toDouble(),
+                min: 1,
+                max: widget.totalWords.toDouble(),
+                divisions: widget.totalWords > 1 ? widget.totalWords - 1 : 1,
+                label: _selectedCount.toString(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedCount = value.toInt();
+                  });
+                },
+              ),
             ),
 
-            //Etiquetas min/max
+            // Min/Max labels
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -117,6 +126,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 12,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
@@ -124,33 +134,49 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 12,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 20),
 
-            //Botones de acceso rápido
+            // Quick selection chips
             Wrap(
               spacing: 8,
               alignment: WrapAlignment.center,
               children: [
                 if (widget.totalWords >= 5) _buildQuickButton(5),
                 if (widget.totalWords >= 10) _buildQuickButton(10),
+                if (widget.totalWords >= 20) _buildQuickButton(20),
                 if (widget.totalWords >= 30) _buildQuickButton(30),
                 if (widget.totalWords >= 50) _buildQuickButton(50),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 24),
 
-            //Botones de acción
+            // Practice info
+            _buildPracticeInfo(),
+            const SizedBox(height: 24),
+
+            // Action buttons
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancelar'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: BorderSide(color: _getColor()),
+                    ),
+                    child: Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _getColor(),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -161,13 +187,16 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                       widget.onStartPractice(_selectedCount);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: _getColor(),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     child: const Text(
                       'Comenzar',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -179,15 +208,101 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
     );
   }
 
-  Widget _buildQuickButton(int count, {String? label}) {
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: _getColor().withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            _getIcon(),
+            size: 40,
+            color: _getColor(),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          _getTitle(),
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPracticeInfo() {
+    final infoPoints = _getInfoPoints();
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 18,
+                color: _getColor(),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Información',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...infoPoints.map((point) => Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '• ',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _getColor(),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        point,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickButton(int count) {
     final isSelected = _selectedCount == count;
     return ChoiceChip(
-      label: Text(label ?? '$count'),
+      label: Text('$count'),
       selected: isSelected,
-      selectedColor: Colors.deepPurple,
+      selectedColor: _getColor(),
       showCheckmark: false,
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : Colors.black,
+        color: isSelected ? Colors.white : Colors.black87,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
       onSelected: (selected) {
@@ -198,5 +313,86 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         }
       },
     );
+  }
+
+  String _getTitle() {
+    switch (widget.practiceType) {
+      case PracticeType.flashcard:
+        return 'Flashcards';
+      case PracticeType.sentence:
+        return 'Ordenar Oraciones';
+      case PracticeType.spelling:
+        return 'Spelling';
+      case PracticeType.listening:
+        return 'Listening';
+    }
+  }
+
+  String _getDescription() {
+    switch (widget.practiceType) {
+      case PracticeType.flashcard:
+        return '¿Cuántas palabras practicar?';
+      case PracticeType.sentence:
+        return '¿Cuántas oraciones ordenar?';
+      case PracticeType.spelling:
+        return '¿Cuántas palabras escribir?';
+      case PracticeType.listening:
+        return '¿Cuántas palabras escuchar?';
+    }
+  }
+
+  IconData _getIcon() {
+    switch (widget.practiceType) {
+      case PracticeType.flashcard:
+        return Icons.style;
+      case PracticeType.sentence:
+        return Icons.sort;
+      case PracticeType.spelling:
+        return Icons.keyboard;
+      case PracticeType.listening:
+        return Icons.headphones;
+    }
+  }
+
+  Color _getColor() {
+    switch (widget.practiceType) {
+      case PracticeType.flashcard:
+        return Colors.blue;
+      case PracticeType.sentence:
+        return Colors.green;
+      case PracticeType.spelling:
+        return Colors.orange;
+      case PracticeType.listening:
+        return Colors.purple;
+    }
+  }
+
+  List<String> _getInfoPoints() {
+    switch (widget.practiceType) {
+      case PracticeType.flashcard:
+        return [
+          'Verás palabras con definiciones',
+          'Puedes ver imágenes de referencia',
+          'Marca si conoces cada palabra',
+        ];
+      case PracticeType.sentence:
+        return [
+          'Palabras desordenadas',
+          'Forma oraciones correctas',
+          'Arrastra al orden correcto',
+        ];
+      case PracticeType.spelling:
+        return [
+          'Escucha la pronunciación',
+          'Escribe correctamente',
+          'Mejora tu ortografía',
+        ];
+      case PracticeType.listening:
+        return [
+          'Escucha con atención',
+          'Identifica las palabras',
+          'Mejora tu comprensión',
+        ];
+    }
   }
 }
