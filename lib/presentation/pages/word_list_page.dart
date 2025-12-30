@@ -64,13 +64,13 @@ class WordListPage extends StatelessWidget {
         builder: (context) => const PracticeSelectionPage(),
       ),
     );
-    
+
     if (context.mounted) {
       context.read<WordListBloc>().add(const RefreshWordsEvent());
     }
   }
 
-  void _navigateToSentencePractice(BuildContext context) async {
+/*   void _navigateToSentencePractice(BuildContext context) async {
     final bloc = context.read<WordListBloc>();
     final deps = Dependencies.instance;
     await Navigator.push(
@@ -85,5 +85,5 @@ class WordListPage extends StatelessWidget {
     );
 
     bloc.add(const RefreshWordsEvent());
-  }
+  } */
 }

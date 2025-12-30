@@ -1,9 +1,10 @@
+import 'package:first_app/presentation/widgets/modals/practice_card.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/presentation/pages/practice_config_page.dart';
 
-enum PracticeType { 
-  flashcard, 
-  sentence, 
+enum PracticeType {
+  flashcard,
+  sentence,
   spelling,
   listening,
   // Add more practice types as needed
@@ -47,10 +48,11 @@ class PracticeSelectionPage extends StatelessWidget {
                     PracticeCard(
                       icon: Icons.style,
                       title: 'Flashcards',
-                      description: 'Practica vocabulario con tarjetas interactivas',
+                      description:
+                          'Practica vocabulario con tarjetas interactivas',
                       color: Colors.blue,
                       onTap: () => _navigateToConfig(
-                        context, 
+                        context,
                         PracticeType.flashcard,
                       ),
                     ),
@@ -61,7 +63,7 @@ class PracticeSelectionPage extends StatelessWidget {
                       description: 'Construye oraciones ordenando las palabras',
                       color: Colors.green,
                       onTap: () => _navigateToConfig(
-                        context, 
+                        context,
                         PracticeType.sentence,
                       ),
                     ),
@@ -69,10 +71,11 @@ class PracticeSelectionPage extends StatelessWidget {
                     PracticeCard(
                       icon: Icons.keyboard,
                       title: 'Spelling',
-                      description: 'Escribe correctamente las palabras que escuchas',
+                      description:
+                          'Escribe correctamente las palabras que escuchas',
                       color: Colors.orange,
                       onTap: () => _navigateToConfig(
-                        context, 
+                        context,
                         PracticeType.spelling,
                       ),
                       isComingSoon: true,
@@ -84,7 +87,7 @@ class PracticeSelectionPage extends StatelessWidget {
                       description: 'Mejora tu comprensión auditiva',
                       color: Colors.purple,
                       onTap: () => _navigateToConfig(
-                        context, 
+                        context,
                         PracticeType.listening,
                       ),
                       isComingSoon: true,

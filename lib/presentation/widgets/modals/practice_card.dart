@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class PracticeCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -102,3 +104,4 @@ class PracticeCard extends StatelessWidget {
       ),
     );
   }
+}

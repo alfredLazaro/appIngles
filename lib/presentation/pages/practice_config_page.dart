@@ -83,7 +83,7 @@ class PracticeConfigPage extends StatelessWidget {
   void _navigateToPractice(BuildContext context, PracticeReady state) {
     // Close the config page first
     Navigator.pop(context);
-    
+
     // Then navigate to practice
     Navigator.push(
       context,
@@ -92,12 +92,12 @@ class PracticeConfigPage extends StatelessWidget {
           switch (practiceType) {
             case PracticeType.flashcard:
               return FlashcardPracticePage(
-                words: state.practiceData.words,
-                imagesMap: state.practiceData.imagesMap,
+                words: state.words,
+                imagesMap: state.imagesMap,
               );
             case PracticeType.sentence:
               return SentencePracticePage(
-                sentenceCount: state.practiceData.words.length,
+                sentenceCount: state.words.length,
               );
             default:
               return const Scaffold(

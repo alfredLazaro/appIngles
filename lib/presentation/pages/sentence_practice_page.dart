@@ -1,3 +1,4 @@
+import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/sentence/sentence_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/data/datasources/local/word_dao.dart';
@@ -108,14 +109,14 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
                     ),
                     PageNavigationControls(
                       currentIndex: _currentIndex,
-                      totalPages: widget.words.length,
+                      totalPages: _sentences!.length,
                       onPrevious: () {
                         _pageController.previousPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                         );
                       },
-                      onNext: _currentIndex < widget.words.length - 1
+                      onNext: _currentIndex < _sentences!.length - 1
                           ? () {
                               _pageController.nextPage(
                                 duration: const Duration(milliseconds: 300),
