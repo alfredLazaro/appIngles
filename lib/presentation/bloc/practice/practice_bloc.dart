@@ -3,6 +3,7 @@ import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
+import 'package:logger/logger.dart';
 import 'practice_event.dart';
 import 'practice_state.dart';
 
@@ -48,16 +49,17 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
 
     try {
       // Load words for practice
-      final words = await _wordRepository.getWordsForPractice(event.count);
+      final List<FlashcardWord> words =
+          await _wordRepository.getWordsForPractice(event.count);
 
       // Get word IDs
       final wordIds =
-          words.map((w) => w.id!).toList(); //aseguro que cada uno tiene id
-
+          words.map((w) => w.id).toList(); //aseguro que cada uno tiene id
+      Logger log = Logger();
       // Load images
       final imagesMap = await _imageRepository.getImagesByWordIds(wordIds);
 
-      // Create practice data
+      log.i(words.length); //show correctly
 
       emit(PracticeReady(words, imagesMap));
     } catch (e) {

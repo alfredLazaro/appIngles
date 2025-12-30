@@ -8,6 +8,7 @@ import 'package:first_app/presentation/pages/flashcard_practice_page.dart';
 import 'package:first_app/presentation/pages/sentence_practice_page.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/modals/practice_selection_modal.dart';
+import 'package:logger/logger.dart';
 
 class PracticeConfigPage extends StatelessWidget {
   final PracticeType practiceType;
@@ -85,7 +86,8 @@ class PracticeConfigPage extends StatelessWidget {
   void _navigateToPractice(BuildContext context, PracticeReady state) {
     // Close the config page first
     Navigator.pop(context);
-
+    Logger log = Logger();
+    log.i(state.words);
     // Then navigate to practice
     Navigator.push(
       context,
