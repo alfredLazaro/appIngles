@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:first_app/data/mappers/image_mapper.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
@@ -60,8 +61,9 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
       final imagesMap = await _imageRepository.getImagesByWordIds(wordIds);
 
       log.i(words.length); //show correctly
-
-      emit(PracticeReady(words, imagesMap));
+      Map<int, List<FlashcardImage>> flashcardImagesMap =
+          ImageMapper().mapToFlashcardImages(imagesMap);
+      emit(PracticeReady(words, flashcardImagesMap));
     } catch (e) {
       emit(PracticeError('Error al preparar práctica: $e'));
     }

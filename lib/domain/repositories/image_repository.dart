@@ -1,3 +1,4 @@
+import 'package:first_app/data/models/image_model.dart';
 import 'package:first_app/domain/entities/word_image.dart';
 
 abstract class ImageRepository {
@@ -5,5 +6,5 @@ abstract class ImageRepository {
   Future<List<int>> saveImages(List<Map<String, dynamic>> images, int wordId);
   Future<List<WordImage>> getImagesByWordId(int wordId);
 
-  Future<dynamic> getImagesByWordIds(List<int> wordIds) async {}
+  Future<Map<int, List<Image_Model>>> getImagesByWordIds(List<int> wordIds);
 }
