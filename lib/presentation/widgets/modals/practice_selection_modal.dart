@@ -183,7 +183,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      //Navigator.pop(context); //no es necesario ponerlo aqui
                       widget.onStartPractice(_selectedCount);
                     },
                     style: ElevatedButton.styleFrom(
