@@ -2,6 +2,7 @@ import 'package:first_app/main.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
+import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/presentation/pages/word_learning_page.dart';
 import 'package:first_app/presentation/pages/word_list_page.dart';
@@ -54,6 +55,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           value: wordLearningBloc,
           child: const WordLearningPage(),
         ),
+        const PracticeSelectionPage(),
         BlocProvider.value(
           value: wordListBloc,
           child: const WordListPage(),
@@ -69,7 +71,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         onTap: (index) {
           setState(() {
             _currentIndex = index;
-            if (index == 1) {
+            if (index == 2) {
               wordListBloc.add(const LoadWordsEvent());
             }
           });
@@ -79,6 +81,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             icon: Icon(Icons.school),
             label: 'Aprender',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.alarm)),
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
             label: 'Mis Palabras',
