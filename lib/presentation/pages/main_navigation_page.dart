@@ -81,7 +81,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             icon: Icon(Icons.school),
             label: 'Aprender',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.alarm)),
+          BottomNavigationBarItem(icon: Icon(Icons.alarm), label: "d"),
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
             label: 'Mis Palabras',
