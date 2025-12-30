@@ -51,7 +51,7 @@ class PageNavigationControls extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // ✅ Botón Anterior
+          // Botón Anterior
           ElevatedButton.icon(
             onPressed: !isFirstPage ? onPrevious : null,
             icon: Icon(previousIcon),
@@ -64,14 +64,14 @@ class PageNavigationControls extends StatelessWidget {
             ),
           ),
 
-          // ✅ Widget central (contador o custom)
+          // Widget central (contador o custom)
           centerWidget ??
               _DefaultCenterWidget(
                 currentIndex: currentIndex,
                 totalPages: totalPages,
               ),
 
-          // ✅ Botón Siguiente/Finalizar
+          // Botón Siguiente/Finalizar
           ElevatedButton.icon(
             onPressed: onNext,
             icon: Icon(isLastPage ? finalIcon : nextIcon),

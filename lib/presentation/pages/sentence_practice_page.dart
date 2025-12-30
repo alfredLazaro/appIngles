@@ -106,7 +106,24 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
                         },
                       ),
                     ),
-                    _buildNavigationControls(),
+                    PageNavigationControls(
+                      currentIndex: _currentIndex,
+                      totalPages: widget.words.length,
+                      onPrevious: () {
+                        _pageController.previousPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      onNext: _currentIndex < widget.words.length - 1
+                          ? () {
+                              _pageController.nextPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          : () => _showCompletionDialog(),
+                    ),
                   ],
                 ),
     );
