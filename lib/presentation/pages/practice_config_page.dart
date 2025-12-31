@@ -69,7 +69,7 @@ class PracticeConfigPage extends StatelessWidget {
         totalWords: totalCount,
         practiceType: practiceType,
         onStartPractice: (count) {
-          // Use the outer context (BlocProvider context)
+          Navigator.pop(dialogContext);
           context.read<PracticeBloc>().add(
                 StartPracticeEvent(count, practiceType),
               );
