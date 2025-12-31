@@ -159,7 +159,10 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
         totalItems: totalWords,
         learnedCount: learnedCount,
         itemName: 'palabras',
-        onFinish: () => Navigator.pop(dialogContext),
+        onFinish: () {
+          Navigator.pop(dialogContext),
+          Navigator.pop(context),
+        } 
         onRepeat: () {
           Navigator.pop(dialogContext);
           setState(() {
