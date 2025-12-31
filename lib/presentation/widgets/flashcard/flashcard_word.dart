@@ -44,7 +44,7 @@ class WordFlashcard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ✅ Imágenes
+                // Imágenes
                 FlashcardImageWidget(
                   images: images,
                   height: constraints.maxHeight * 0.35,
@@ -52,7 +52,7 @@ class WordFlashcard extends StatelessWidget {
 
                 SizedBox(height: constraints.maxHeight * 0.02),
 
-                // ✅ Palabra principal
+                // Palabra principal
                 Center(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -70,7 +70,7 @@ class WordFlashcard extends StatelessWidget {
 
                 SizedBox(height: constraints.maxHeight * 0.02),
 
-                // ✅ Definición
+                // Definición
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -115,7 +115,7 @@ class WordFlashcard extends StatelessWidget {
 
                 SizedBox(height: constraints.maxHeight * 0.015),
 
-                // ✅ Oración de ejemplo
+                // Oración de ejemplo
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -159,40 +159,6 @@ class WordFlashcard extends StatelessWidget {
                   ),
                 ),
 
-                const Spacer(),
-
-                // ✅ Contador de aprendizaje (opcional, en la parte inferior)
-                if (word.learnCount > 0)
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.sync,
-                            color: textColor,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Revisado ${word.learnCount} veces',
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
               ],
             ),
           );
