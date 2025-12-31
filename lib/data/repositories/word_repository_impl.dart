@@ -143,7 +143,7 @@ class WordRepositoryImpl implements WordRepository {
         items: maps.map((map) => WordMapper.toWordWithImage(map)).toList(),
         currentPage: page,
         pageSize: pageSize,
-        totalItems: 0, // Can't calculate without count method
+        totalItems: await getTotalWordCount(), // total words
         hasNextPage: hasNextPage,
       );
     } catch (e) {

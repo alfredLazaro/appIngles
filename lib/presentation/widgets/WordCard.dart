@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
+import 'package:first_app/presentation/widgets/learn_progress_indicator.dart';
 import 'package:flutter/material.dart';
 
 class WordCard extends StatelessWidget {
@@ -64,15 +65,24 @@ class WordCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: onSpeak,
-                    child: Text(
-                      word.word,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: onSpeak,
+                          child: Text(
+                            word.word,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      // Progress indicator next to the word
+                      LearnProgressIndicator(learnValue: word.learn),
+                    ],
                   ),
                   const SizedBox(height: 1),
                   Text(

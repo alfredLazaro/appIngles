@@ -57,6 +57,7 @@ class WordMapper {
       word: map['word'] ?? '',
       definition: map['definition'] ?? '',
       tinyImageUrl: map['tinyImageUrl'], // Puede ser null
+      learn: map['learn'],
     );
   }
 
