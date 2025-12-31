@@ -85,11 +85,9 @@ class PracticeConfigPage extends StatelessWidget {
 
   void _navigateToPractice(BuildContext context, PracticeReady state) {
     // Close the config page first
-    Navigator.pop(context);
-    Logger log = Logger();
-    log.i(state.words);
+    Navigator.pop(context); 
     // Then navigate to practice
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (context) {
@@ -110,6 +108,7 @@ class PracticeConfigPage extends StatelessWidget {
           }
         },
       ),
+      (Route<dynamic> route) => false,
     );
   }
 }
