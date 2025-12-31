@@ -147,7 +147,7 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              Navigator.pop(context);
+              Navigator.pop(context); //pantalla negra si esto pasa
             },
             child: const Text('Finalizar'),
           ),

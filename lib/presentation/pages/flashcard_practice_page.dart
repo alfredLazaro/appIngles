@@ -42,23 +42,23 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     super.initState();
     // Initialize all BLoCs once
     _flashcardBlocs = {
-      for (var word in widget.words)
-        word.id: _createBlocForWord(word)
+      for (var word in widget.words) word.id: _createBlocForWord(word)
     };
-  } 
+  }
+
   FlashcardBloc _createBlocForWord(FlashcardWord word) {
     final ttsService = TtsService();
     final wordDao = WordDao();
     final wordRepository = FlashcardRepository(wordDao: wordDao);
     final images = widget.imagesMap[word.id] ?? [];
-    
+
     final initialState = FlashcardLoaded(
       word: word,
       images: images,
       showFront: true,
       learnCount: word.learnCount,
     );
-    
+
     return FlashcardBloc(
       validateWordAnswer: ValidateWordAnswer(),
       speakText: SpeakText(ttsService),
@@ -66,6 +66,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
       initialState: initialState,
     );
   }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -135,7 +136,9 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                             .showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  state.isCorrect ? '¡Correcto! ✅' : 'Incorrecto ❌',
+                                  state.isCorrect
+                                      ? '¡Correcto! ✅'
+                                      : 'Incorrecto ❌',
                                 ),
                                 backgroundColor:
                                     state.isCorrect ? Colors.green : Colors.red,
@@ -221,9 +224,11 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
         learnedCount: learnedCount,
         itemName: 'palabras',
         onFinish: () {
-          Navigator.pop(dialogContext),
-          Navigator.pop(context),
-        } 
+          Navigator.pop(dialogContext);
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context); //pantalla negra si entra aqui
+          }
+        },
         onRepeat: () {
           Navigator.pop(dialogContext);
           setState(() {
