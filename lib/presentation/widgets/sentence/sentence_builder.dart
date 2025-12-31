@@ -109,7 +109,7 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
               // Área de construcción de oración
               Container(
                 width: double.infinity,
-                height: 210,
+                height: 190,
                 constraints: const BoxConstraints(minHeight: 120),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(

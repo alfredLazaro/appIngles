@@ -130,63 +130,6 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
     );
   }
 
-  Widget _buildNavigationControls() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          ElevatedButton.icon(
-            onPressed: _currentIndex > 0
-                ? () {
-                    _pageController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  }
-                : null,
-            icon: const Icon(Icons.arrow_back),
-            label: const Text('Anterior'),
-          ),
-          Text(
-            '${_currentIndex + 1} / ${_sentences!.length}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          ElevatedButton.icon(
-            onPressed: _currentIndex < _sentences!.length - 1
-                ? () {
-                    _pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  }
-                : () => _showCompletionDialog(),
-            icon: Icon(_currentIndex < _sentences!.length - 1
-                ? Icons.arrow_forward
-                : Icons.check_circle),
-            label: Text(_currentIndex < _sentences!.length - 1
-                ? 'Siguiente'
-                : 'Finalizar'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  _currentIndex < _sentences!.length - 1 ? null : Colors.green,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showCompletionDialog() {
     showDialog(
       context: context,

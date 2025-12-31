@@ -172,7 +172,6 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
           });
         },
         // Opcional: personalización
-        customTitle: '¡Lección completada!',
         primaryColor: Theme.of(dialogContext).colorScheme.secondary,
       ),
     );
