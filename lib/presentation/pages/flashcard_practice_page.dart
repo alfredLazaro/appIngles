@@ -81,6 +81,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   Widget build(BuildContext context) {
     final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: isKeyboardVisible
           ? null
           : AppBar(
