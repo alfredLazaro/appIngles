@@ -35,10 +35,44 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
   final Map<int, int> _scores = {}; // wordId → score (learned count)
+  late final Map<int, FlashcardBloc> _flashcardBlocs;
 
+  @override
+  void initState() {
+    super.initState();
+    // Initialize all BLoCs once
+    _flashcardBlocs = {
+      for (var word in widget.words)
+        word.id: _createBlocForWord(word)
+    };
+  } 
+  FlashcardBloc _createBlocForWord(FlashcardWord word) {
+    final ttsService = TtsService();
+    final wordDao = WordDao();
+    final wordRepository = FlashcardRepository(wordDao: wordDao);
+    final images = widget.imagesMap[word.id] ?? [];
+    
+    final initialState = FlashcardLoaded(
+      word: word,
+      images: images,
+      showFront: true,
+      learnCount: word.learnCount,
+    );
+    
+    return FlashcardBloc(
+      validateWordAnswer: ValidateWordAnswer(),
+      speakText: SpeakText(ttsService),
+      wordRepository: wordRepository,
+      initialState: initialState,
+    );
+  }
   @override
   void dispose() {
     _pageController.dispose();
+    // Dispose all BLoCs
+    for (var bloc in _flashcardBlocs.values) {
+      bloc.close();
+    }
     super.dispose();
   }
 
@@ -89,15 +123,42 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
               itemBuilder: (context, index) {
                 final word = widget.words[index];
                 final images = widget.imagesMap[word.id] ?? [];
+                final bloc = _flashcardBlocs[word.id]!;
 
-                return _FlashcardPageItem(
-                  word: word,
-                  images: images,
-                  onLearnedUpdated: (learnCount) {
-                    setState(() {
-                      _scores[word.id] = learnCount;
-                    });
-                  },
+                // Use BlocProvider.value instead of BlocProvider
+                return BlocProvider<FlashcardBloc>.value(
+                  value: bloc,
+                  child: BlocListener<FlashcardBloc, FlashcardState>(
+                    listener: (context, state) {
+                      if (state is FlashcardAnswerValidated) {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  state.isCorrect ? '¡Correcto! ✅' : 'Incorrecto ❌',
+                                ),
+                                backgroundColor:
+                                    state.isCorrect ? Colors.green : Colors.red,
+                                duration: const Duration(seconds: 1),
+                              ),
+                            )
+                            .closed
+                            .then((_) {
+                          context.read<FlashcardBloc>().add(FlipFlashcard());
+                        });
+                      }
+
+                      if (state is FlashcardLoaded) {
+                        setState(() {
+                          _scores[word.id] = state.learnCount;
+                        });
+                      }
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: EnglishFlashCard(),
+                    ),
+                  ),
                 );
               },
             ),
