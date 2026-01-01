@@ -1,6 +1,7 @@
 import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/domain/repositories/flashcard_repository.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
+import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
 import 'package:flutter/material.dart';
@@ -225,9 +226,19 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
         itemName: 'palabras',
         onFinish: () {
           Navigator.pop(dialogContext);
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context); //pantalla negra si entra aqui
-          }
+          /* Navigator.popUntil(context, (route) {
+            // This will pop until we reach the PracticeSelectionPage
+            return route.settings.name == '/practice-selection' ||
+                route.isFirst;
+          }); */
+          // OR if you want to go back to the PracticeSelectionPage directly:
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    const PracticeSelectionPage()), //solo la pagina sin la barra de navegacion como si fuera la unica
+            (route) => false,
+          );
         },
         onRepeat: () {
           Navigator.pop(dialogContext);

@@ -1,3 +1,4 @@
+import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/sentence/sentence_builder.dart';
 import 'package:flutter/material.dart';
@@ -147,7 +148,19 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              Navigator.pop(context); //pantalla negra si esto pasa
+              /* Navigator.popUntil(context, (route) {
+            // This will pop until we reach the PracticeSelectionPage
+            return route.settings.name == '/practice-selection' ||
+                route.isFirst;
+          }); */
+              // OR if you want to go back to the PracticeSelectionPage directly:
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        const PracticeSelectionPage()), //devuelve solo la pagina sin la navegacion
+                (route) => false,
+              );
             },
             child: const Text('Finalizar'),
           ),
