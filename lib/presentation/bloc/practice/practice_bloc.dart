@@ -4,7 +4,6 @@ import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
-import 'package:logger/logger.dart';
 import 'practice_event.dart';
 import 'practice_state.dart';
 
@@ -56,11 +55,9 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
       // Get word IDs
       final wordIds =
           words.map((w) => w.id).toList(); //aseguro que cada uno tiene id
-      Logger log = Logger();
       // Load images
       final imagesMap = await _imageRepository.getImagesByWordIds(wordIds);
 
-      log.i(words.length); //show correctly
       Map<int, List<FlashcardImage>> flashcardImagesMap =
           ImageMapper().mapToFlashcardImages(imagesMap);
       emit(PracticeReady(words, flashcardImagesMap));
