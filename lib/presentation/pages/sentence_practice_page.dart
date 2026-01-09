@@ -154,13 +154,7 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
                 route.isFirst;
           }); */
               // OR if you want to go back to the PracticeSelectionPage directly:
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        const PracticeSelectionPage()), //devuelve solo la pagina sin la navegacion
-                (route) => false,
-              );
+              Navigator.pop(context);
             },
             child: const Text('Finalizar'),
           ),
