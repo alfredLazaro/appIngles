@@ -8,7 +8,6 @@ import 'package:first_app/presentation/pages/flashcard_practice_page.dart';
 import 'package:first_app/presentation/pages/sentence_practice_page.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/modals/practice_selection_modal.dart';
-import 'package:logger/logger.dart';
 
 class PracticeConfigPage extends StatelessWidget {
   final PracticeType practiceType;

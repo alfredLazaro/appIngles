@@ -1,7 +1,6 @@
 import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/domain/repositories/flashcard_repository.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
-import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
 import 'package:flutter/material.dart';

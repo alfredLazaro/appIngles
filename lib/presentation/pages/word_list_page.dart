@@ -1,4 +1,3 @@
-import 'package:first_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
