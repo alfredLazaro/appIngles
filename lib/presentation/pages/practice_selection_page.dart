@@ -7,7 +7,6 @@ enum PracticeType {
   sentence,
   spelling,
   listening,
-  // Add more practice types as needed
 }
 
 class PracticeSelectionPage extends StatelessWidget {

@@ -147,12 +147,6 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              /* Navigator.popUntil(context, (route) {
-            // This will pop until we reach the PracticeSelectionPage
-            return route.settings.name == '/practice-selection' ||
-                route.isFirst;
-          }); */
-              // OR if you want to go back to the PracticeSelectionPage directly:
               Navigator.pop(context);
             },
             child: const Text('Finalizar'),
