@@ -84,9 +84,8 @@ class PracticeConfigPage extends StatelessWidget {
   }
 
   void _navigateToPractice(BuildContext context, PracticeReady state) {
-    
-    // Then navigate to practice
-    Navigator.of(context).pushReplacement(
+    Navigator.pushAndRemoveUntil(
+      context,
       MaterialPageRoute(
         builder: (context) {
           switch (practiceType) {
@@ -106,6 +105,7 @@ class PracticeConfigPage extends StatelessWidget {
           }
         },
       ),
+      (route) => route.isFirst,
     );
   }
 }

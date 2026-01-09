@@ -227,19 +227,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
         itemName: 'palabras',
         onFinish: () {
           Navigator.pop(dialogContext);
-          /* Navigator.popUntil(context, (route) {
-            // This will pop until we reach the PracticeSelectionPage
-            return route.settings.name == '/practice-selection' ||
-                route.isFirst;
-          }); */
-          // OR if you want to go back to the PracticeSelectionPage directly:
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    const PracticeSelectionPage()), //solo la pagina sin la barra de navegacion como si fuera la unica
-            (route) => false,
-          );
+          Navigator.pop(context);
         },
         onRepeat: () {
           Navigator.pop(dialogContext);
