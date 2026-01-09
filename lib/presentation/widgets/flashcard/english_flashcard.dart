@@ -39,11 +39,6 @@ class EnglishFlashCard extends StatelessWidget {
             ),
             child: GestureDetector(
               onTap: () {
-                // Avoid flipping when a TextField or any input is focused
-                final primaryFocus = FocusManager.instance.primaryFocus;
-                if (primaryFocus != null && primaryFocus.hasFocus) {
-                  return;
-                }
                 context.read<FlashcardBloc>().add(FlipFlashcard());
               },
               child: Card(
