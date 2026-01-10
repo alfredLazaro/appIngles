@@ -54,7 +54,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     final initialState = FlashcardLoaded(
       word: word,
       images: images,
-      showFront: true,
+      showFront: false,
       learnCount: word.learnCount,
     );
 
@@ -78,14 +78,11 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   @override
   Widget build(BuildContext context) {
     final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
-    
+
     return Scaffold(
-      // FIXED: Changed to true to allow proper keyboard handling
       resizeToAvoidBottomInset: true,
-      // FIXED: Always show AppBar, just adjust its height
-      appBar: AppBar(
-        // Hide AppBar content when keyboard is visible, but keep the AppBar widget
-        toolbarHeight: isKeyboardVisible ? 0 : kToolbarHeight,
+      /* appBar: AppBar(
+        //toolbarHeight: isKeyboardVisible ? 0 : kToolbarHeight,
         title: isKeyboardVisible 
             ? null 
             : Text('Práctica (${_currentIndex + 1}/${widget.words.length})'),
@@ -103,26 +100,25 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                   ),
                 ),
               ],
-      ),
+      ), */
       body: Column(
         children: [
           // Progress bar
-          if (!isKeyboardVisible)
-            LinearProgressIndicator(
-              value: (_currentIndex + 1) / widget.words.length,
-              minHeight: 6,
-              backgroundColor: Colors.grey[300],
-              valueColor:
-                  const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
-            ),
+          //if (!isKeyboardVisible)
+          LinearProgressIndicator(
+            value: (_currentIndex + 1) / widget.words.length,
+            minHeight: 6,
+            backgroundColor: Colors.grey[300],
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+          ),
 
           // PageView with flashcards
           Expanded(
             child: PageView.builder(
               controller: _pageController,
               itemCount: widget.words.length,
-              physics: isKeyboardVisible 
-                  ? const NeverScrollableScrollPhysics() 
+              physics: isKeyboardVisible
+                  ? const NeverScrollableScrollPhysics()
                   : null, // Disable swipe when keyboard is open
               onPageChanged: (index) {
                 setState(() {
@@ -174,45 +170,45 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
           ),
 
           // Navigation controls
-          if (!isKeyboardVisible)
-            PageNavigationControls(
-              currentIndex: _currentIndex,
-              totalPages: widget.words.length,
-              onPrevious: () {
-                _pageController.previousPage(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
-              },
-              onNext: _currentIndex < widget.words.length - 1
-                  ? () {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  : () => _showCompletionDialog(),
-              centerWidget: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+          //if (!isKeyboardVisible)
+          PageNavigationControls(
+            currentIndex: _currentIndex,
+            totalPages: widget.words.length,
+            onPrevious: () {
+              _pageController.previousPage(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            },
+            onNext: _currentIndex < widget.words.length - 1
+                ? () {
+                    _pageController.nextPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  }
+                : () => _showCompletionDialog(),
+            centerWidget: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${_currentIndex + 1} / ${widget.words.length}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (_scores.isNotEmpty)
                   Text(
-                    '${_currentIndex + 1} / ${widget.words.length}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    '${_scores.values.where((s) => s > 0).length} aprendidas',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
                     ),
                   ),
-                  if (_scores.isNotEmpty)
-                    Text(
-                      '${_scores.values.where((s) => s > 0).length} aprendidas',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                ],
-              ),
+              ],
             ),
+          ),
         ],
       ),
     );
