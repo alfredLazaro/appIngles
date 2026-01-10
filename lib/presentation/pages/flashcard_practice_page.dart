@@ -19,7 +19,7 @@ Logger log = Logger();
 
 class FlashcardPracticePage extends StatefulWidget {
   final List<FlashcardWord> words;
-  final Map<int, List<FlashcardImage>> imagesMap; // wordId → List<Images>
+  final Map<int, List<FlashcardImage>> imagesMap;
 
   const FlashcardPracticePage({
     super.key,
@@ -34,13 +34,12 @@ class FlashcardPracticePage extends StatefulWidget {
 class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
-  final Map<int, int> _scores = {}; // wordId → score (learned count)
+  final Map<int, int> _scores = {};
   late final Map<int, FlashcardBloc> _flashcardBlocs;
 
   @override
   void initState() {
     super.initState();
-    // Initialize all BLoCs once
     _flashcardBlocs = {
       for (var word in widget.words) word.id: _createBlocForWord(word)
     };
@@ -70,7 +69,6 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   @override
   void dispose() {
     _pageController.dispose();
-    // Dispose all BLoCs
     for (var bloc in _flashcardBlocs.values) {
       bloc.close();
     }
@@ -80,14 +78,20 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   @override
   Widget build(BuildContext context) {
     final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+    
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: isKeyboardVisible
-          ? null
-          : AppBar(
-              title: Text(
-                  'Práctica (${_currentIndex + 1}/${widget.words.length})'),
-              actions: [
+      // FIXED: Changed to true to allow proper keyboard handling
+      resizeToAvoidBottomInset: true,
+      // FIXED: Always show AppBar, just adjust its height
+      appBar: AppBar(
+        // Hide AppBar content when keyboard is visible, but keep the AppBar widget
+        toolbarHeight: isKeyboardVisible ? 0 : kToolbarHeight,
+        title: isKeyboardVisible 
+            ? null 
+            : Text('Práctica (${_currentIndex + 1}/${widget.words.length})'),
+        actions: isKeyboardVisible 
+            ? null 
+            : [
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.only(right: 16),
@@ -99,10 +103,10 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                   ),
                 ),
               ],
-            ),
+      ),
       body: Column(
         children: [
-          // Barra de progreso
+          // Progress bar
           if (!isKeyboardVisible)
             LinearProgressIndicator(
               value: (_currentIndex + 1) / widget.words.length,
@@ -112,11 +116,14 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                   const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
             ),
 
-          // PageView con flashcards
+          // PageView with flashcards
           Expanded(
             child: PageView.builder(
               controller: _pageController,
               itemCount: widget.words.length,
+              physics: isKeyboardVisible 
+                  ? const NeverScrollableScrollPhysics() 
+                  : null, // Disable swipe when keyboard is open
               onPageChanged: (index) {
                 setState(() {
                   _currentIndex = index;
@@ -124,10 +131,8 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
               },
               itemBuilder: (context, index) {
                 final word = widget.words[index];
-                final images = widget.imagesMap[word.id] ?? [];
                 final bloc = _flashcardBlocs[word.id]!;
 
-                // Use BlocProvider.value instead of BlocProvider
                 return BlocProvider<FlashcardBloc>.value(
                   value: bloc,
                   child: BlocListener<FlashcardBloc, FlashcardState>(
@@ -168,7 +173,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             ),
           ),
 
-          // Controles de navegación (ahora reutilizable)
+          // Navigation controls
           if (!isKeyboardVisible)
             PageNavigationControls(
               currentIndex: _currentIndex,
@@ -236,7 +241,6 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             _pageController.jumpToPage(0);
           });
         },
-        // Opcional: personalización
         primaryColor: Theme.of(dialogContext).colorScheme.secondary,
       ),
     );
