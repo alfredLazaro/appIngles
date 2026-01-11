@@ -26,7 +26,7 @@ class FlashcardFront extends StatelessWidget {
       builder: (context, constraints) {
         return Container(
           constraints: BoxConstraints(
-            minHeight: constraints.maxHeight,
+            minHeight: constraints.minHeight,
             maxWidth: constraints.maxWidth,
           ),
           padding: EdgeInsets.all(constraints.maxHeight * 0.02),
