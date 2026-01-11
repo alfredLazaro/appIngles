@@ -13,7 +13,7 @@ class EnglishFlashCard extends StatelessWidget {
   final Color textColor;
   final double borderRadius;
   final double? minHeight;
-  final double? maxWidth; 
+  final double? maxWidth;
   const EnglishFlashCard({
     super.key,
     this.cardColor = Colors.white,
@@ -37,7 +37,7 @@ class EnglishFlashCard extends StatelessWidget {
         return Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: minHeight, 
+              minHeight: minHeight ?? 0,
               maxWidth: maxWidth ?? double.infinity,
             ),
             child: GestureDetector(
