@@ -23,10 +23,9 @@ class FlashcardBack extends StatelessWidget {
         return Container(
           padding: EdgeInsets.all(constraints.maxHeight * 0.02),
           constraints: BoxConstraints(
-            minHeight: constraints.maxHeight,
+            minHeight: constraints.minHeight,
             maxWidth: constraints.maxWidth,
           ),
-          child: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.all(constraints.maxHeight * 0.02),
               child: Column(
@@ -54,7 +53,6 @@ class FlashcardBack extends StatelessWidget {
                 ],
               ),
             ),
-          ),
         );
       },
     );

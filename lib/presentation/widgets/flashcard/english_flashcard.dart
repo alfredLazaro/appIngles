@@ -18,7 +18,7 @@ class EnglishFlashCard extends StatelessWidget {
     this.cardColor = Colors.white,
     this.textColor = Colors.black,
     this.borderRadius = FlashcardConstants.defaultBorderRadius,
-    this.maxWidth = 450.0, // Valor por defecto: 600px
+    this.maxWidth = 450.0, // Valor por defecto: 450px
   });
 
   @override
