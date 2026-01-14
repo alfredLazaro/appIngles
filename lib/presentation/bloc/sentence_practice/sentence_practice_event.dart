@@ -1,4 +1,5 @@
 // sentence_practice_event.dart
+import 'package:equatable/equatable.dart';
 part of 'sentence_practice_bloc.dart';
 
 abstract class SentencePracticeEvent extends Equatable {
