@@ -4,6 +4,7 @@ import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
+import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 
 /// Contrato del repositorio de palabras
 abstract class WordRepository {
@@ -23,7 +24,7 @@ abstract class WordRepository {
     String? searchQuery,
   });
   Future<List<FlashcardWord>> getWordsForPractice(int limit);
-  Future<List<String>> getSentencesForPractice({int limit});
+  Future<List<SentenceModel>> getSentencesForPractice({int limit});
   Future<List<Word>> searchWords(String query);
   Future<int> getTotalWordCount();
   Future<void> batchUpdateLearnCounts(Map<int, int> updates);

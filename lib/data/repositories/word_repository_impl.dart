@@ -8,6 +8,7 @@ import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/core/services/dictonary_service.dart';
 import 'package:first_app/data/mappers/word_mapper.dart';
+import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 
 /// Implementación concreta del repositorio
 class WordRepositoryImpl implements WordRepository {
@@ -162,12 +163,12 @@ class WordRepositoryImpl implements WordRepository {
   }
 
   @override
-  Future<List<String>> getSentencesForPractice({int limit = 10}) async {
+  Future<List<SentenceModel>> getSentencesForPractice({int limit = 10}) async {
     try {
       final maps = await _wordDao.getSentencesForPractice(limit);
       return maps
           .where((map) => map['sentence'] != null)
-          .map((map) => map['sentence'] as String)
+          .map((map) => SentenceModel.fromMap(map))
           .toList();
     } catch (e) {
       throw Exception('Error al obtener oraciones para practicar: $e');
@@ -221,6 +222,7 @@ class WordRepositoryImpl implements WordRepository {
       throw Exception('Error al actualizar palabra: $e');
     }
   }
+
   @override
   Future<int> countSentences() async {
     return await _wordDao.countSentences();

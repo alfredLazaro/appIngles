@@ -6,6 +6,7 @@ import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
+import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 
 /// Repositorio especializado solo para operaciones de flashcards
 /// Implementa solo los métodos necesarios para flashcards
@@ -70,7 +71,7 @@ class FlashcardRepository implements WordRepository {
   }
 
   @override
-  Future<List<String>> getSentencesForPractice({int limit = 10}) {
+  Future<List<SentenceModel>> getSentencesForPractice({int limit = 10}) {
     // TODO: implement getSentencesForPractice
     throw UnimplementedError();
   }
@@ -117,6 +118,7 @@ class FlashcardRepository implements WordRepository {
     // TODO: implement wordExists
     throw UnimplementedError();
   }
+
   @override
   Future<int> countSentences() async {
     return await _wordDao.countSentences();

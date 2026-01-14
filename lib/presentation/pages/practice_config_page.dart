@@ -98,7 +98,7 @@ class PracticeConfigPage extends StatelessWidget {
             case PracticeType.sentence:
               final sentenceData = state.practiceData as SentencePracticeData;
               return SentencePracticePage(
-                sentenceCount: sentenceData.sentences,
+                sentences: sentenceData.sentences,
               );
             default:
               return const Scaffold(

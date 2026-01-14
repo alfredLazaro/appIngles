@@ -21,7 +21,7 @@ class ImageMapper {
         .toList();
   }
 
-  Map<int, List<FlashcardImage>> mapToFlashcardImages(
+  static Map<int, List<FlashcardImage>> mapToFlashcardImages(
     Map<int, List<Image_Model>> imagesMap,
   ) {
     return imagesMap.map((wordId, imageModels) {

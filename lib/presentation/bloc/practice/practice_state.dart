@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:first_app/domain/entities/flashcard_word.dart';
-import 'package:first_app/domain/entities/flashcard_image.dart';
+import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 
 abstract class PracticeState extends Equatable {
   const PracticeState();
@@ -26,13 +25,12 @@ class PracticeDataLoaded extends PracticeState {
 }
 
 class PracticeReady extends PracticeState {
-  final List<FlashcardWord> words;
-  final Map<int, List<FlashcardImage>> imagesMap;
+  final PracticeData practiceData;
 
-  const PracticeReady(this.words, this.imagesMap);
+  const PracticeReady(this.practiceData);
 
   @override
-  List<Object> get props => [words, imagesMap];
+  List<Object> get props => [practiceData];
 }
 
 class PracticeError extends PracticeState {
