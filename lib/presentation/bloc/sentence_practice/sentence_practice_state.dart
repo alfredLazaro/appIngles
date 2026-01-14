@@ -1,85 +1,62 @@
-// lib/presentation/bloc/sentence_practice/sentence_practice_state.dart
+// sentence_practice_state.dart
+part of 'sentence_practice_bloc.dart';
 
-abstract class SentencePracticeState {}
+abstract class SentencePracticeState extends Equatable {
+  const SentencePracticeState();
+}
 
-class SentencePracticeInitial extends SentencePracticeState {}
-
-class SentencePracticeLoading extends SentencePracticeState {}
+class SentencePracticeInitial extends SentencePracticeState {
+  @override
+  List<Object> get props => [];
+}
 
 class SentencePracticeLoaded extends SentencePracticeState {
-  final List<SentenceData> sentences;
-  final int currentIndex;
-  final Map<int, bool> answersCorrect; // sentenceId → isCorrect
-  final Map<int, bool> answersChecked; // sentenceId → hasBeenChecked
+  final int sentenceId;
+  final String originalSentence;
+  final List<String> shuffledWords;
+  final List<bool> wordVisibility;
+  final List<String> userSentence;
+  final bool isCorrect;
+  final bool showResult;
 
-  SentencePracticeLoaded({
-    required this.sentences,
-    this.currentIndex = 0,
-    Map<int, bool>? answersCorrect,
-    Map<int, bool>? answersChecked,
-  })  : answersCorrect = answersCorrect ?? {},
-        answersChecked = answersChecked ?? {};
+  const SentencePracticeLoaded({
+    required this.sentenceId,
+    required this.originalSentence,
+    required this.shuffledWords,
+    required this.wordVisibility,
+    required this.userSentence,
+    this.isCorrect = false,
+    this.showResult = false,
+  });
 
   SentencePracticeLoaded copyWith({
-    List<SentenceData>? sentences,
-    int? currentIndex,
-    Map<int, bool>? answersCorrect,
-    Map<int, bool>? answersChecked,
+    int? sentenceId,
+    String? originalSentence,
+    List<String>? shuffledWords,
+    List<bool>? wordVisibility,
+    List<String>? userSentence,
+    bool? isCorrect,
+    bool? showResult,
   }) {
     return SentencePracticeLoaded(
-      sentences: sentences ?? this.sentences,
-      currentIndex: currentIndex ?? this.currentIndex,
-      answersCorrect: answersCorrect ?? this.answersCorrect,
-      answersChecked: answersChecked ?? this.answersChecked,
+      sentenceId: sentenceId ?? this.sentenceId,
+      originalSentence: originalSentence ?? this.originalSentence,
+      shuffledWords: shuffledWords ?? this.shuffledWords,
+      wordVisibility: wordVisibility ?? this.wordVisibility,
+      userSentence: userSentence ?? this.userSentence,
+      isCorrect: isCorrect ?? this.isCorrect,
+      showResult: showResult ?? this.showResult,
     );
   }
 
-  SentenceData get currentSentence => sentences[currentIndex];
-  bool get hasNext => currentIndex < sentences.length - 1;
-  bool get hasPrevious => currentIndex > 0;
-  int get completedCount => answersCorrect.values.where((v) => v).length;
-  double get progress => (currentIndex + 1) / sentences.length;
-}
-
-class SentenceAnswerValidated extends SentencePracticeState {
-  final bool isCorrect;
-  final String correctAnswer;
-  
-  SentenceAnswerValidated({
-    required this.isCorrect,
-    required this.correctAnswer,
-  });
-}
-
-class SentencePracticeError extends SentencePracticeState {
-  final String message;
-  SentencePracticeError(this.message);
-}
-
-// Data class for sentence information
-class SentenceData {
-  final int id;
-  final String sentence;
-  final List<String> words;
-  final List<String> shuffledWords;
-
-  SentenceData({
-    required this.id,
-    required this.sentence,
-    required this.words,
-    required this.shuffledWords,
-  });
-
-  factory SentenceData.fromMap(Map<String, dynamic> map) {
-    final sentence = map['sentence'] as String;
-    final words = sentence.split(' ');
-    final shuffledWords = List<String>.from(words)..shuffle();
-
-    return SentenceData(
-      id: map['id'] as int,
-      sentence: sentence,
-      words: words,
-      shuffledWords: shuffledWords,
-    );
-  }
+  @override
+  List<Object> get props => [
+        sentenceId,
+        originalSentence,
+        shuffledWords,
+        wordVisibility,
+        userSentence,
+        isCorrect,
+        showResult,
+      ];
 }

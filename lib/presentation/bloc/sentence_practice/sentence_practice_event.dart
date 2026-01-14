@@ -1,44 +1,64 @@
-// lib/presentation/bloc/sentence_practice/sentence_practice_event.dart
+// sentence_practice_event.dart
+part of 'sentence_practice_bloc.dart';
 
-abstract class SentencePracticeEvent {}
-
-/// Load sentences for practice
-class LoadSentences extends SentencePracticeEvent {
-  final int count;
-  LoadSentences(this.count);
+abstract class SentencePracticeEvent extends Equatable {
+  const SentencePracticeEvent();
 }
 
-/// Check if user's answer is correct
-class CheckAnswer extends SentencePracticeEvent {
+class InitializeSentenceEvent extends SentencePracticeEvent {
   final int sentenceId;
-  final String userAnswer;
-  
-  CheckAnswer({
+  final String originalSentence;
+
+  const InitializeSentenceEvent({
     required this.sentenceId,
-    required this.userAnswer,
+    required this.originalSentence,
   });
+
+  @override
+  List<Object> get props => [sentenceId, originalSentence];
 }
 
-/// Reset current sentence
-class ResetSentence extends SentencePracticeEvent {
-  final int sentenceId;
-  ResetSentence(this.sentenceId);
+class AddWordToSentenceEvent extends SentencePracticeEvent {
+  final String word;
+  final int wordIndex;
+
+  const AddWordToSentenceEvent({
+    required this.word,
+    required this.wordIndex,
+  });
+
+  @override
+  List<Object> get props => [word, wordIndex];
 }
 
-/// Speak sentence text
-class SpeakSentence extends SentencePracticeEvent {
-  final String text;
-  SpeakSentence(this.text);
+class RemoveWordFromSentenceEvent extends SentencePracticeEvent {
+  final int userSentenceIndex;
+
+  const RemoveWordFromSentenceEvent(this.userSentenceIndex);
+
+  @override
+  List<Object> get props => [userSentenceIndex];
 }
 
-/// Navigate to next sentence
-class NextSentence extends SentencePracticeEvent {}
+class CheckAnswerEvent extends SentencePracticeEvent {
+  const CheckAnswerEvent();
 
-/// Navigate to previous sentence
-class PreviousSentence extends SentencePracticeEvent {}
+  @override
+  List<Object> get props => [];
+}
 
-/// Jump to specific sentence
-class JumpToSentence extends SentencePracticeEvent {
+class ResetSentenceEvent extends SentencePracticeEvent {
+  const ResetSentenceEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+class NavigateToSentenceEvent extends SentencePracticeEvent {
   final int index;
-  JumpToSentence(this.index);
+
+  const NavigateToSentenceEvent(this.index);
+
+  @override
+  List<Object> get props => [index];
 }
