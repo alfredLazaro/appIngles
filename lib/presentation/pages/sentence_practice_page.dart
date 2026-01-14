@@ -107,35 +107,20 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.celebration, color: Colors.amber, size: 30),
-            SizedBox(width: 8),
-            Text('¡Completado!'),
-          ],
-        ),
-        content: Text('Has practicado ${widget.sentences.length} oraciones.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              Navigator.pop(context);
-            },
-            child: const Text('Finalizar'),
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              setState(() {
-                _currentIndex = 0;
-                _pageController.jumpToPage(0);
-              });
-            },
-            icon: const Icon(Icons.replay),
-            label: const Text('Repetir'),
-          ),
-        ],
+      builder: (dialogContext) => CompletionDialog(
+        totalItems:widget.sentences.length,
+        itemName: 'sentence',
+        onFinish: () {
+          Navigator.pop(dialogContext);
+          Navigator.pop(context);
+        },
+        onRepeat: () {
+          Navigator.pop(dialogContext);
+          setState(() {
+            _currentIndex = 0;
+            _pageController.jumpToPage(0);
+          });
+        }
       ),
     );
   }
