@@ -1,6 +1,5 @@
 // sentence_practice_state.dart
 import 'package:equatable/equatable.dart';
-part of 'sentence_practice_bloc.dart';
 
 abstract class SentencePracticeState extends Equatable {
   const SentencePracticeState();

@@ -1,5 +1,6 @@
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
+import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
 import 'package:first_app/presentation/widgets/sentence/sentence_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/core/services/tts_service.dart';
@@ -108,20 +109,20 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => CompletionDialog(
-        totalItems:widget.sentences.length,
-        itemName: 'sentence',
-        onFinish: () {
-          Navigator.pop(dialogContext);
-          Navigator.pop(context);
-        },
-        onRepeat: () {
-          Navigator.pop(dialogContext);
-          setState(() {
-            _currentIndex = 0;
-            _pageController.jumpToPage(0);
-          });
-        }
-      ),
+          totalItems: widget.sentences.length,
+          learnedCount: 0,
+          itemName: 'sentence',
+          onFinish: () {
+            Navigator.pop(dialogContext);
+            Navigator.pop(context);
+          },
+          onRepeat: () {
+            Navigator.pop(dialogContext);
+            setState(() {
+              _currentIndex = 0;
+              _pageController.jumpToPage(0);
+            });
+          }),
     );
   }
 }

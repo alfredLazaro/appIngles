@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-part 'sentence_practice_event.dart';
-part 'sentence_practice_state.dart';
+import 'sentence_practice_event.dart';
+import 'sentence_practice_state.dart';
 
 class SentencePracticeBloc
     extends Bloc<SentencePracticeEvent, SentencePracticeState> {
@@ -22,10 +22,10 @@ class SentencePracticeBloc
   ) {
     // Split sentence into words
     final words = event.originalSentence.split(' ');
-    
+
     // Shuffle words
     final shuffledWords = List<String>.from(words)..shuffle(Random());
-    
+
     // Initialize visibility (all visible)
     final wordVisibility = List<bool>.filled(shuffledWords.length, true);
 

@@ -1,4 +1,6 @@
 // sentence_builder_widget.dart
+import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_event.dart';
+import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/tts_service.dart';
@@ -74,8 +76,7 @@ class SentenceBuilderWidget extends StatelessWidget {
           ),
 
           // Show correct answer if wrong
-          if (state.showResult && !state.isCorrect)
-            _buildCorrectAnswer(state),
+          if (state.showResult && !state.isCorrect) _buildCorrectAnswer(state),
         ],
       ),
     );
