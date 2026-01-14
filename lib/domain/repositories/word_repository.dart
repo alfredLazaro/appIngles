@@ -29,4 +29,5 @@ abstract class WordRepository {
   Future<void> batchUpdateLearnCounts(Map<int, int> updates);
   Future<List<Word>> getAllWords();
   Future<void> updateWord(Word word);
+  Future<int> countSentences();
 }

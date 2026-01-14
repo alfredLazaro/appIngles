@@ -221,4 +221,8 @@ class WordRepositoryImpl implements WordRepository {
       throw Exception('Error al actualizar palabra: $e');
     }
   }
+  @override
+  Future<int> countSentences() async {
+    return await _wordDao.countSentences();
+  }
 }

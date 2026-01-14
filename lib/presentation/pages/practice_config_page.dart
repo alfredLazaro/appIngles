@@ -8,6 +8,7 @@ import 'package:first_app/presentation/pages/flashcard_practice_page.dart';
 import 'package:first_app/presentation/pages/sentence_practice_page.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/modals/practice_selection_modal.dart';
+import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 
 class PracticeConfigPage extends StatelessWidget {
   final PracticeType practiceType;
@@ -89,13 +90,15 @@ class PracticeConfigPage extends StatelessWidget {
         builder: (context) {
           switch (practiceType) {
             case PracticeType.flashcard:
+              final flashcardData = state.practiceData as FlashcardPracticeData;
               return FlashcardPracticePage(
-                words: state.words,
-                imagesMap: state.imagesMap,
+                words: flashcardData.words,
+                imagesMap: flashcardData.imagesMap,
               );
             case PracticeType.sentence:
+              final sentenceData = state.practiceData as SentencePracticeData;
               return SentencePracticePage(
-                sentenceCount: state.words.length,
+                sentenceCount: sentenceData.sentences,
               );
             default:
               return const Scaffold(

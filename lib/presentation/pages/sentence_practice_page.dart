@@ -5,11 +5,10 @@ import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/core/services/tts_service.dart';
 
 class SentencePracticePage extends StatefulWidget {
-  final int sentenceCount;
-
+  final List<SentenceModel> sentences;
   const SentencePracticePage({
     super.key,
-    required this.sentenceCount,
+    required this.sentences,
   });
 
   @override
@@ -17,7 +16,6 @@ class SentencePracticePage extends StatefulWidget {
 }
 
 class _SentencePracticePageState extends State<SentencePracticePage> {
-  final WordDao _wordDao = WordDao();
   final TtsService _ttsService = TtsService();
   final PageController _pageController = PageController();
 
@@ -28,7 +26,7 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
   @override
   void initState() {
     super.initState();
-    _loadSentences();
+    //_loadSentences();
   }
 
   @override
@@ -37,25 +35,6 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
     super.dispose();
   }
 
-  Future<void> _loadSentences() async {
-    try {
-      final sentences =
-          await _wordDao.getSentencesForPractice(widget.sentenceCount);
-      setState(() {
-        _sentences = sentences;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,11 +76,11 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
                           });
                         },
                         itemBuilder: (context, index) {
-                          final sentence = _sentences![index];
+                          final sentence = widget.sentences[index];
                           return SentenceBuilderWidget(
-                            key: ValueKey(sentence['id']),
-                            sentenceId: sentence['id'],
-                            originalSentence: sentence['sentence'],
+                            key: ValueKey(sentence.id),
+                            sentenceId: sentence.id,
+                            originalSentence: sentence.sentence,
                             ttsService: _ttsService,
                           );
                         },
@@ -109,14 +88,14 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
                     ),
                     PageNavigationControls(
                       currentIndex: _currentIndex,
-                      totalPages: _sentences!.length,
+                      totalPages: widget.sentences.length,
                       onPrevious: () {
                         _pageController.previousPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                         );
                       },
-                      onNext: _currentIndex < _sentences!.length - 1
+                      onNext: _currentIndex < widget.sentences.length - 1
                           ? () {
                               _pageController.nextPage(
                                 duration: const Duration(milliseconds: 300),
@@ -142,7 +121,7 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
             Text('¡Completado!'),
           ],
         ),
-        content: Text('Has practicado ${_sentences!.length} oraciones.'),
+        content: Text('Has practicado ${widget.sentences.length} oraciones.'),
         actions: [
           TextButton(
             onPressed: () {

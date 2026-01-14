@@ -28,10 +28,25 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     emit(PracticeLoading());
 
     try {
-      final totalCount = await _wordRepository.getTotalWordCount();
-
+      int totalCount;
+      
+      // Get count based on practice type
+      switch (event.type) {
+        case PracticeType.flashcard:
+        case PracticeType.spelling:
+        case PracticeType.listening:
+          totalCount = await _wordRepository.countWords();
+          break;
+        case PracticeType.sentence:
+          totalCount = await _wordRepository.countSentences();
+          break;
+      }
+      
       if (totalCount == 0) {
-        emit(const PracticeError('No hay palabras para practicar'));
+        final message = event.type == PracticeType.sentence
+            ? 'No hay oraciones para practicar'
+            : 'No hay palabras para practicar';
+        emit(PracticeError(message));
         return;
       }
 
@@ -48,21 +63,59 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     emit(PracticeLoading());
 
     try {
-      // Load words for practice
-      final List<FlashcardWord> words =
-          await _wordRepository.getWordsForPractice(event.count);
+      PracticeData practiceData;
 
-      // Get word IDs
-      final wordIds =
-          words.map((w) => w.id).toList(); //aseguro que cada uno tiene id
-      // Load images
-      final imagesMap = await _imageRepository.getImagesByWordIds(wordIds);
+      switch (event.type) {
+        case PracticeType.flashcard:
+          print('📚 Loading flashcard data...');
+          practiceData = await _loadFlashcardPractice(event.count);
+          print('✅ Flashcard data loaded: ${(practiceData as FlashcardPracticeData).words.length} words');
+          break;
+          
+        case PracticeType.sentence:
+          print('📝 Loading sentence data...');
+          practiceData = await _loadSentencePractice(event.count);
+          print('✅ Sentence data loaded: ${(practiceData as SentencePracticeData).sentences.length} sentences');
+          break;
+          
+        case PracticeType.spelling:
+        case PracticeType.listening:
+          print('⚠️ Practice type not implemented: ${event.type}');
+          throw UnimplementedError('Práctica no disponible aún');
+      }
 
-      Map<int, List<FlashcardImage>> flashcardImagesMap =
-          ImageMapper().mapToFlashcardImages(imagesMap);
-      emit(PracticeReady(words, flashcardImagesMap));
-    } catch (e) {
+      print('✅ Emitting PracticeReady state');
+      emit(PracticeReady(practiceData));
+      
+    } catch (e, stackTrace) {
+      print('❌ Error preparing practice: $e');
+      print('Stack trace: $stackTrace');
       emit(PracticeError('Error al preparar práctica: $e'));
     }
+  }
+  
+  Future<FlashcardPracticeData> _loadFlashcardPractice(int count) async {
+    // Load words for practice
+    final words = await _wordRepository.getWordsForPractice(count);
+    
+    // Get word IDs
+    final wordIds = words.map((w) => w.id).toList();
+    
+    // Load images
+    final imagesMap = await _imageRepository.getImagesByWordIds(wordIds);
+    
+    return FlashcardPracticeData(
+      words: words,
+      imagesMap: imagesMap,
+    );
+  }
+
+  Future<SentencePracticeData> _loadSentencePractice(int count) async {
+    // Load sentences for practice
+    final sentences = await _wordRepository.getSentencesForPractice(count);
+    
+    return SentencePracticeData(
+      sentences: sentences,
+    );
   }
 }
