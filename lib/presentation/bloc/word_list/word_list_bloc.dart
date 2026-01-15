@@ -213,4 +213,14 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
       emit(currentState.copyWith(selectedCount: 0));
     }
   }
+
+  Future<void> _onLoadUniqueWord(
+    LoadWord event,
+    Emitter<WordListState> emit,
+  ) async {
+    try {
+      final word = await _wordRepository.getWordById(event.wordId);
+      final images = await _imageRepository.getImagesByWordId(event.wordId);
+    } catch (e) {}
+  }
 }

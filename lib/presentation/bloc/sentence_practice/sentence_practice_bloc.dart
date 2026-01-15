@@ -1,7 +1,6 @@
 // sentence_practice_bloc.dart
 import 'dart:math';
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 
 import 'sentence_practice_event.dart';
 import 'sentence_practice_state.dart';

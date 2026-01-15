@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:first_app/data/mappers/image_mapper.dart';
-import 'package:first_app/data/mappers/word_mapper.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';

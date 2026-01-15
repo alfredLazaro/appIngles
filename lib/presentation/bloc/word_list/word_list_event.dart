@@ -70,3 +70,10 @@ class ClearSelectionEvent extends WordListEvent {
   @override
   List<Object?> get props => [];
 }
+
+class LoadWord extends WordListEvent {
+  final int wordId;
+  const LoadWord(this.wordId);
+  @override
+  List<Object?> get props => [wordId];
+}

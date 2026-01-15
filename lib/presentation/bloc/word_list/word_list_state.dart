@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:first_app/domain/entities/flashcard_word.dart';
+import 'package:first_app/domain/entities/word_image.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 
 abstract class WordListState extends Equatable {
@@ -88,4 +90,12 @@ class WordListError extends WordListState {
 
   @override
   List<Object?> get props => [message];
+}
+
+class WordLoaded extends WordListState {
+  final FlashcardWord w;
+  final List<WordImage> images;
+  const WordLoaded(this.w, this.images);
+  @override
+  List<Object?> get props => [w, images];
 }

@@ -38,8 +38,8 @@ class _ListaCardsState extends State<ListaCards> {
   void _onScroll() {
     if (_isBottom) {
       final state = context.read<WordListBloc>().state;
-      if (state is WordListLoaded && 
-          state.hasMorePages && 
+      if (state is WordListLoaded &&
+          state.hasMorePages &&
           !state.isLoadingMore) {
         context.read<WordListBloc>().add(const LoadMoreWordsEvent());
       }
@@ -69,6 +69,20 @@ class _ListaCardsState extends State<ListaCards> {
     super.dispose();
   }
 
+/*   void _navigateToWordDetail(WordWithImage word) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WordDetailScreen(
+          word: word,
+          ttsService: _ttsService,
+          onWordUpdated: () {
+            // Refresh the word list when a word is updated
+            context.read<WordListBloc>().add(const RefreshWordsEvent());
+          },
+        ),
+      ),
+    );
+  } */
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<WordListBloc, WordListState>(

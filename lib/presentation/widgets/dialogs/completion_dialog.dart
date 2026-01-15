@@ -38,15 +38,15 @@ class CompletionDialog extends StatelessWidget {
             // Encabezado
             _buildHeader(context, color),
             const SizedBox(height: 20),
-            
+
             // Estadísticas
             _buildStatistics(context),
             const SizedBox(height: 20),
-            
+
             // Contenedor de progreso
             _buildProgressContainer(context),
             const SizedBox(height: 24),
-            
+
             // Botones de acción
             _buildActionButtons(context),
           ],
@@ -62,15 +62,15 @@ class CompletionDialog extends StatelessWidget {
         Icon(
           Icons.celebration,
           color: color,
-          size: 32,
+          size: 24,
         ),
         const SizedBox(width: 12),
         Text(
           customTitle ?? '¡Práctica completada!',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
         ),
       ],
     );
@@ -109,9 +109,9 @@ class CompletionDialog extends StatelessWidget {
             child: Text(
               '$learnedCount $itemName marcadas como aprendidas',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Colors.green[800],
-              ),
+                    fontWeight: FontWeight.w600,
+                    color: Colors.green[800],
+                  ),
               textAlign: TextAlign.center,
               maxLines: 2,
             ),
