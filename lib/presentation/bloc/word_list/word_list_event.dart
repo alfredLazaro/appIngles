@@ -77,3 +77,9 @@ class LoadWord extends WordListEvent {
   @override
   List<Object?> get props => [wordId];
 }
+class LoadWordStatsEvent extends WordListEvent {
+  const LoadWordStatsEvent();
+
+  @override
+  List<Object?> get props => [];
+}

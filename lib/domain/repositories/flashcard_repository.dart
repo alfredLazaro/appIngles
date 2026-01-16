@@ -123,4 +123,9 @@ class FlashcardRepository implements WordRepository {
   Future<int> countSentences() async {
     return await _wordDao.countSentences();
   }
+  @override
+  Future<WordStats> getWordStatistics() {
+    // TODO: implement wordExists
+    throw UnimplementedError();
+  }
 }

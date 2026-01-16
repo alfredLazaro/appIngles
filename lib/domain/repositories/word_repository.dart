@@ -31,4 +31,5 @@ abstract class WordRepository {
   Future<List<Word>> getAllWords();
   Future<void> updateWord(Word word);
   Future<int> countSentences();
+  Future<WordStats> getWordStatistics();
 }

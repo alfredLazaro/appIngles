@@ -29,7 +29,7 @@ class WordListLoaded extends WordListState {
   final String? filterQuery;
   final int selectedCount;
   final String? sortType;
-
+  final WordStats? stats;
   const WordListLoaded({
     required this.words,
     this.currentPage = 1,
@@ -38,6 +38,7 @@ class WordListLoaded extends WordListState {
     this.filterQuery,
     this.selectedCount = 0,
     this.sortType,
+    this.stats,
   });
 
   WordListLoaded copyWith({
@@ -48,6 +49,7 @@ class WordListLoaded extends WordListState {
     String? filterQuery,
     int? selectedCount,
     String? sortType,
+    WordStats? stats,
   }) {
     return WordListLoaded(
       words: words ?? this.words,
@@ -57,6 +59,7 @@ class WordListLoaded extends WordListState {
       filterQuery: filterQuery ?? this.filterQuery,
       selectedCount: selectedCount ?? this.selectedCount,
       sortType: sortType ?? this.sortType,
+      stats: stats ?? this.stats,
     );
   }
 
@@ -69,6 +72,7 @@ class WordListLoaded extends WordListState {
         filterQuery,
         selectedCount,
         sortType,
+        stats,
       ];
 }
 

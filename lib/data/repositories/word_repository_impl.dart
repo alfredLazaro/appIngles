@@ -227,4 +227,15 @@ class WordRepositoryImpl implements WordRepository {
   Future<int> countSentences() async {
     return await _wordDao.countSentences();
   }
+  @override
+  Future<WordStats> getWordStatistics() async {
+    final stats = await _wordDao.getWordStatistics();
+    
+    return WordStats(
+      totalWords: stats['total'] ?? 0,
+      newWords: stats['new'] ?? 0,
+      practiceWords: stats['practice'] ?? 0,
+      learnedWords: stats['learned'] ?? 0,
+    );
+  }
 }

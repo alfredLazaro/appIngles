@@ -354,4 +354,49 @@ class WordDao {
       return 0;
     }
   }
+  // Add this method to your WordDao class in lib/data/datasources/local/word_dao.dart
+
+/// Get statistics about words based on learn count
+Future<Map<String, int>> getWordStatistics() async {
+    final db = await DatabaseHelper().database;
+    
+    try {
+      // Total words
+      final totalResult = await db.rawQuery('SELECT COUNT(*) as count FROM Word');
+      final total = Sqflite.firstIntValue(totalResult) ?? 0;
+      
+      // New words (learn = 0)
+      final newResult = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM Word WHERE learn = 0'
+      );
+      final newWords = Sqflite.firstIntValue(newResult) ?? 0;
+      
+      // Practice words (1 <= learn < 100)
+      final practiceResult = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM Word WHERE learn >= 1 AND learn < 100'
+      );
+      final practiceWords = Sqflite.firstIntValue(practiceResult) ?? 0;
+      
+      // Learned words (learn >= 100)
+      final learnedResult = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM Word WHERE learn >= 100'
+      );
+      final learnedWords = Sqflite.firstIntValue(learnedResult) ?? 0;
+      
+      return {
+        'total': total,
+        'new': newWords,
+        'practice': practiceWords,
+        'learned': learnedWords,
+      };
+    } catch (e) {
+      print('Error getting word statistics: $e');
+      return {
+        'total': 0,
+        'new': 0,
+        'practice': 0,
+        'learned': 0,
+      };
+    }
+}
 }

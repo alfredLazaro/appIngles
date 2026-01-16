@@ -23,6 +23,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     on<DeleteWordEvent>(_onDeleteWord);
     on<ToggleWordSelectionEvent>(_onToggleWordSelection);
     on<FilterWordsEvent>(_onFilterWords);
+    on<LoadWordStatsEvent>(_onLoadWordStats);
 /*     on<SortWordsEvent>(_onSortWords); */
     on<ClearSelectionEvent>(_onClearSelection);
   }
@@ -39,13 +40,14 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         pageSize: _pageSize,
         searchQuery: event.searchQuery,
       );
-
+      final stats = await _wordRepository.getWordStatistics();
       emit(WordListLoaded(
         words: result.items,
         currentPage: 1,
         hasMorePages: result.hasNextPage,
         isLoadingMore: false,
         filterQuery: event.searchQuery,
+        stats: stats,
       ));
     } catch (e) {
       emit(WordListError(e.toString()));
@@ -85,6 +87,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         filterQuery: currentState.filterQuery,
         selectedCount: currentState.selectedCount,
         sortType: currentState.sortType,
+        stats: currentState.stats,
       ));
     } catch (e) {
       // Keep current state but show error
@@ -111,19 +114,21 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         pageSize: _pageSize,
         searchQuery: searchQuery,
       );
-
+      final stats = await _wordRepository.getWordStatistics();
       if (state is WordListLoaded) {
         final currentState = state as WordListLoaded;
         emit(currentState.copyWith(
           words: result.items,
           currentPage: 1,
           hasMorePages: result.hasNextPage,
+          stats: stats,
         ));
       } else {
         emit(WordListLoaded(
           words: result.items,
           currentPage: 1,
           hasMorePages: result.hasNextPage,
+          stats: stats,
         ));
       }
     } catch (e) {
@@ -191,7 +196,22 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
       emit(WordListError('Error al filtrar: $e'));
     }
   }
+  Future<void> _onLoadWordStats(
+    LoadWordStatsEvent event,
+    Emitter<WordListState> emit,
+  ) async {
+    if (state is! WordListLoaded) return;
 
+    final currentState = state as WordListLoaded;
+
+    try {
+      final stats = await _wordRepository.getWordStatistics();
+      emit(currentState.copyWith(stats: stats));
+    } catch (e) {
+      // Keep current state if stats loading fails
+      print('Error loading stats: $e');
+    }
+  }
 /*   void _onSortWords(
     SortWordsEvent event,
     Emitter<WordListState> emit,
