@@ -133,9 +133,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //Obtener dependencias del singleton (no crear nuevas)
-    final deps = Dependencies.instance;
-
     return MaterialApp(
       title: 'Mi App',
       theme: ThemeData(

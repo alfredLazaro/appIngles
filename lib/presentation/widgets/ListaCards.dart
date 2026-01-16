@@ -1,5 +1,4 @@
 import 'package:first_app/core/services/tts_service.dart';
-import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_state.dart';
