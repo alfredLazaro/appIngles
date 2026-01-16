@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/word_image.dart';
+import 'package:first_app/domain/entities/word_stats.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 
 abstract class WordListState extends Equatable {

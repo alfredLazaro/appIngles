@@ -3,6 +3,7 @@ import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
+import 'package:first_app/domain/entities/word_stats.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
@@ -123,6 +124,7 @@ class FlashcardRepository implements WordRepository {
   Future<int> countSentences() async {
     return await _wordDao.countSentences();
   }
+
   @override
   Future<WordStats> getWordStatistics() {
     // TODO: implement wordExists

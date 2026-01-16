@@ -1,3 +1,4 @@
+import 'package:first_app/presentation/widgets/sentence/word_stats_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
@@ -12,30 +13,31 @@ class WordListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<WordListBloc, WordListState>(
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("My Words"),
-              actions: [
-                if (state is WordListLoaded && state.stats != null)
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("My Words"),
+            actions: [
+              if (state is WordListLoaded && state.stats != null)
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                   child: WordStatsWidget(
                     stats: state.stats!,
                     compact: true,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.school),
-                  onPressed: () => _navigateToPracticeHub(context),
-                  tooltip: 'Prácticas',
-                ),
-              ],
-            ),
-            body: _buildBody(context, state),
-          );
-
-        },);
+              IconButton(
+                icon: const Icon(Icons.school),
+                onPressed: () => _navigateToPracticeHub(context),
+                tooltip: 'Prácticas',
+              ),
+            ],
+          ),
+          body: _buildBody(context, state),
+        );
+      },
+    );
   }
 
   void _navigateToPracticeHub(BuildContext context) async {
@@ -69,31 +71,31 @@ class WordListPage extends StatelessWidget {
   } */
   Widget _buildBody(BuildContext context, WordListState state) {
     if (state is WordListLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      return const Center(child: CircularProgressIndicator());
+    }
 
-          if (state is WordListError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Error: ${state.message}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<WordListBloc>().add(const LoadWordsEvent());
-                    },
-                    child: const Text('Reintentar'),
-                  ),
-                ],
-              ),
-            );
-          }
+    if (state is WordListError) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: ${state.message}'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                context.read<WordListBloc>().add(const LoadWordsEvent());
+              },
+              child: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      );
+    }
 
-          if (state is WordListLoaded) {
-            return const ListaCards();
-          }
+    if (state is WordListLoaded) {
+      return const ListaCards();
+    }
 
-          return const SizedBox.shrink();
+    return const SizedBox.shrink();
   }
 }
