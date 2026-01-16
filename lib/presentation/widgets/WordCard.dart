@@ -82,6 +82,15 @@ class WordCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       // Progress indicator next to the word
                       LearnProgressIndicator(learnValue: word.learn),
+                      const SizedBox(width: 3),
+                      SizedBox(
+                        width: 36, // Enough for "100 %"
+                        child: Text(
+                          '${word.learn} %',
+                          textAlign: TextAlign
+                              .right, // Align to the right for consistency
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 1),

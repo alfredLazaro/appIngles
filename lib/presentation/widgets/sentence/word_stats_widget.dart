@@ -34,19 +34,19 @@ class WordStatsWidget extends StatelessWidget {
           _StatChip(
             icon: Icons.library_books,
             value: stats.totalWords,
-            color: Colors.blue,
+            color: Colors.black,
           ),
           const SizedBox(width: 8),
           _StatChip(
             icon: Icons.fiber_new,
             value: stats.newWords,
-            color: Colors.orange,
+            color: Colors.blueGrey,
           ),
           const SizedBox(width: 8),
           _StatChip(
             icon: Icons.fitness_center,
             value: stats.practiceWords,
-            color: Colors.purple,
+            color: Colors.orange,
           ),
           const SizedBox(width: 8),
           _StatChip(
