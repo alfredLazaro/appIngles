@@ -57,7 +57,7 @@ class WordService {
             '';
         final List<dynamic> meaningsJson = wordData['meanings'] ?? [];
         final List<Map<String, dynamic>> meanings =
-            (wordData['meanings'] as List<dynamic>).map((meaning) {
+            (meaningsJson).map((meaning) {
           final List<dynamic> definitions = meaning['definitions'] ?? [];
           return {
             'partOfSpeech': meaning['partOfSpeech'],
