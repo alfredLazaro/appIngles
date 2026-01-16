@@ -37,6 +37,7 @@ class DatabaseService {
             CREATE TABLE ${DBTables.word}(
                 ${WordFields.id} $idType,
                 ${WordFields.word}  $textType,
+                ${WordFields.phonetic} TEXT,
                 ${WordFields.definition}  $textType,
                 ${WordFields.sentence} $textType,
                 ${WordFields.learn} INTEGER NOT NULL DEFAULT 0,

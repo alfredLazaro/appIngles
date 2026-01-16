@@ -1,6 +1,7 @@
 class WordModel {
   final int? id;
   final String word;
+  final String phonetic;
   final String definition;
   final String sentence;
   int learn;
@@ -10,6 +11,7 @@ class WordModel {
   WordModel({
     this.id,
     required this.word,
+    required this.phonetic,
     required this.definition,
     required this.sentence,
     required this.learn,
@@ -20,6 +22,7 @@ class WordModel {
   WordModel copyWith({
     int? id,
     String? word,
+    String? phonetic,
     String? definition,
     String? sentence,
     int? learn,
@@ -29,6 +32,7 @@ class WordModel {
     return WordModel(
       id: id ?? this.id,
       word: word ?? this.word,
+      phonetic: phonetic ?? this.phonetic,
       definition: definition ?? this.definition,
       sentence: sentence ?? this.sentence,
       learn: learn ?? this.learn,
@@ -42,6 +46,7 @@ class WordModel {
     required this.word,
     required this.sentence,
   })  : definition = '',
+        phonetic = '', //need correction
         learn = 0,
         createdAt = '',
         updatedAt = '';
@@ -49,8 +54,9 @@ class WordModel {
   factory WordModel.fromMap(Map<String, dynamic> map) {
     return WordModel(
       id: map['id'],
-      definition: map['definition'],
       word: map['word'],
+      phonetic: map['phonetic'],
+      definition: map['definition'],
       sentence: map['sentence'],
       learn: map['learn'],
       createdAt: map['created_at'],
@@ -68,6 +74,7 @@ class WordModel {
     return {
       'definition': definition,
       'word': word,
+      'phonetic': phonetic,
       'sentence': sentence,
       'learn': learn,
       'created_at': createdAt,
@@ -78,8 +85,9 @@ class WordModel {
   factory WordModel.fromJson(Map<String, dynamic> json) {
     return WordModel(
       id: json['id'],
-      definition: json['definition'],
       word: json['word'],
+      phonetic: json['phonetic'],
+      definition: json['definition'],
       sentence: json['sentence'],
       learn: json['learn'],
       createdAt: json['created_at'],

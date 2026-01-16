@@ -70,6 +70,7 @@ class WordRepositoryImpl implements WordRepository {
         final definitions = (meaning['definitions'] as List)
             .map((def) => WordDefinition(
                   definition: def['definition'] ?? '',
+                  phonetic: def['phonetic'] ?? '',
                   example: def['example'],
                 ))
             .toList();

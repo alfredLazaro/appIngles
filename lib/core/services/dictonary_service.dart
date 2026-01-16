@@ -10,19 +10,17 @@ class WordService {
   WordService._internal();
 
   // URL base para la API, obtenida de variables de entorno
-  final baseUrl =dotenv.env['BASE_URL_DICTIONARY'];
+  final baseUrl = dotenv.env['BASE_URL_DICTIONARY'];
 
   // Método para obtener definición de palabra
-  Future<Map<String,dynamic>> getWordDefinition(String word) async {
+  Future<Map<String, dynamic>> getWordDefinition(String word) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/$word')
-      );
+      final response = await http.get(Uri.parse('$baseUrl/$word'));
 
       if (response.statusCode == 200) {
         // Devuelve la respuesta decodificada
         final List<dynamic> jsonList = json.decode(response.body);
-        final Map<String,dynamic> json2 = jsonList[0];
+        final Map<String, dynamic> json2 = jsonList[0];
         return {
           'definition': json2['meanings'][0]['definitions'][0]['definition'],
           'example': json2['meanings'][0]['definitions'][0]['example']
@@ -35,40 +33,55 @@ class WordService {
       throw Exception('Error al buscar la definición');
     }
   }
+
   Future<List<Map<String, dynamic>>> getAllMeanings(String word) async {
-      // 1. Petición HTTP
-      try {
-        final response = await http.get(
-          Uri.parse('$baseUrl/$word')
-        );
+    // 1. Petición HTTP
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/$word'));
 
-        // 2. Manejo de respuesta
-        if (response.statusCode == 200) {
-          final List<dynamic> jsonList = json.decode(response.body);
-          
-          if (jsonList.isEmpty) {
-            return [];
-          }
+      // 2. Manejo de respuesta
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
 
-          // 3. Procesamiento de datos
-          final Map<String, dynamic> wordData = jsonList[0];
-          final List<dynamic> meaningsJson = wordData['meanings'] ?? [];
-          final List<Map<String, dynamic>> meanings = meaningsJson.cast<Map<String, dynamic>>();
-          
-          return meanings;
-          
-        } else if (response.statusCode == 404) {
-          throw Exception('Palabra no encontrada');
-        } else {
-          throw Exception('Error en la API: ${response.statusCode}');
+        if (jsonList.isEmpty) {
+          return [];
         }
-      } catch (e) {
-        throw Exception('Error al obtener significados: $e');
+
+        // 3. Procesamiento de datos
+        final Map<String, dynamic> wordData = jsonList[0];
+        final String phonetic = (wordData['phonetics'] as List<dynamic>)
+                .map((p) => p['text'])
+                .where((text) => text != null && text.isNotEmpty)
+                .firstOrNull ??
+            (wordData['phonetic'] as String?) ??
+            '';
+        final List<dynamic> meaningsJson = wordData['meanings'] ?? [];
+        final List<Map<String, dynamic>> meanings =
+            (wordData['meanings'] as List<dynamic>).map((meaning) {
+          final List<dynamic> definitions = meaning['definitions'] ?? [];
+          return {
+            'partOfSpeech': meaning['partOfSpeech'],
+            'definitions': definitions.map((def) {
+              return {
+                'definition': def['definition'],
+                'example': def['example'],
+                'phonetic': phonetic, // Se añade a cada definición
+              };
+            }).toList(),
+          };
+        }).toList();
+
+        return meanings;
+      } else if (response.statusCode == 404) {
+        throw Exception('Palabra no encontrada');
+      } else {
+        throw Exception('Error en la API: ${response.statusCode}');
       }
+    } catch (e) {
+      throw Exception('Error al obtener significados: $e');
+    }
   }
-
 }
-
 
 // Ejemplo de clase de proveedor de estado
 class WordProvider extends ChangeNotifier {
@@ -99,7 +112,7 @@ class WordProvider extends ChangeNotifier {
       _error = 'No se pudo obtener la definición';
       _isLoading = false;
     }
-    
+
     notifyListeners();
   }
 }

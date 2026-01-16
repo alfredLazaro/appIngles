@@ -12,9 +12,11 @@ class WordMeaning {
 class WordDefinition {
   final String definition;
   final String? example;
+  final String phonetic;
 
   const WordDefinition({
     required this.definition,
     this.example,
+    required this.phonetic,
   });
 }
