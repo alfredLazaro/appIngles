@@ -53,22 +53,6 @@ class WordListPage extends StatelessWidget {
     }
   }
 
-/*   void _navigateToSentencePractice(BuildContext context) async {
-    final bloc = context.read<WordListBloc>();
-    final deps = Dependencies.instance;
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PracticeSelectionPage(
-          practiceType: PracticeType.sentence,
-          wordRepository: deps.wordRepository, 
-          imageRepository: deps.imageRepository,
-        ),
-      ),
-    );
-
-    bloc.add(const RefreshWordsEvent());
-  } */
   Widget _buildBody(BuildContext context, WordListState state) {
     if (state is WordListLoading) {
       return const Center(child: CircularProgressIndicator());
