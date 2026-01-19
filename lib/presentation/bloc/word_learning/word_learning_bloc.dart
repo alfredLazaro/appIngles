@@ -169,7 +169,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     InsertLotWordsEvent event,
     Emitter<WordLearningState> emit,
   ) async {
-    emit(WordLearningLoading());
+    //emit(WordLearningLoading());
     try {
       final results = await _saveLotWords(event.words);
       emit(LotWordsInserted(results: results));

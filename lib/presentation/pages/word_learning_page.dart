@@ -1,4 +1,5 @@
 import 'package:first_app/domain/entities/word_sumary.dart';
+import 'package:first_app/presentation/widgets/bulk_insert_dialog.dart';
 import 'package:first_app/presentation/widgets/modals/combine_word_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -90,11 +91,11 @@ class _WordLearningPageState extends State<WordLearningPage> {
         title: const Text('Aprendiendo'),
         actions: [
           // Add this button to open bulk insert dialog
-          /* IconButton(
+          IconButton(
             icon: const Icon(Icons.add_box),
             tooltip: 'Inserción masiva',
-            onPressed: () => BulkWordInsertDialog.show(context),
-          ), */
+            onPressed: () => BulkInsertDialog.show(context),
+          ),
           // Alternative with text button
           // TextButton.icon(
           //   icon: const Icon(Icons.upload_file, color: Colors.white),
