@@ -21,7 +21,7 @@ class WordDao {
   }
 
   Future<List<Map<String, dynamic>>> insertLotWords(
-      List<WordModel> words) async {
+      List<Map<String, String>> words) async {
     try {
       final db = await dbHelper.database;
       final List<Map<String, dynamic>> results = [];
@@ -29,10 +29,10 @@ class WordDao {
       // Use batch for better performance
       final batch = db.batch();
 
-      for (WordModel word in words) {
+      for (Map<String, String> word in words) {
         batch.insert(
           'Word',
-          word.toMap(), // Use the existing toMap() method from WordModel
+          word, // Use the existing toMap() method from WordModel
           conflictAlgorithm: ConflictAlgorithm.ignore,
         );
       }
@@ -44,7 +44,7 @@ class WordDao {
       for (int i = 0; i < words.length; i++) {
         results.add({
           'id': ids[i],
-          'word': words[i].word, // Only return the word string
+          'word': words[i]['word'], // Only return the word string
         });
       }
 

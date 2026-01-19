@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:first_app/domain/entities/word_insertion.dart';
 
 abstract class WordLearningEvent extends Equatable {
   @override
@@ -67,4 +68,10 @@ class ChangePageEvent extends WordLearningEvent {
 
   @override
   List<Object?> get props => [page];
+}
+
+class InsertLotWordsEvent extends WordLearningEvent {
+  final List<WordInsertion> words;
+
+  InsertLotWordsEvent(this.words);
 }

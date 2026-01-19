@@ -1,6 +1,7 @@
 import 'package:first_app/data/models/word_model.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/word.dart';
+import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:logger/logger.dart';
@@ -89,5 +90,14 @@ class WordMapper {
       sentence: map['sentence'],
       learnCount: map['learn'],
     );
+  }
+
+  static Map<String, String> toMapInsertion(WordInsertion word) {
+    return {
+      'word': word.word,
+      'definition': word.definition,
+      'sentence': word.sentence,
+      'phonetic': word.phonetic,
+    };
   }
 }

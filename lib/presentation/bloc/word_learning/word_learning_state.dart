@@ -56,3 +56,9 @@ class ImagesLoaded extends WordLearningState {
   @override
   List<Object?> get props => [images];
 }
+
+class LotWordsInserted extends WordLearningState {
+  final List<Map<String, dynamic>> results;
+
+  LotWordsInserted({required this.results});
+}

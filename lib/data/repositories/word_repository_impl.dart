@@ -1,6 +1,6 @@
-import 'package:first_app/data/models/word_model.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/word.dart';
+import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_stats.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
@@ -244,8 +244,10 @@ class WordRepositoryImpl implements WordRepository {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> insertLotWords(List<Word> words) async {
-    List<WordModel> ls = words.map((word) => WordMapper.toModel(word)).toList();
+  Future<List<Map<String, dynamic>>> insertLotWords(
+      List<WordInsertion> words) async {
+    List<Map<String, String>> ls =
+        words.map((word) => WordMapper.toMapInsertion(word)).toList();
     final list = await _wordDao.insertLotWords(ls);
     return list;
   }

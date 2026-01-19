@@ -1,6 +1,7 @@
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
 import 'package:first_app/domain/entities/word.dart';
+import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_stats.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
@@ -33,5 +34,5 @@ abstract class WordRepository {
   Future<void> updateWord(Word word);
   Future<int> countSentences();
   Future<WordStats> getWordStatistics();
-  Future<List<Map<String, dynamic>>> insertLotWords(List<Word> words);
+  Future<List<Map<String, dynamic>>> insertLotWords(List<WordInsertion> words);
 }

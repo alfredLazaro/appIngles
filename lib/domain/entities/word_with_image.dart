@@ -3,7 +3,7 @@ class WordWithImage {
   final int id;
   final String word;
   final String definition;
-  final String? tinyImageUrl; // ✅ Opcional por si no hay imagen
+  final String? tinyImageUrl; // Opcional por si no hay imagen
   final int learn;
   const WordWithImage({
     required this.id,

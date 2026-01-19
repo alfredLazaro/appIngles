@@ -1,4 +1,5 @@
 import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
+import 'package:first_app/domain/usecases/word/insert_lot_words.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/core/services/dictonary_service.dart';
@@ -85,7 +86,6 @@ class Dependencies {
   late final ImageService imageService;
   late final WordRepositoryImpl wordRepository;
   late final ImageRepositoryImpl imageRepository;
-
   // Use cases
   late final GetRecentWordsSummaryUseCase getRecentWords;
   late final SaveWordUseCase saveWord;
@@ -94,6 +94,7 @@ class Dependencies {
   late final SearchWordDefinitionUseCase searchWordDefinition;
   late final SearchImagesUseCase searchImages;
   late final SaveWordImagesUseCase saveWordImages;
+  late final InsertLotWordsUseCase saveLotWords;
 
   Dependencies._() {
     // Inicializar UNA SOLA VEZ
@@ -120,6 +121,7 @@ class Dependencies {
     searchWordDefinition = SearchWordDefinitionUseCase(wordRepository);
     searchImages = SearchImagesUseCase(imageRepository);
     saveWordImages = SaveWordImagesUseCase(imageRepository);
+    saveLotWords = InsertLotWordsUseCase(wordRepository);
   }
 
   static Dependencies get instance {

@@ -35,6 +35,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       searchWordDefinition: deps.searchWordDefinition,
       searchImages: deps.searchImages,
       saveWordImages: deps.saveWordImages,
+      saveLotWords: deps.saveLotWords,
     );
 
     wordListBloc = WordListBloc(
