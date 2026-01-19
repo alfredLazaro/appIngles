@@ -7,17 +7,20 @@ import 'package:first_app/presentation/bloc/word_learning/word_learning_event.da
 import 'package:first_app/presentation/bloc/word_learning/word_learning_state.dart';
 
 class BulkInsertDialog extends StatefulWidget {
-  final WordLearningBloc? bloc; // Make it optional
+  const BulkInsertDialog({super.key});
 
-  const BulkInsertDialog({super.key, this.bloc});
-
-  // Helper method to show the dialog
-  static Future<void> show(BuildContext context,
-      {WordLearningBloc? bloc}) async {
+  // Helper method to show the dialog with proper BLoC access
+  static Future<void> show(BuildContext context) async {
+    // Get the bloc from the current context BEFORE showing the dialog
+    final bloc = context.read<WordLearningBloc>();
+    
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => BulkInsertDialog(bloc: bloc),
+      builder: (dialogContext) => BlocProvider.value(
+        value: bloc, // Provide the bloc to the dialog
+        child: const BulkInsertDialog(),
+      ),
     );
   }
 
@@ -65,7 +68,7 @@ class _BulkInsertDialogState extends State<BulkInsertDialog> {
     return wordInsertions;
   }
 
-  void _insertWords(BuildContext context) {
+  void _insertWords() {
     final text = _textController.text.trim();
     if (text.isEmpty) {
       setState(() => _errorMessage = 'Por favor ingresa al menos una palabra');
@@ -83,92 +86,13 @@ class _BulkInsertDialogState extends State<BulkInsertDialog> {
       _errorMessage = null;
     });
 
-    // Get bloc from widget or context
-    final bloc = widget.bloc ?? context.read<WordLearningBloc>();
-    bloc.add(InsertLotWordsEvent(wordInsertions));
+    // Now we can safely read the bloc from context
+    context.read<WordLearningBloc>().add(InsertLotWordsEvent(wordInsertions));
   }
 
   @override
   Widget build(BuildContext context) {
-    // Create the dialog widget
-    final dialog = AlertDialog(
-      title: const Row(
-        children: [
-          Icon(Icons.upload_file, size: 24),
-          SizedBox(width: 12),
-          Text('Inserción Masiva de Palabras'),
-        ],
-      ),
-      content: SizedBox(
-        width: 500,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Formato: palabra|fonética|definición|oración (una por línea)',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Ejemplo:\napple|ˈæpəl|Una fruta roja|Me como una manzana cada día.',
-              style: TextStyle(
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _textController,
-              maxLines: 10,
-              minLines: 6,
-              onChanged: (_) => _calculateWordCount(),
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                hintText:
-                    'Escribe aquí...\naprender|əpˈrɛndər|Adquirir conocimiento|Quiero aprender inglés.',
-                errorText: _errorMessage,
-                contentPadding: const EdgeInsets.all(12),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Palabras detectadas: $_wordCount',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: _wordCount > 0 ? Colors.green : Colors.grey,
-                    fontWeight:
-                        _wordCount > 0 ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-                if (_isLoading)
-                  const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-          child: const Text('Cancelar'),
-        ),
-        ElevatedButton.icon(
-          onPressed: _isLoading ? null : () => _insertWords(context),
-          icon: const Icon(Icons.save_alt, size: 20),
-          label: const Text('Insertar Todas'),
-        ),
-      ],
-    );
-
-    // Wrap with BlocListener
-    final listener = BlocListener<WordLearningBloc, WordLearningState>(
+    return BlocListener<WordLearningBloc, WordLearningState>(
       listener: (context, state) {
         if (state is LotWordsInserted) {
           Navigator.of(context).pop();
@@ -186,17 +110,81 @@ class _BulkInsertDialogState extends State<BulkInsertDialog> {
           });
         }
       },
-      child: dialog,
+      child: AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.upload_file, size: 24),
+            SizedBox(width: 12),
+            Text('Inserción Masiva de Palabras'),
+          ],
+        ),
+        content: SizedBox(
+          width: 500,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Formato: palabra|fonética|definición|oración (una por línea)',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Ejemplo:\napple|ˈæpəl|Una fruta roja|Me como una manzana cada día.',
+                style: TextStyle(
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _textController,
+                maxLines: 10,
+                minLines: 6,
+                onChanged: (_) => _calculateWordCount(),
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  hintText:
+                      'Escribe aquí...\naprender|əpˈrɛndər|Adquirir conocimiento|Quiero aprender inglés.',
+                  errorText: _errorMessage,
+                  contentPadding: const EdgeInsets.all(12),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Palabras detectadas: $_wordCount',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: _wordCount > 0 ? Colors.green : Colors.grey,
+                      fontWeight:
+                          _wordCount > 0 ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  if (_isLoading)
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton.icon(
+            onPressed: _isLoading ? null : _insertWords,
+            icon: const Icon(Icons.save_alt, size: 20),
+            label: const Text('Insertar Todas'),
+          ),
+        ],
+      ),
     );
-
-    // If bloc is provided, wrap with BlocProvider
-    if (widget.bloc != null) {
-      return BlocProvider.value(
-        value: widget.bloc!,
-        child: listener,
-      );
-    } else {
-      return listener;
-    }
   }
 }
