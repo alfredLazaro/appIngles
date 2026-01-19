@@ -12,7 +12,6 @@ import 'package:first_app/presentation/widgets/word_input_section.dart';
 import 'package:first_app/presentation/widgets/listshort/word_list_section.dart';
 import 'package:first_app/presentation/widgets/listshort/EditDialog.dart';
 
-/// Página principal refactorizada (antes Pagina1)
 class WordLearningPage extends StatefulWidget {
   const WordLearningPage({super.key});
   @override
@@ -92,16 +91,11 @@ class _WordLearningPageState extends State<WordLearningPage> {
         actions: [
           // Add this button to open bulk insert dialog
           IconButton(
-            icon: const Icon(Icons.add_box),
-            tooltip: 'Inserción masiva',
-            onPressed: () => BulkInsertDialog.show(context),
-          ),
-          // Alternative with text button
-          // TextButton.icon(
-          //   icon: const Icon(Icons.upload_file, color: Colors.white),
-          //   label: const Text('Bulk', style: TextStyle(color: Colors.white)),
-          //   onPressed: () => BulkWordInsertDialog.show(context),
-          // ),
+              icon: const Icon(Icons.add_box),
+              tooltip: 'Inserción masiva',
+              onPressed: () => {
+                    BulkInsertDialog.show(context),
+                  }),
         ],
       ),
       body: BlocListener<WordLearningBloc, WordLearningState>(
