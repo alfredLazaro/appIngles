@@ -130,4 +130,10 @@ class FlashcardRepository implements WordRepository {
     // TODO: implement wordExists
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> insertLotWords(List<Word> l) {
+    // TODO: implement wordExists
+    throw UnimplementedError();
+  }
 }

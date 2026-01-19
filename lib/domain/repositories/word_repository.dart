@@ -33,4 +33,5 @@ abstract class WordRepository {
   Future<void> updateWord(Word word);
   Future<int> countSentences();
   Future<WordStats> getWordStatistics();
+  Future<List<Map<String, dynamic>>> insertLotWords(List<Word> words);
 }

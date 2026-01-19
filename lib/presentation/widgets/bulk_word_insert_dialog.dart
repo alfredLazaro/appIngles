@@ -21,7 +21,7 @@ class BulkWordInsertDialog extends StatefulWidget {
 class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
   final TextEditingController _textController = TextEditingController();
   final WordDao _wordDao = WordDao();
-  
+
   List<Map<String, dynamic>> _insertedResults = [];
   bool _isLoading = false;
   String? _errorMessage;
@@ -30,21 +30,25 @@ class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
     try {
       // Remove extra whitespace and prepare for parsing
       final cleanText = text.trim();
-      
+
       // This is a simple parser - for production, you might want a more robust solution
       final List<WordModel> words = [];
-      
+
       // Split by WordModel( to find each word definition
       final wordBlocks = cleanText.split('WordModel(').skip(1);
-      
+
       for (var block in wordBlocks) {
         // Extract values using regex or string manipulation
-        final wordMatch = RegExp(r"word:\s*['\"](.+?)['\"]").firstMatch(block);
-        final phoneticMatch = RegExp(r"phonetic:\s*['\"](.+?)['\"]").firstMatch(block);
-        final definitionMatch = RegExp(r"definition:\s*['\"](.+?)['\"]").firstMatch(block);
-        final sentenceMatch = RegExp(r"sentence:\s*['\"](.+?)['\"]").firstMatch(block);
+        final wordMatch =
+            RegExp(r'''word:\s*['"](.+?)['"]''').firstMatch(block);
+        final phoneticMatch =
+            RegExp(r'''phonetic:\s*['\"](.+?)['\"]''').firstMatch(block);
+        final definitionMatch =
+            RegExp(r'''definition:\s*['\"](.+?)['\"]''').firstMatch(block);
+        final sentenceMatch =
+            RegExp(r'''sentence:\s*['\"](.+?)['\"]''').firstMatch(block);
         final learnMatch = RegExp(r"learn:\s*(\d+)").firstMatch(block);
-        
+
         if (wordMatch != null) {
           words.add(WordModel(
             word: wordMatch.group(1) ?? '',
@@ -52,10 +56,12 @@ class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
             definition: definitionMatch?.group(1) ?? '',
             sentence: sentenceMatch?.group(1) ?? '',
             learn: int.tryParse(learnMatch?.group(1) ?? '0') ?? 0,
+            createdAt: '',
+            updatedAt: '',
           ));
         }
       }
-      
+
       return words;
     } catch (e) {
       throw Exception('Failed to parse WordModel format: $e');
@@ -64,7 +70,7 @@ class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
 
   Future<void> _insertWords() async {
     final text = _textController.text.trim();
-    
+
     if (text.isEmpty) {
       setState(() => _errorMessage = 'Please paste your WordModel list');
       return;
@@ -78,7 +84,7 @@ class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
     try {
       // Parse the WordModel list
       final wordModels = _parseWordModels(text);
-      
+
       if (wordModels.isEmpty) {
         setState(() {
           _errorMessage = 'No valid WordModels found';
@@ -89,7 +95,7 @@ class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
 
       // Insert words
       final results = await _wordDao.insertLotWords(wordModels);
-      
+
       setState(() {
         _insertedResults = results;
         _isLoading = false;
@@ -169,8 +175,8 @@ class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
                 Text(
                   'Bulk Word Insert',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -194,7 +200,8 @@ class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.info_outline, size: 20, color: Colors.blue[700]),
+                      Icon(Icons.info_outline,
+                          size: 20, color: Colors.blue[700]),
                       const SizedBox(width: 8),
                       Text(
                         'Paste your WordModel list format:',
@@ -289,7 +296,8 @@ class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
                   : const Icon(Icons.upload),
               label: Text(
                 _isLoading ? 'Inserting...' : 'Insert Words',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 16),
@@ -301,13 +309,15 @@ class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.check_circle, color: Colors.green[700], size: 20),
+                      Icon(Icons.check_circle,
+                          color: Colors.green[700], size: 20),
                       const SizedBox(width: 8),
                       Text(
                         'Results (${_insertedResults.length})',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                     ],
                   ),
@@ -368,7 +378,8 @@ class _BulkWordInsertDialogState extends State<BulkWordInsertDialog> {
                           icon: const Icon(Icons.copy, size: 18),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(
-                              text: 'ID: ${result['id']}, Word: ${result['word']}',
+                              text:
+                                  'ID: ${result['id']}, Word: ${result['word']}',
                             ));
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(

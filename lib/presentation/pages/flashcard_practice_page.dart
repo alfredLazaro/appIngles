@@ -3,6 +3,7 @@ import 'package:first_app/domain/repositories/flashcard_repository.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
+import 'package:first_app/presentation/widgets/flashcard/flashcard_word.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/services/tts_service.dart';
@@ -13,7 +14,6 @@ import 'package:first_app/domain/usecases/speak_text.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_bloc.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_state.dart';
 import 'package:first_app/presentation/widgets/flashcard/english_flashcard.dart';
-import 'package:first_app/presentation/widgets/flashcard/word_flashcard.dart';
 import 'package:logger/logger.dart';
 
 Logger log = Logger();
@@ -184,8 +184,8 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
               padding: const EdgeInsets.only(right: 16),
               child: Text(
                 '${((_currentIndex + 1) / _sessions.length * 100).toInt()}%',
-                style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -198,7 +198,8 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             value: (_currentIndex + 1) / _sessions.length,
             minHeight: 6,
             backgroundColor: Colors.grey[300],
-            valueColor: AlwaysStoppedAnimation<Color>(_getModeColor(currentMode)),
+            valueColor:
+                AlwaysStoppedAnimation<Color>(_getModeColor(currentMode)),
           ),
 
           // Mode indicator banner

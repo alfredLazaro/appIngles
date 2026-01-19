@@ -90,11 +90,11 @@ class _WordLearningPageState extends State<WordLearningPage> {
         title: const Text('Aprendiendo'),
         actions: [
           // Add this button to open bulk insert dialog
-          IconButton(
+          /* IconButton(
             icon: const Icon(Icons.add_box),
             tooltip: 'Inserción masiva',
             onPressed: () => BulkWordInsertDialog.show(context),
-          ),
+          ), */
           // Alternative with text button
           // TextButton.icon(
           //   icon: const Icon(Icons.upload_file, color: Colors.white),

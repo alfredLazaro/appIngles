@@ -19,25 +19,27 @@ class WordDao {
       rethrow; // Or return -1 if you prefer silent failure
     }
   }
-  Future<List<Map<String, dynamic>>> insertLotWords(List<WordModel> words) async {
+
+  Future<List<Map<String, dynamic>>> insertLotWords(
+      List<WordModel> words) async {
     try {
       final db = await dbHelper.database;
       final List<Map<String, dynamic>> results = [];
-      
+
       // Use batch for better performance
       final batch = db.batch();
-      
+
       for (WordModel word in words) {
         batch.insert(
-          DBTables.word,
+          'Word',
           word.toMap(), // Use the existing toMap() method from WordModel
           conflictAlgorithm: ConflictAlgorithm.ignore,
         );
       }
-      
+
       // Execute batch and get the inserted IDs
       final ids = await batch.commit();
-      
+
       // Map the results with only ID and word string
       for (int i = 0; i < words.length; i++) {
         results.add({
@@ -45,13 +47,14 @@ class WordDao {
           'word': words[i].word, // Only return the word string
         });
       }
-      
+
       return results;
     } catch (e) {
       _logError('insertLotWords', e, {'wordsCount': words.length});
       rethrow;
     }
   }
+
   Future<void> updateWord(WordModel word) async {
     try {
       final db = await dbHelper.database;
