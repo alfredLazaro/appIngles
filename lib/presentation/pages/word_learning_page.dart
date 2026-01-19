@@ -88,6 +88,20 @@ class _WordLearningPageState extends State<WordLearningPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Aprendiendo'),
+        actions: [
+          // Add this button to open bulk insert dialog
+          IconButton(
+            icon: const Icon(Icons.add_box),
+            tooltip: 'Inserción masiva',
+            onPressed: () => BulkWordInsertDialog.show(context),
+          ),
+          // Alternative with text button
+          // TextButton.icon(
+          //   icon: const Icon(Icons.upload_file, color: Colors.white),
+          //   label: const Text('Bulk', style: TextStyle(color: Colors.white)),
+          //   onPressed: () => BulkWordInsertDialog.show(context),
+          // ),
+        ],
       ),
       body: BlocListener<WordLearningBloc, WordLearningState>(
         listener: (context, state) {
