@@ -96,6 +96,13 @@ class _WordLearningPageState extends State<WordLearningPage> {
               onPressed: () => {
                     BulkInsertDialog.show(context),
                   }),
+                  IconButton(
+                    icon: const Icon(Icons.insert),
+                    tooltip: 'last n words',
+                    onPressed: () => {
+                      _showWordsLimitDialog(),
+                    }
+                  ),
         ],
       ),
       body: BlocListener<WordLearningBloc, WordLearningState>(
