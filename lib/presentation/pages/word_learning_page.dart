@@ -83,12 +83,49 @@ class _WordLearningPageState extends State<WordLearningPage> {
     );
   }
 
+  Future<void> _copySearchResults() async {
+    final currentState = context.read<WordLearningBloc>().state;
+    List<WordSummary> wordsToCopy = _cachedWords;
+
+    // Try to get words from the current state if it's WordsLoaded
+    if (currentState is WordsLoaded) {
+      wordsToCopy = currentState.words;
+    }
+
+    if (wordsToCopy.isEmpty) {
+      _showError('No hay palabras para copiar');
+      return;
+    }
+
+    print('Copying ${wordsToCopy.length} words');
+
+    // Format the words for copying
+    String result = '';
+    for (int i = 0; i < wordsToCopy.length; i++) {
+      final word = wordsToCopy[i];
+      result += 'id ${word.id}. ${word.word}\n';
+      if (word.sentence != null && word.sentence!.isNotEmpty) {
+        result += ' Ejemplo: ${word.sentence}\n';
+      }
+      result += '\n';
+    }
+
+    await ClipboardHelper.copyText(result);
+    _showSuccess('${_cachedWords.length} palabras copiadas al portapapeles');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Aprendiendo'),
         actions: [
+          // Add copy button
+          IconButton(
+            icon: const Icon(Icons.content_copy),
+            tooltip: 'Copiar resultados',
+            onPressed: _copySearchResults,
+          ),
           // Add this button to open bulk insert dialog
           IconButton(
               icon: const Icon(Icons.add_box),
@@ -261,95 +298,94 @@ class _WordLearningPageState extends State<WordLearningPage> {
     _tempImages = null;
   }
 
- Future<void> _showWordsLimitDialog() async {
-  // Create a TextEditingController for the input field
-  final TextEditingController _limitController = TextEditingController();
+  Future<void> _showWordsLimitDialog() async {
+    // Create a TextEditingController for the input field
+    final TextEditingController _limitController = TextEditingController();
 
-  await showDialog(
-    context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: const Text('Cargar palabras recientes'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text('Ingresa el número de palabras a cargar:'),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _limitController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Límite',
-              hintText: 'Ej: 9',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.numbers),
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Cargar palabras recientes'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Ingresa el número de palabras a cargar:'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _limitController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Límite',
+                hintText: 'Ej: 9',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.numbers),
+              ),
+              autofocus: true,
             ),
-            autofocus: true,
+            const SizedBox(height: 8),
+            const Text(
+              'Dejar vacío para usar el valor por defecto (9)',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancelar'),
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'Dejar vacío para usar el valor por defecto (9)',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ElevatedButton(
+            onPressed: () {
+              final input = _limitController.text.trim();
+
+              // Parse the input
+              int? limit;
+              if (input.isNotEmpty) {
+                limit = int.tryParse(input);
+
+                // Validate the input
+                if (limit == null || limit <= 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content:
+                          Text('Por favor ingresa un número válido mayor a 0'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return; // Don't close dialog on invalid input
+                }
+              }
+
+              // Close the dialog first
+              Navigator.pop(dialogContext);
+
+              // Dispatch the event with the limit (or null for default)
+              context.read<WordLearningBloc>().add(
+                    LoadRecentWordsEvent(limit: limit),
+                  );
+
+              // Show success message using the original context
+              _showSuccessMessage(limit);
+            },
+            child: const Text('Cargar'),
           ),
         ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(dialogContext),
-          child: const Text('Cancelar'),
+    );
+
+    // Dispose the controller
+  }
+
+  void _showSuccessMessage(int? limit) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          limit != null
+              ? 'Cargando $limit palabras...'
+              : 'Cargando palabras con límite por defecto...',
         ),
-        ElevatedButton(
-          onPressed: () {
-            final input = _limitController.text.trim();
-
-            // Parse the input
-            int? limit;
-            if (input.isNotEmpty) {
-              limit = int.tryParse(input);
-
-              // Validate the input
-              if (limit == null || limit <= 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content:
-                        Text('Por favor ingresa un número válido mayor a 0'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return; // Don't close dialog on invalid input
-              }
-            }
-
-            // Close the dialog first
-            Navigator.pop(dialogContext);
-
-            // Dispatch the event with the limit (or null for default)
-            context.read<WordLearningBloc>().add(
-                  LoadRecentWordsEvent(limit: limit),
-                );
-
-            // Show success message using the original context
-            _showSuccessMessage(limit);
-          },
-          child: const Text('Cargar'),
-        ),
-      ],
-    ),
-  );
-
-  // Dispose the controller
-  _limitController.dispose();
-}
-
-void _showSuccessMessage(int? limit) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(
-        limit != null
-            ? 'Cargando $limit palabras...'
-            : 'Cargando palabras con límite por defecto...',
+        backgroundColor: Colors.green,
       ),
-      backgroundColor: Colors.green,
-    ),
-  );
-}
+    );
+  }
 }
