@@ -58,8 +58,9 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     emit(WordLearningLoading());
     try {
       final words = await _getRecentWords(
-        limit: event.limit, // Could be null
+        limit: event.limit ?? 9, // Could be null
       );
+      if (event.limit == null) {}
       emit(WordsLoaded(words: words));
     } catch (e) {
       emit(WordLearningError(e.toString()));
