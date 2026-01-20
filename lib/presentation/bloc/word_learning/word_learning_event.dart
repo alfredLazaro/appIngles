@@ -6,7 +6,10 @@ abstract class WordLearningEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadRecentWordsEvent extends WordLearningEvent {}
+class LoadRecentWordsEvent extends WordLearningEvent {
+  final int? limit;
+  LoadRecentWordsEvent({this.limit});
+}
 
 class SearchWordDefinitionEvent extends WordLearningEvent {
   final String word;
