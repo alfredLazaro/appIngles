@@ -78,3 +78,12 @@ class InsertLotWordsEvent extends WordLearningEvent {
 
   InsertLotWordsEvent(this.words);
 }
+// word_learning_event.dart
+class FetchWordsEvent extends WordLearningEvent {
+  final int limit;
+  
+  const FetchWordsEvent(this.limit);
+  
+  @override
+  List<Object?> get props => [limit];
+}

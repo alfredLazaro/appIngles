@@ -361,9 +361,12 @@ class _WordLearningPageState extends State<WordLearningPage> {
 
               // Dispatch the event with the limit (or null for default)
               context.read<WordLearningBloc>().add(
-                    LoadRecentWordsEvent(limit: limit),
+                    FetchWordsEvent(limit: limit),
                   );
-
+              if(state is WordsFetched){
+                final result=state.words;
+                await ClipboardHelper.copyText(result);
+              }
               // Show success message using the original context
               _showSuccessMessage(limit);
             },

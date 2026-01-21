@@ -45,6 +45,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
         super(WordLearningInitial()) {
     // Eventos con sufijo "Event"
     on<LoadRecentWordsEvent>(_onLoadRecentWords);
+    on<FetchWordsEvent>(_onFetchWords);
     on<SearchWordDefinitionEvent>(_onSearchWordDefinition);
     on<SearchWordImagesEvent>(_onSearchWordImages);
     on<SaveNewWordEvent>(_onSaveNewWord);
@@ -73,7 +74,18 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
       emit(WordLearningError(e.toString()));
     }
   }
-
+  Future<void> _onFetchWords(
+    FetchWordsEvent event,
+    Emitter<WordLearningState> emit,
+  ) async {
+    emit(WordLearningLoading());
+    try {
+      final words = await _wordRepository.getRecentWords(limit: event.limit);
+      emit(WordsFetched(words)); 
+    } catch (e) {
+      emit(WordLearningError('Error fetching words: $e'));
+    }
+  }
   Future<void> _onSearchWordDefinition(
     SearchWordDefinitionEvent event,
     Emitter<WordLearningState> emit,

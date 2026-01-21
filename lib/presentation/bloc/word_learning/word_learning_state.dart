@@ -62,3 +62,12 @@ class LotWordsInserted extends WordLearningState {
 
   LotWordsInserted({required this.results});
 }
+// word_learning_state.dart
+class WordsFetched extends WordLearningState {
+  final List<WordSummary> words;
+  
+  const WordsFetched(this.words);
+  
+  @override
+  List<Object?> get props => [words];
+}
