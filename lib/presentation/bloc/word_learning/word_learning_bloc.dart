@@ -74,18 +74,20 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
       emit(WordLearningError(e.toString()));
     }
   }
+
   Future<void> _onFetchWords(
     FetchWordsEvent event,
     Emitter<WordLearningState> emit,
   ) async {
     emit(WordLearningLoading());
     try {
-      final words = await _wordRepository.getRecentWords(limit: event.limit);
-      emit(WordsFetched(words)); 
+      final words = await _getRecentWords(limit: event.limit);
+      emit(WordsFetched(words));
     } catch (e) {
       emit(WordLearningError('Error fetching words: $e'));
     }
   }
+
   Future<void> _onSearchWordDefinition(
     SearchWordDefinitionEvent event,
     Emitter<WordLearningState> emit,

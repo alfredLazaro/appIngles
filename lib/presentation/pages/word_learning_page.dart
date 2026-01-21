@@ -339,9 +339,9 @@ class _WordLearningPageState extends State<WordLearningPage> {
               final input = _limitController.text.trim();
 
               // Parse the input
-              int? limit;
+              int limit = 9;
               if (input.isNotEmpty) {
-                limit = int.tryParse(input);
+                limit = int.tryParse(input) ?? 9;
 
                 // Validate the input
                 if (limit == null || limit <= 0) {
@@ -361,12 +361,12 @@ class _WordLearningPageState extends State<WordLearningPage> {
 
               // Dispatch the event with the limit (or null for default)
               context.read<WordLearningBloc>().add(
-                    FetchWordsEvent(limit: limit),
+                    FetchWordsEvent(limit),
                   );
-              if(state is WordsFetched){
-                final result=state.words;
-                await ClipboardHelper.copyText(result);
-              }
+              /* if (state is WordsFetched) {
+                final result = state.words;
+                ClipboardHelper.copyText(result);
+              } */
               // Show success message using the original context
               _showSuccessMessage(limit);
             },
