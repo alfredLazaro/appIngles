@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/entities/word.dart';
@@ -57,9 +60,13 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
   ) async {
     emit(WordLearningLoading());
     try {
+      final int limitUsed = event.limit ?? 9;
       final words = await _getRecentWords(
-        limit: event.limit ?? 9, // Could be null
+        limit: limitUsed, // Could be null
       );
+      // #region agent log
+      //try { File(r'd:\compartidoAtodos\proyectos\appIngles\.cursor\debug.log').writeAsStringSync(jsonEncode({'sessionId':'debug-session','hypothesisId':'H2','location':'word_learning_bloc.dart:_onLoadRecentWords','message':'Words loaded','data':{'limitUsed':limitUsed,'wordsLength':words.length},'timestamp':DateTime.now().millisecondsSinceEpoch}) + '\n', mode: FileMode.append); } catch (_) {}
+      // #endregion
       if (event.limit == null) {}
       emit(WordsLoaded(words: words));
     } catch (e) {

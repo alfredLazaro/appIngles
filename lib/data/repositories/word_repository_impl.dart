@@ -28,7 +28,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<List<WordSummary>> getRecentWordsSummary({int limit = 9}) async {
     try {
-      final models = await _wordDao.getLastWordBasic();
+      final models = await _wordDao.getLastWordBasic(limit: limit);
       return WordMapper.toSummaryList(models);
     } catch (e) {
       throw Exception('Error al obtener palabras recientes: $e');
