@@ -26,6 +26,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
   List<Map<String, dynamic>>? _tempImages;
   // Cache to keep the last loaded list so it doesn't disappear while searching
   List<WordSummary> _cachedWords = [];
+  List<WordSummary> _selecteWords = [];
   int _cachedPage = 0;
   @override
   void initState() {
@@ -84,13 +85,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
   }
 
   Future<void> _copySearchResults() async {
-    final currentState = context.read<WordLearningBloc>().state;
-    List<WordSummary> wordsToCopy = _cachedWords;
-
-    // Try to get words from the current state if it's WordsLoaded
-    if (currentState is WordsLoaded) {
-      wordsToCopy = currentState.words;
-    }
+    List<WordSummary> wordsToCopy = _selecteWords;
 
     if (wordsToCopy.isEmpty) {
       _showError('No hay palabras para copiar');
@@ -111,7 +106,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
     }
 
     await ClipboardHelper.copyText(result);
-    _showSuccess('${_cachedWords.length} palabras copiadas al portapapeles');
+    _showSuccess('${wordsToCopy.length} palabras copiadas al portapapeles');
   }
 
   @override
@@ -161,6 +156,9 @@ class _WordLearningPageState extends State<WordLearningPage> {
               'Palabra guardada con ${state.imagesCount} imagen(es)',
             );
             _wordController.clear();
+          }else if (state is WordsFetched) {
+            // Handle the fetched words
+            _selecteWords = state.words;
           }
         },
         child: BlocBuilder<WordLearningBloc, WordLearningState>(
@@ -363,11 +361,6 @@ class _WordLearningPageState extends State<WordLearningPage> {
               context.read<WordLearningBloc>().add(
                     FetchWordsEvent(limit),
                   );
-              /* if (state is WordsFetched) {
-                final result = state.words;
-                ClipboardHelper.copyText(result);
-              } */
-              // Show success message using the original context
               _showSuccessMessage(limit);
             },
             child: const Text('Cargar'),
