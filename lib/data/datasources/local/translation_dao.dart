@@ -1,5 +1,5 @@
+import 'package:first_app/data/datasources/local/DataBaseHelper.dart';
 import 'package:first_app/data/datasources/local/db_constants.dart';
-import 'package:first_app/data/datasources/local/database_service.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TranslationDao {
@@ -132,7 +132,8 @@ class TranslationDao {
     final db = await _databaseService.database;
     return await db.query(
       DBTables.translation,
-      where: '${TranslationFields.wordTranslate} LIKE ? OR ${TranslationFields.alternatives} LIKE ?',
+      where:
+          '${TranslationFields.wordTranslate} LIKE ? OR ${TranslationFields.alternatives} LIKE ?',
       whereArgs: ['%$searchTerm%', '%$searchTerm%'],
     );
   }
@@ -169,17 +170,17 @@ class TranslationDao {
   // Update or insert translation (upsert pattern)
   Future<int> upsertTranslation(Map<String, dynamic> translation) async {
     final db = await _databaseService.database;
-    
+
     if (translation.containsKey(TranslationFields.id)) {
       final id = translation[TranslationFields.id];
       final exists = await getTranslationById(id);
-      
+
       if (exists != null) {
         await updateTranslation(id, translation);
         return id;
       }
     }
-    
+
     return await insertTranslation(translation);
   }
 }

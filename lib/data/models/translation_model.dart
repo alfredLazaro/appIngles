@@ -1,4 +1,6 @@
 // data/models/translation_model.dart
+import 'package:first_app/domain/entities/translation.dart';
+
 class TranslationModel {
   final int? id;
   final String wordTranslate;
