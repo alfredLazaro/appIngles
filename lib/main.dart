@@ -82,10 +82,12 @@ class Dependencies {
   // Lazy initialization
   late final WordDao wordDao;
   late final ImageDao imageDao;
+  late final TranslationDao translationDao;
   late final WordService wordService;
   late final ImageService imageService;
   late final WordRepositoryImpl wordRepository;
   late final ImageRepositoryImpl imageRepository;
+  late final TranslationRepositoryImpl translationRepository;
   // Use cases
   late final GetRecentWordsSummaryUseCase getRecentWords;
   late final SaveWordUseCase saveWord;
@@ -102,6 +104,7 @@ class Dependencies {
     imageDao = ImageDao();
     wordService = WordService();
     imageService = ImageService();
+    translationDao = TranslationDao();
 
     wordRepository = WordRepositoryImpl(
       wordDao: wordDao,
@@ -112,7 +115,9 @@ class Dependencies {
       imageService: imageService,
       imageDao: imageDao,
     );
-
+    translationRepository = TranslationRepositoryImpl(
+      translationDao: translationDao,
+    );
     // Casos de uso
     getRecentWords = GetRecentWordsSummaryUseCase(wordRepository);
     saveWord = SaveWordUseCase(wordRepository);
