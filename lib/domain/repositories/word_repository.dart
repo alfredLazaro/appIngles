@@ -6,7 +6,6 @@ import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_stats.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
-import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 
 /// Contrato del repositorio de palabras
 abstract class WordRepository {
