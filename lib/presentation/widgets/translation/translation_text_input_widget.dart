@@ -1,5 +1,4 @@
 // presentation/widgets/translation/translation_text_input_widget.dart
-import 'package:first_app/data/datasources/local/db_constants.dart';
 import 'package:first_app/presentation/bloc/translation/translation_bloc.dart';
 import 'package:first_app/presentation/bloc/translation/translation_event.dart';
 import 'package:first_app/presentation/bloc/translation/translation_state.dart';
@@ -279,23 +278,19 @@ class _TranslationTextInputWidgetState
                 .toList();
 
             if (alternatives.isNotEmpty) {
-              // Use first alternative as main translation, rest as alternatives
               translations.add({
-                TranslationFields.wordTranslate: alternatives[0],
-                TranslationFields.alternatives:
-                    alternatives.sublist(1).join('|'),
+                'wordTranslate': alternatives[0],
+                'alternatives': alternatives.sublist(1).join('|'),
               });
             }
           } else {
-            // Simple translation
             translations.add({
-              TranslationFields.wordTranslate: translationPart,
-              TranslationFields.alternatives: '',
+              'wordTranslate': translationPart,
+              'alternatives': '',
             });
           }
         }
       } else {
-        // Check for comma-separated values
         if (trimmedLine.contains(',')) {
           final items = trimmedLine
               .split(',')
@@ -304,17 +299,15 @@ class _TranslationTextInputWidgetState
               .toList();
 
           if (items.isNotEmpty) {
-            // First item is main translation, rest are alternatives
             translations.add({
-              TranslationFields.wordTranslate: items[0],
-              TranslationFields.alternatives: items.sublist(1).join('|'),
+              'wordTranslate': items[0],
+              'alternatives': items.sublist(1).join('|'),
             });
           }
         } else {
-          // Single translation
           translations.add({
-            TranslationFields.wordTranslate: trimmedLine,
-            TranslationFields.alternatives: '',
+            'wordTranslate': trimmedLine,
+            'alternatives': '',
           });
         }
       }

@@ -10,7 +10,7 @@ import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/core/services/dictonary_service.dart';
 import 'package:first_app/data/mappers/word_mapper.dart';
-import 'package:first_app/presentation/bloc/practice/practice_data.dart';
+import 'package:first_app/domain/entities/sentence_model.dart';
 
 /// Implementación concreta del repositorio
 class WordRepositoryImpl implements WordRepository {

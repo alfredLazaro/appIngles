@@ -1,4 +1,4 @@
-import 'package:first_app/presentation/bloc/practice/practice_data.dart';
+import 'package:first_app/domain/entities/sentence_model.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
 import 'package:first_app/presentation/widgets/sentence/sentence_builder.dart';

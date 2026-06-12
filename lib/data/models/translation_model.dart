@@ -1,5 +1,6 @@
 // data/models/translation_model.dart
 import 'package:first_app/domain/entities/translation.dart';
+import 'package:first_app/domain/entities/translation_entity.dart';
 
 class TranslationModel {
   final int? id;
@@ -32,23 +33,26 @@ class TranslationModel {
     );
   }
 
-  // Convert to entity
-  Translation toEntity() {
-    return Translation(
+  // Convert to TranslationEntity (v2)
+  TranslationEntity toEntity() {
+    return TranslationEntity(
       id: id,
       wordTranslate: wordTranslate,
       wordId: wordId,
-      alternatives: alternatives,
+      alternatives: (alternatives ?? '')
+          .split('|')
+          .where((item) => item.isNotEmpty)
+          .toList(),
     );
   }
 
-  // Create from entity
-  factory TranslationModel.fromEntity(Translation entity) {
+  // Create from TranslationEntity (v2)
+  factory TranslationModel.fromEntity(TranslationEntity entity) {
     return TranslationModel(
       id: entity.id,
       wordTranslate: entity.wordTranslate,
       wordId: entity.wordId,
-      alternatives: entity.alternatives,
+      alternatives: entity.alternatives.join('|'),
     );
   }
 }
