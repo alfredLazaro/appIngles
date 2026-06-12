@@ -1,4 +1,6 @@
-class WordImage {
+import 'package:equatable/equatable.dart';
+
+class WordImage extends Equatable {
   final int? id;
   final int wordId;
   final String url;
@@ -16,4 +18,8 @@ class WordImage {
     required this.author,
     required this.source,
   });
+
+  @override
+  List<Object?> get props =>
+      [id, wordId, url, tinyUrl, name, author, source];
 }

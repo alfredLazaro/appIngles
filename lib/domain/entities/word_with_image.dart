@@ -1,10 +1,12 @@
-/// Entidad para mostrar palabra con su primera imagen
-class WordWithImage {
+import 'package:equatable/equatable.dart';
+
+class WordWithImage extends Equatable {
   final int id;
   final String word;
   final String definition;
-  final String? tinyImageUrl; // Opcional por si no hay imagen
+  final String? tinyImageUrl;
   final int learn;
+
   const WordWithImage({
     required this.id,
     required this.word,
@@ -12,4 +14,7 @@ class WordWithImage {
     this.tinyImageUrl,
     this.learn = 0,
   });
+
+  @override
+  List<Object?> get props => [id, word, definition, tinyImageUrl, learn];
 }

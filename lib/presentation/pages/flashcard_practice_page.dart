@@ -1,5 +1,6 @@
 import 'package:first_app/data/datasources/local/word_dao.dart';
-import 'package:first_app/domain/repositories/flashcard_repository.dart';
+import 'package:first_app/data/datasources/remote/dictionary_service.dart';
+import 'package:first_app/data/repositories/word_repository_impl.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
@@ -101,7 +102,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   FlashcardBloc _createBlocForWord(FlashcardWord word) {
     final ttsService = TtsService();
     final wordDao = WordDao();
-    final wordRepository = FlashcardRepository(wordDao: wordDao);
+    final wordRepository = WordRepositoryImpl(wordDao: wordDao, wordService: WordService());
     final images = widget.imagesMap[word.id] ?? [];
 
     final initialState = FlashcardLoaded(

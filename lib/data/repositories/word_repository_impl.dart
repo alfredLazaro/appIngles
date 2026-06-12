@@ -8,7 +8,7 @@ import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/data/datasources/local/word_dao.dart';
-import 'package:first_app/core/services/dictonary_service.dart';
+import 'package:first_app/data/datasources/remote/dictionary_service.dart';
 import 'package:first_app/data/mappers/word_mapper.dart';
 import 'package:first_app/domain/entities/sentence_model.dart';
 

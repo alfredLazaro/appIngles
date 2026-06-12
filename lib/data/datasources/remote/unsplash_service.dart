@@ -25,9 +25,9 @@ class ImageService {
     _dio = Dio(
       BaseOptions(
         baseUrl: _basUrl!,
-        connectTimeout: const Duration(seconds: 5), // Tiempo máximo de conexión
+        connectTimeout: const Duration(seconds: 5),
         receiveTimeout:
-            const Duration(seconds: 3), // Tiempo máximo de respuesta
+            const Duration(seconds: 3),
       ),
     );
   }
@@ -54,7 +54,7 @@ class ImageService {
           queryParameters: {
             'query': nImg,
             'page': '1',
-            'per_page': '10', //solo quiero 10 results
+            'per_page': '10',
           },
           options: Options(headers: {'Authorization': 'Client-ID $_apiKey'}));
       if (response.data['results'] == null ||

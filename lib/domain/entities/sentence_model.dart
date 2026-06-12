@@ -1,4 +1,6 @@
-class SentenceModel {
+import 'package:equatable/equatable.dart';
+
+class SentenceModel extends Equatable {
   final int id;
   final String sentence;
 
@@ -13,4 +15,7 @@ class SentenceModel {
       sentence: map['sentence'] as String,
     );
   }
+
+  @override
+  List<Object?> get props => [id, sentence];
 }

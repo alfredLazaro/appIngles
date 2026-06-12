@@ -5,7 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class DeepSeekApiService {
   DeepSeekApiService._privateConstructor();
   static final DeepSeekApiService _instance = DeepSeekApiService._privateConstructor();
-  
+
   factory DeepSeekApiService() {
     return _instance;
   }
@@ -15,7 +15,6 @@ class DeepSeekApiService {
     await dotenv.load(fileName: "assets/.env");
     _apiKey = dotenv.env['API_DEE'] ?? _throwEnvError('API_DEE');
     _apiUrl = dotenv.env['URL_D'] ?? _throwEnvError('URL_D');
-    //print("API URL: $_apiUrl"); // Debug
   }
 
   Never _throwEnvError(String key) {

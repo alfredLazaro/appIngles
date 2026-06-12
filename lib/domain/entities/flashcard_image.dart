@@ -1,4 +1,6 @@
-class FlashcardImage {
+import 'package:equatable/equatable.dart';
+
+class FlashcardImage extends Equatable {
   final String url;
   final String? author;
   final String? source;
@@ -8,4 +10,7 @@ class FlashcardImage {
     this.author,
     this.source,
   });
+
+  @override
+  List<Object?> get props => [url, author, source];
 }

@@ -1,6 +1,6 @@
 import 'package:first_app/domain/entities/word_image.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
-import 'package:first_app/core/services/apiImage.dart';
+import 'package:first_app/data/datasources/remote/unsplash_service.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/models/image_model.dart';
 import 'package:logger/logger.dart';

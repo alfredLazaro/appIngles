@@ -1,4 +1,4 @@
-import 'package:first_app/main.dart';
+import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
@@ -20,11 +20,10 @@ class PracticeConfigPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dep = Dependencies.instance;
     return BlocProvider(
       create: (context) => PracticeBloc(
-        wordRepository: dep.wordRepository,
-        imageRepository: dep.imageRepository,
+        wordRepository: sl(),
+        imageRepository: sl(),
       )..add(LoadPracticeDataEvent(practiceType)),
       child: BlocConsumer<PracticeBloc, PracticeState>(
         listener: (context, state) {

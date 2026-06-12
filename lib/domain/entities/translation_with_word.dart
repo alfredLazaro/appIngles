@@ -1,12 +1,13 @@
-// domain/entities/translation_with_word.dart
-class TranslationWithWord {
+import 'package:equatable/equatable.dart';
+
+class TranslationWithWord extends Equatable {
   final int translationId;
   final String wordTranslate;
   final String? alternatives;
   final String word;
   final String definition;
 
-  TranslationWithWord({
+  const TranslationWithWord({
     required this.translationId,
     required this.wordTranslate,
     this.alternatives,
@@ -23,6 +24,10 @@ class TranslationWithWord {
       definition: map['definition'] as String,
     );
   }
+
+  @override
+  List<Object?> get props =>
+      [translationId, wordTranslate, alternatives, word, definition];
 
   @override
   String toString() {

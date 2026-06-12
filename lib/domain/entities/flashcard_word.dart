@@ -1,5 +1,6 @@
-/// Entidad pura sin dependencias externas
-class FlashcardWord {
+import 'package:equatable/equatable.dart';
+
+class FlashcardWord extends Equatable {
   final int id;
   final String word;
   final String definition;
@@ -13,6 +14,9 @@ class FlashcardWord {
     required this.sentence,
     this.learnCount = 0,
   });
+
+  @override
+  List<Object?> get props => [id, word, definition, sentence, learnCount];
 
   FlashcardWord copyWith({
     String? word,

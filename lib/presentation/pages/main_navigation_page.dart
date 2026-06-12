@@ -1,4 +1,4 @@
-import 'package:first_app/main.dart';
+import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
@@ -18,29 +18,27 @@ class MainNavigationPage extends StatefulWidget {
 class _MainNavigationPageState extends State<MainNavigationPage> {
   int _currentIndex = 0;
 
-  // Create blocs once
   late final WordLearningBloc wordLearningBloc;
   late final WordListBloc wordListBloc;
 
   @override
   void initState() {
     super.initState();
-    final deps = Dependencies.instance;
 
     wordLearningBloc = WordLearningBloc(
-      getRecentWords: deps.getRecentWords,
-      saveWord: deps.saveWord,
-      deleteWord: deps.deleteWord,
-      updateSentence: deps.updateSentence,
-      searchWordDefinition: deps.searchWordDefinition,
-      searchImages: deps.searchImages,
-      saveWordImages: deps.saveWordImages,
-      saveLotWords: deps.saveLotWords,
+      getRecentWords: sl(),
+      saveWord: sl(),
+      deleteWord: sl(),
+      updateSentence: sl(),
+      searchWordDefinition: sl(),
+      searchImages: sl(),
+      saveWordImages: sl(),
+      saveLotWords: sl(),
     );
 
     wordListBloc = WordListBloc(
-        wordRepository: deps.wordRepository,
-        imageRepository: deps.imageRepository)
+        wordRepository: sl(),
+        imageRepository: sl())
       ..add(const LoadWordsEvent());
   }
 
