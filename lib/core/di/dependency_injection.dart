@@ -1,3 +1,4 @@
+import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/datasources/local/translation_dao.dart';
@@ -17,6 +18,8 @@ import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
 import 'package:first_app/domain/usecases/word/insert_lot_words.dart';
 import 'package:first_app/domain/usecases/image/search_images.dart';
 import 'package:first_app/domain/usecases/image/save_word_images.dart';
+import 'package:first_app/domain/usecases/validate_word_answer.dart';
+import 'package:first_app/domain/usecases/speak_text.dart';
 import 'package:get_it/get_it.dart';
 
 final sl = GetIt.instance;
@@ -76,4 +79,11 @@ void setupDependencies() {
   sl.registerLazySingleton<InsertLotWordsUseCase>(
     () => InsertLotWordsUseCase(sl<WordRepository>()),
   );
+
+  // === Services ===
+  sl.registerLazySingleton<TtsService>(() => TtsService());
+
+  // === Use cases (shared) ===
+  sl.registerLazySingleton<ValidateWordAnswer>(() => ValidateWordAnswer());
+  sl.registerLazySingleton<SpeakText>(() => SpeakText(sl<TtsService>()));
 }

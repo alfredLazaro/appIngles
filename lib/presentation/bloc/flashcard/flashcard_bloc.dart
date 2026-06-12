@@ -1,3 +1,5 @@
+import 'package:first_app/domain/entities/flashcard_word.dart';
+import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
@@ -10,15 +12,22 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   final SpeakText _speakText;
   final WordRepository _wordRepository;
 
+  List<FlashcardSession> _sessions = [];
+  int _currentIndex = 0;
+  final Map<int, int> _scores = {};
+  Map<int, List<FlashcardImage>> _imagesMap = {};
+
   FlashcardBloc({
     required ValidateWordAnswer validateWordAnswer,
     required SpeakText speakText,
     required WordRepository wordRepository,
-    FlashcardState? initialState,
   })  : _validateWordAnswer = validateWordAnswer,
         _speakText = speakText,
         _wordRepository = wordRepository,
-        super(initialState ?? FlashcardInitial()) {
+        super(const FlashcardInitial()) {
+    on<InitializeSession>(_onInitializeSession);
+    on<NextFlashcard>(_onNextFlashcard);
+    on<PreviousFlashcard>(_onPreviousFlashcard);
     on<FlipFlashcard>(_onFlipFlashcard);
     on<IncrementLearnCount>(_onIncrementLearnCount);
     on<DecrementLearnCount>(_onDecrementLearnCount);
@@ -27,6 +36,88 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     on<SpeakFlashcardText>(_onSpeakText);
     on<MarkAsKnown>(_onMarkAsKnown);
     on<MarkAsUnknown>(_onMarkAsUnknown);
+  }
+
+  List<FlashcardSession> _generateSessions(
+      List<FlashcardWord> words, int batchSize) {
+    final sessions = <FlashcardSession>[];
+
+    for (int i = 0; i < words.length; i += batchSize) {
+      final end =
+          (i + batchSize < words.length) ? i + batchSize : words.length;
+      final batch = words.sublist(i, end);
+
+      for (int j = 0; j < batch.length; j++) {
+        sessions.add(FlashcardSession(
+          word: batch[j],
+          mode: FlashcardMode.learn,
+          originalIndex: i + j,
+        ));
+      }
+
+      for (int j = 0; j < batch.length; j++) {
+        sessions.add(FlashcardSession(
+          word: batch[j],
+          mode: FlashcardMode.test,
+          originalIndex: i + j,
+        ));
+      }
+    }
+
+    return sessions;
+  }
+
+  FlashcardLoaded _buildLoadedState(int index) {
+    final session = _sessions[index];
+    final images = _imagesMap[session.word.id] ?? [];
+
+    return FlashcardLoaded(
+      sessions: _sessions,
+      currentIndex: index,
+      word: session.word,
+      images: images,
+      mode: session.mode,
+      originalIndex: session.originalIndex,
+      showFront: true,
+      learnCount: _scores[session.word.id] ?? session.word.learnCount,
+      scores: Map.from(_scores),
+    );
+  }
+
+  void _onInitializeSession(
+      InitializeSession event, Emitter<FlashcardState> emit) {
+    _sessions = _generateSessions(event.words, event.batchSize);
+    _currentIndex = 0;
+    _scores.clear();
+    _imagesMap = event.imagesMap;
+
+    for (final word in event.words) {
+      _scores[word.id] = word.learnCount;
+    }
+
+    emit(_buildLoadedState(0));
+  }
+
+  void _onNextFlashcard(
+      NextFlashcard event, Emitter<FlashcardState> emit) {
+    if (state is! FlashcardLoaded) return;
+
+    final nextIndex = _currentIndex + 1;
+    if (nextIndex >= _sessions.length) return;
+
+    _currentIndex = nextIndex;
+    emit(_buildLoadedState(nextIndex));
+  }
+
+  void _onPreviousFlashcard(
+      PreviousFlashcard event, Emitter<FlashcardState> emit) {
+    if (state is! FlashcardLoaded) return;
+
+    final prevIndex = _currentIndex - 1;
+    if (prevIndex < 0) return;
+
+    _currentIndex = prevIndex;
+    emit(_buildLoadedState(prevIndex));
   }
 
   void _onFlipFlashcard(FlipFlashcard event, Emitter<FlashcardState> emit) {
@@ -42,13 +133,11 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final currentState = state as FlashcardLoaded;
       final increment = event.amount ?? 1;
       final newCount = currentState.learnCount + increment;
-      
-      emit(currentState.copyWith(learnCount: newCount));
-      
-      await _wordRepository.updateLearnCount(
-        currentState.word.id,
-        newCount,
-      );
+
+      _scores[currentState.word.id] = newCount;
+      emit(currentState.copyWith(learnCount: newCount, scores: Map.from(_scores)));
+
+      await _wordRepository.updateLearnCount(currentState.word.id, newCount);
     }
   }
 
@@ -57,15 +146,13 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final decrement = event.amount ?? 1;
-      // Ensure learnCount doesn't go below 0
-      final newCount = (currentState.learnCount - decrement).clamp(0, double.infinity).toInt();
-      
-      emit(currentState.copyWith(learnCount: newCount));
-      
-      await _wordRepository.updateLearnCount(
-        currentState.word.id,
-        newCount,
-      );
+      final newCount =
+          (currentState.learnCount - decrement).clamp(0, double.infinity).toInt();
+
+      _scores[currentState.word.id] = newCount;
+      emit(currentState.copyWith(learnCount: newCount, scores: Map.from(_scores)));
+
+      await _wordRepository.updateLearnCount(currentState.word.id, newCount);
     }
   }
 
@@ -73,44 +160,34 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       ResetLearnCount event, Emitter<FlashcardState> emit) async {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
-      emit(currentState.copyWith(learnCount: 0));
-      
-      await _wordRepository.updateLearnCount(
-        currentState.word.id,
-        0,
-      );
+
+      _scores[currentState.word.id] = 0;
+      emit(currentState.copyWith(learnCount: 0, scores: Map.from(_scores)));
+
+      await _wordRepository.updateLearnCount(currentState.word.id, 0);
     }
   }
 
-  void _onValidateAnswer(ValidateAnswer event, Emitter<FlashcardState> emit) async {
+  void _onValidateAnswer(
+      ValidateAnswer event, Emitter<FlashcardState> emit) async {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final isCorrect =
           _validateWordAnswer(event.userAnswer, currentState.word.word);
-      
-      // Emit validation state
-      emit(FlashcardAnswerValidated(isCorrect));
-      
-      // Update learn count based on correctness
+
       if (isCorrect) {
-        final newCount = currentState.learnCount + 2; // Increment by 2 for correct answer
-        final updatedState = currentState.copyWith(learnCount: newCount);
-        emit(updatedState);
-        
-        await _wordRepository.updateLearnCount(
-          currentState.word.id,
-          newCount,
-        );
+        final newCount = currentState.learnCount + 2;
+        _scores[currentState.word.id] = newCount;
+        emit(currentState.copyWith(
+            learnCount: newCount, isAnswerCorrect: true, scores: Map.from(_scores)));
+        await _wordRepository.updateLearnCount(currentState.word.id, newCount);
       } else {
-        // Optionally decrement on wrong answer (configurable behavior)
-        final newCount = (currentState.learnCount - 1).clamp(0, double.infinity).toInt();
-        final updatedState = currentState.copyWith(learnCount: newCount);
-        emit(updatedState);
-        
-        await _wordRepository.updateLearnCount(
-          currentState.word.id,
-          newCount,
-        );
+        final newCount =
+            (currentState.learnCount - 1).clamp(0, double.infinity).toInt();
+        _scores[currentState.word.id] = newCount;
+        emit(currentState.copyWith(
+            learnCount: newCount, isAnswerCorrect: false, scores: Map.from(_scores)));
+        await _wordRepository.updateLearnCount(currentState.word.id, newCount);
       }
     }
   }
@@ -120,32 +197,28 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     await _speakText(event.text);
   }
 
-  // Mark word as fully known (e.g., set to mastery level)
-  void _onMarkAsKnown(MarkAsKnown event, Emitter<FlashcardState> emit) async {
+  void _onMarkAsKnown(
+      MarkAsKnown event, Emitter<FlashcardState> emit) async {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
-      final masteryLevel = event.masteryLevel ?? 5; // Default mastery level
-      
-      emit(currentState.copyWith(learnCount: masteryLevel));
-      
-      await _wordRepository.updateLearnCount(
-        currentState.word.id,
-        masteryLevel,
-      );
+      final masteryLevel = event.masteryLevel ?? 5;
+
+      _scores[currentState.word.id] = masteryLevel;
+      emit(currentState.copyWith(learnCount: masteryLevel, scores: Map.from(_scores)));
+
+      await _wordRepository.updateLearnCount(currentState.word.id, masteryLevel);
     }
   }
 
-  // Mark word as unknown (reset to 0)
-  void _onMarkAsUnknown(MarkAsUnknown event, Emitter<FlashcardState> emit) async {
+  void _onMarkAsUnknown(
+      MarkAsUnknown event, Emitter<FlashcardState> emit) async {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
-      
-      emit(currentState.copyWith(learnCount: 0));
-      
-      await _wordRepository.updateLearnCount(
-        currentState.word.id,
-        0,
-      );
+
+      _scores[currentState.word.id] = 0;
+      emit(currentState.copyWith(learnCount: 0, scores: Map.from(_scores)));
+
+      await _wordRepository.updateLearnCount(currentState.word.id, 0);
     }
   }
 }
