@@ -2,7 +2,6 @@ import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
-import 'package:first_app/domain/entities/word_stats.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
@@ -232,15 +231,8 @@ class WordRepositoryImpl implements WordRepository {
   }
 
   @override
-  Future<WordStats> getWordStatistics() async {
-    final stats = await _wordDao.getWordStatistics();
-
-    return WordStats(
-      totalWords: stats['total'] ?? 0,
-      newWords: stats['new'] ?? 0,
-      practiceWords: stats['practice'] ?? 0,
-      learnedWords: stats['learned'] ?? 0,
-    );
+  Future<List<int>> getAllLearnCounts() async {
+    return await _wordDao.getAllLearnCounts();
   }
 
   @override

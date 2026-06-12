@@ -1,4 +1,3 @@
-// presentation/widgets/translation/translation_text_input_widget.dart
 import 'package:first_app/presentation/bloc/translation/translation_bloc.dart';
 import 'package:first_app/presentation/bloc/translation/translation_event.dart';
 import 'package:first_app/presentation/bloc/translation/translation_state.dart';

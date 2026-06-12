@@ -3,7 +3,6 @@ import 'package:first_app/domain/entities/paginated_result.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
-import 'package:first_app/domain/entities/word_stats.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/domain/entities/sentence_model.dart';
@@ -33,6 +32,6 @@ abstract class WordRepository {
   Future<List<Word>> getAllWords();
   Future<void> updateWord(Word word);
   Future<int> countSentences();
-  Future<WordStats> getWordStatistics();
+  Future<List<int>> getAllLearnCounts();
   Future<List<Map<String, dynamic>>> insertLotWords(List<WordInsertion> words);
 }

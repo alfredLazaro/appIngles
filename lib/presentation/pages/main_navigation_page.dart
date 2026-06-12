@@ -38,7 +38,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
     wordListBloc = WordListBloc(
         wordRepository: sl(),
-        imageRepository: sl())
+        imageRepository: sl(),
+        getWordStatisticsUseCase: sl())
       ..add(const LoadWordsEvent());
   }
 

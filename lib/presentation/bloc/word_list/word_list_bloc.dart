@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
+import 'package:first_app/domain/usecases/word/get_word_statistics.dart';
 
 import 'word_list_event.dart';
 import 'word_list_state.dart';
@@ -8,14 +9,17 @@ import 'word_list_state.dart';
 class WordListBloc extends Bloc<WordListEvent, WordListState> {
   final WordRepository _wordRepository;
   final ImageRepository _imageRepository;
+  final GetWordStatisticsUseCase _getWordStatisticsUseCase;
   final Set<int> _selectedWordIds = {};
   final int _pageSize = 20;
 
   WordListBloc({
     required WordRepository wordRepository,
     required ImageRepository imageRepository,
+    required GetWordStatisticsUseCase getWordStatisticsUseCase,
   })  : _wordRepository = wordRepository,
         _imageRepository = imageRepository,
+        _getWordStatisticsUseCase = getWordStatisticsUseCase,
         super(const WordListInitial()) {
     on<LoadWordsEvent>(_onLoadWords);
     on<LoadMoreWordsEvent>(_onLoadMoreWords);
@@ -40,7 +44,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         pageSize: _pageSize,
         searchQuery: event.searchQuery,
       );
-      final stats = await _wordRepository.getWordStatistics();
+      final stats = await _getWordStatisticsUseCase();
       emit(WordListLoaded(
         words: result.items,
         currentPage: 1,
@@ -114,7 +118,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         pageSize: _pageSize,
         searchQuery: searchQuery,
       );
-      final stats = await _wordRepository.getWordStatistics();
+      final stats = await _getWordStatisticsUseCase();
       if (state is WordListLoaded) {
         final currentState = state as WordListLoaded;
         emit(currentState.copyWith(
@@ -196,6 +200,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
       emit(WordListError('Error al filtrar: $e'));
     }
   }
+
   Future<void> _onLoadWordStats(
     LoadWordStatsEvent event,
     Emitter<WordListState> emit,
@@ -205,11 +210,10 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     final currentState = state as WordListLoaded;
 
     try {
-      final stats = await _wordRepository.getWordStatistics();
+      final stats = await _getWordStatisticsUseCase();
       emit(currentState.copyWith(stats: stats));
     } catch (e) {
       // Keep current state if stats loading fails
-      print('Error loading stats: $e');
     }
   }
 /*   void _onSortWords(
@@ -232,15 +236,5 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
       final currentState = state as WordListLoaded;
       emit(currentState.copyWith(selectedCount: 0));
     }
-  }
-
-  Future<void> _onLoadUniqueWord(
-    LoadWord event,
-    Emitter<WordListState> emit,
-  ) async {
-    try {
-      final word = await _wordRepository.getWordById(event.wordId);
-      final images = await _imageRepository.getImagesByWordId(event.wordId);
-    } catch (e) {}
   }
 }

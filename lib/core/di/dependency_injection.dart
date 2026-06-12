@@ -15,6 +15,7 @@ import 'package:first_app/domain/usecases/word/delete_word.dart';
 import 'package:first_app/domain/usecases/word/update_sentence.dart';
 import 'package:first_app/domain/usecases/word/search_word_definition.dart';
 import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
+import 'package:first_app/domain/usecases/word/get_word_statistics.dart';
 import 'package:first_app/domain/usecases/word/insert_lot_words.dart';
 import 'package:first_app/domain/usecases/image/search_images.dart';
 import 'package:first_app/domain/usecases/image/save_word_images.dart';
@@ -78,6 +79,9 @@ void setupDependencies() {
   );
   sl.registerLazySingleton<InsertLotWordsUseCase>(
     () => InsertLotWordsUseCase(sl<WordRepository>()),
+  );
+  sl.registerLazySingleton<GetWordStatisticsUseCase>(
+    () => GetWordStatisticsUseCase(sl<WordRepository>()),
   );
 
   // === Services ===
