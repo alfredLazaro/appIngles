@@ -1,8 +1,10 @@
+import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/domain/entities/word_image.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/data/datasources/remote/unsplash_service.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/models/image_model.dart';
+import 'package:first_app/data/mappers/image_mapper.dart';
 import 'package:logger/logger.dart';
 
 class ImageRepositoryImpl implements ImageRepository {
@@ -65,15 +67,14 @@ class ImageRepositoryImpl implements ImageRepository {
   }
 
   @override
-  Future<Map<int, List<Image_Model>>> getImagesByWordIds(
+  Future<Map<int, List<FlashcardImage>>> getImagesByWordIds(
       List<int> wordIds) async {
     try {
-      final Map<int, List<Image_Model>> imags =
-          await _imageDao.getImagesByWordIds(wordIds);
-      return imags;
+      final imagesMap = await _imageDao.getImagesByWordIds(wordIds);
+      return ImageMapper.mapToFlashcardImages(imagesMap);
     } catch (e) {
       _logger.e('Error guardando imagen: $e');
-      return {}; //map vacio
+      return {};
     }
   }
 }
