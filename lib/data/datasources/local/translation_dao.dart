@@ -169,8 +169,6 @@ class TranslationDao {
 
   // Update or insert translation (upsert pattern)
   Future<int> upsertTranslation(Map<String, dynamic> translation) async {
-    final db = await _databaseService.database;
-
     if (translation.containsKey(TranslationFields.id)) {
       final id = translation[TranslationFields.id];
       final exists = await getTranslationById(id);
