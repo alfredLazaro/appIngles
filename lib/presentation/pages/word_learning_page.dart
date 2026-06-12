@@ -99,7 +99,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
     for (int i = 0; i < wordsToCopy.length; i++) {
       final word = wordsToCopy[i];
       result += 'id ${word.id}. ${word.word}\n';
-      if (word.sentence != null && word.sentence!.isNotEmpty) {
+      if (word.sentence.isNotEmpty) {
         result += ' Ejemplo: ${word.sentence}\n';
       }
       result += '\n';
@@ -156,7 +156,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
               'Palabra guardada con ${state.imagesCount} imagen(es)',
             );
             _wordController.clear();
-          }else if (state is WordsFetched) {
+          } else if (state is WordsFetched) {
             // Handle the fetched words
             _selecteWords = state.words;
           }
@@ -342,7 +342,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
                 limit = int.tryParse(input) ?? 9;
 
                 // Validate the input
-                if (limit == null || limit <= 0) {
+                if (limit <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content:

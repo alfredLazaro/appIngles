@@ -2,7 +2,6 @@
 import 'package:first_app/domain/entities/translation.dart';
 import 'package:first_app/domain/entities/translation_entity.dart';
 import 'package:first_app/domain/entities/translation_with_word.dart';
-import 'package:first_app/data/models/translation_model.dart';
 
 class TranslationMapper {
   // ============ TranslationEntity (v2) ============

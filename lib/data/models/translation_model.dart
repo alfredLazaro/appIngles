@@ -1,5 +1,4 @@
 // data/models/translation_model.dart
-import 'package:first_app/domain/entities/translation.dart';
 import 'package:first_app/domain/entities/translation_entity.dart';
 
 class TranslationModel {

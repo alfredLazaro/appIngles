@@ -1,6 +1,3 @@
-// domain/entities/translation_entity.dart
-import 'package:flutter/foundation.dart';
-
 class TranslationEntity {
   final int? id;
   final int wordId;
@@ -45,7 +42,7 @@ class TranslationEntity {
         other.id == id &&
         other.wordId == wordId &&
         other.wordTranslate == wordTranslate &&
-        listEquals(other.alternatives, alternatives);
+        _listEquals(other.alternatives, alternatives);
   }
 
   @override
@@ -54,5 +51,13 @@ class TranslationEntity {
         wordId.hashCode ^
         wordTranslate.hashCode ^
         alternatives.hashCode;
+  }
+
+  static bool _listEquals(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 }
