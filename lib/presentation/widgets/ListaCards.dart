@@ -1,7 +1,9 @@
 import 'package:first_app/core/services/tts_service.dart';
+import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_state.dart';
+import 'package:first_app/presentation/pages/word_detail_screen.dart';
 import 'package:first_app/presentation/widgets/WordCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,20 +70,18 @@ class _ListaCardsState extends State<ListaCards> {
     super.dispose();
   }
 
-/*   void _navigateToWordDetail(WordWithImage word) {
+  void _navigateToWordDetail(WordWithImage word) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => WordDetailScreen(
-          word: word,
-          ttsService: _ttsService,
+          wordWithImage: word,
           onWordUpdated: () {
-            // Refresh the word list when a word is updated
             context.read<WordListBloc>().add(const RefreshWordsEvent());
           },
         ),
       ),
     );
-  } */
+  }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<WordListBloc, WordListState>(
@@ -111,6 +111,7 @@ class _ListaCardsState extends State<ListaCards> {
                 return WordCard(
                   word: word,
                   onSpeak: () => speakf(word.word),
+                  onTapImage: () => _navigateToWordDetail(word),
                 );
               },
             ),

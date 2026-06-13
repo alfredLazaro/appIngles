@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 class WordCard extends StatelessWidget {
   final WordWithImage word;
   final VoidCallback onSpeak;
+  final VoidCallback? onTapImage;
 
   const WordCard({
     super.key,
     required this.word,
     required this.onSpeak,
+    this.onTapImage,
   });
 
   @override
@@ -24,23 +26,34 @@ class WordCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Imagen
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: SizedBox(
-                width: 75,
-                height: 75,
-                child: word.tinyImageUrl != null &&
-                        word.tinyImageUrl!.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: word.tinyImageUrl!,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: Colors.grey[200],
-                          child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
+            GestureDetector(
+              onTap: onTapImage,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: SizedBox(
+                  width: 75,
+                  height: 75,
+                  child: word.tinyImageUrl != null &&
+                          word.tinyImageUrl!.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: word.tinyImageUrl!,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
                           ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[300],
+                            child: const Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey,
+                              size: 24,
+                            ),
+                          ),
+                        )
+                      : Container(
                           color: Colors.grey[300],
                           child: const Icon(
                             Icons.image_not_supported,
@@ -48,15 +61,7 @@ class WordCard extends StatelessWidget {
                             size: 24,
                           ),
                         ),
-                      )
-                    : Container(
-                        color: Colors.grey[300],
-                        child: const Icon(
-                          Icons.image_not_supported,
-                          color: Colors.grey,
-                          size: 24,
-                        ),
-                      ),
+                ),
               ),
             ),
             const SizedBox(width: 12), // Espacio entre imagen y texto
