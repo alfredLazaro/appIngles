@@ -65,9 +65,8 @@ class _WordLearningPageState extends State<WordLearningPage> {
       _showError('Por favor escribe una palabra');
       return;
     }
-    // 1. Buscar definiciones
-    context.read<WordLearningBloc>().add(SearchWordDefinitionEvent(word));
-    context.read<WordLearningBloc>().add(SearchWordImagesEvent(word));
+    // 1. Buscar definiciones e imágenes
+    context.read<WordLearningBloc>().add(SearchWordEvent(word));
   }
 
   void _showError(String message) {
@@ -143,13 +142,10 @@ class _WordLearningPageState extends State<WordLearningPage> {
         listener: (context, state) {
           if (state is WordLearningError) {
             _showError(state.message);
-          } else if (state is DefinitionsLoaded) {
-            //_handleDefinitionsLoaded(state.meanings);
+          } else if (state is WordDataLoaded) {
             _tempDefinitions = state.meanings;
-            _checkAndShowCombinedDialog();
-          } else if (state is ImagesLoaded) {
             _tempImages = state.images;
-            _checkAndShowCombinedDialog();
+            _showCombinedDialog();
           } else if (state is WordsLoaded) {
             // Update cache whenever words are (re)loaded
             _cachedWords = state.words;
@@ -215,13 +211,6 @@ class _WordLearningPageState extends State<WordLearningPage> {
         ),
       ),
     );
-  }
-
-  void _checkAndShowCombinedDialog() {
-    // Solo mostrar cuando AMBOS resultados estén listos
-    if (_tempDefinitions != null && _tempImages != null) {
-      _showCombinedDialog();
-    }
   }
 
   Future<void> _showCombinedDialog() async {

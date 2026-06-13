@@ -11,10 +11,10 @@ class LoadRecentWordsEvent extends WordLearningEvent {
   LoadRecentWordsEvent({this.limit});
 }
 
-class SearchWordDefinitionEvent extends WordLearningEvent {
+class SearchWordEvent extends WordLearningEvent {
   final String word;
 
-  SearchWordDefinitionEvent(this.word);
+  SearchWordEvent(this.word);
 
   @override
   List<Object?> get props => [word];

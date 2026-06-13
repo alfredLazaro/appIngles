@@ -40,13 +40,14 @@ class WordLearningError extends WordLearningState {
   List<Object?> get props => [message];
 }
 
-class DefinitionsLoaded extends WordLearningState {
+class WordDataLoaded extends WordLearningState {
   final List<Map<String, dynamic>> meanings;
+  final List<Map<String, dynamic>> images;
 
-  DefinitionsLoaded(this.meanings);
+  WordDataLoaded({required this.meanings, required this.images});
 
   @override
-  List<Object?> get props => [meanings];
+  List<Object?> get props => [meanings, images];
 }
 
 class ImagesLoaded extends WordLearningState {

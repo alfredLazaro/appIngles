@@ -2,6 +2,7 @@ import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
 import 'package:first_app/domain/usecases/word/get_recent_words.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/entities/word.dart';
+import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/usecases/word/save_word.dart';
 import 'package:first_app/domain/usecases/word/delete_word.dart';
 import 'package:first_app/domain/usecases/word/update_sentence.dart';
@@ -47,7 +48,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     // Eventos con sufijo "Event"
     on<LoadRecentWordsEvent>(_onLoadRecentWords);
     on<FetchWordsEvent>(_onFetchWords);
-    on<SearchWordDefinitionEvent>(_onSearchWordDefinition);
+    on<SearchWordEvent>(_onSearchWord);
     on<SearchWordImagesEvent>(_onSearchWordImages);
     on<SaveNewWordEvent>(_onSaveNewWord);
     on<UpdateWordSentenceEvent>(_onUpdateSentence);
@@ -89,29 +90,34 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     }
   }
 
-  Future<void> _onSearchWordDefinition(
-    SearchWordDefinitionEvent event,
+  Future<void> _onSearchWord(
+    SearchWordEvent event,
     Emitter<WordLearningState> emit,
   ) async {
     try {
-      final meanings = await _searchWordDefinition(event.word);
+      final results = await Future.wait([
+        _searchWordDefinition(event.word),
+        _searchImages(event.word),
+      ]);
 
-      final meaningsMap = meanings.map((meaning) {
+      final meanings = (results[0] as List<WordMeaning>).map((m) {
         return {
-          'partOfSpeech': meaning.partOfSpeech,
-          'definitions': meaning.definitions.map((def) {
+          'partOfSpeech': m.partOfSpeech,
+          'definitions': m.definitions.map((d) {
             return {
-              'definition': def.definition,
-              'example': def.example,
-              'phonetic': def.phonetic,
+              'definition': d.definition,
+              'example': d.example,
+              'phonetic': d.phonetic,
             };
           }).toList(),
         };
       }).toList();
 
-      emit(DefinitionsLoaded(meaningsMap));
+      final images = results[1] as List<Map<String, dynamic>>;
+
+      emit(WordDataLoaded(meanings: meanings, images: images));
     } catch (e) {
-      emit(WordLearningError('Error buscando definiciones: $e'));
+      emit(WordLearningError('Error al buscar datos: $e'));
     }
   }
 
