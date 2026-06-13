@@ -42,6 +42,19 @@ class TranslationDao {
     return ids;
   }
 
+  // Get translations for multiple word IDs (batch)
+  Future<List<Map<String, dynamic>>> getTranslationsByWordIds(
+    List<int> wordIds,
+  ) async {
+    final db = await _databaseService.database;
+    final placeholders = wordIds.map((_) => '?').join(',');
+    return await db.query(
+      DBTables.translation,
+      where: '${TranslationFields.wordId} IN ($placeholders)',
+      whereArgs: wordIds,
+    );
+  }
+
   // Get all translations for a specific word
   Future<List<Map<String, dynamic>>> getTranslationsByWordId(
     int wordId,

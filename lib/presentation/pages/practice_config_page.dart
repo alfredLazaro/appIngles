@@ -6,6 +6,7 @@ import 'package:first_app/presentation/bloc/practice/practice_event.dart';
 import 'package:first_app/presentation/bloc/practice/practice_state.dart';
 import 'package:first_app/presentation/pages/flashcard_practice_page.dart';
 import 'package:first_app/presentation/pages/sentence_practice_page.dart';
+import 'package:first_app/presentation/pages/matching_practice_page.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/modals/practice_selection_modal.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
@@ -24,6 +25,7 @@ class PracticeConfigPage extends StatelessWidget {
       create: (context) => PracticeBloc(
         wordRepository: sl(),
         imageRepository: sl(),
+        translationRepository: sl(),
       )..add(LoadPracticeDataEvent(practiceType)),
       child: BlocConsumer<PracticeBloc, PracticeState>(
         listener: (context, state) {
@@ -98,6 +100,11 @@ class PracticeConfigPage extends StatelessWidget {
               final sentenceData = state.practiceData as SentencePracticeData;
               return SentencePracticePage(
                 sentences: sentenceData.sentences,
+              );
+            case PracticeType.matching:
+              final matchingData = state.practiceData as MatchingPracticeData;
+              return MatchingPracticePage(
+                data: matchingData,
               );
             default:
               return const Scaffold(

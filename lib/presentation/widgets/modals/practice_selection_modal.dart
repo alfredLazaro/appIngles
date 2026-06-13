@@ -324,6 +324,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return 'Spelling';
       case PracticeType.listening:
         return 'Listening';
+      case PracticeType.matching:
+        return 'Emparejar';
     }
   }
 
@@ -337,6 +339,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return '¿Cuántas palabras escribir?';
       case PracticeType.listening:
         return '¿Cuántas palabras escuchar?';
+      case PracticeType.matching:
+        return '¿Cuántas palabras emparejar?';
     }
   }
 
@@ -350,6 +354,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return Icons.keyboard;
       case PracticeType.listening:
         return Icons.headphones;
+      case PracticeType.matching:
+        return Icons.compare_arrows;
     }
   }
 
@@ -363,6 +369,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return Colors.orange;
       case PracticeType.listening:
         return Colors.purple;
+      case PracticeType.matching:
+        return Colors.teal;
     }
   }
 
@@ -391,6 +399,12 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
           'Escucha con atención',
           'Identifica las palabras',
           'Mejora tu comprensión',
+        ];
+      case PracticeType.matching:
+        return [
+          'Relaciona cada palabra con su traducción',
+          'Selecciona un tile de cada columna',
+          'Recibirás feedback visual inmediato',
         ];
     }
   }

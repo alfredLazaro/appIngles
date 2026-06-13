@@ -7,6 +7,7 @@ enum PracticeType {
   sentence,
   spelling,
   listening,
+  matching,
 }
 
 class PracticeSelectionPage extends StatelessWidget {
@@ -90,6 +91,17 @@ class PracticeSelectionPage extends StatelessWidget {
                         PracticeType.listening,
                       ),
                       isComingSoon: true,
+                    ),
+                    const SizedBox(height: 16),
+                    PracticeCard(
+                      icon: Icons.compare_arrows,
+                      title: 'Emparejar',
+                      description: 'Relaciona palabras con sus traducciones',
+                      color: Colors.teal,
+                      onTap: () => _navigateToConfig(
+                        context,
+                        PracticeType.matching,
+                      ),
                     ),
                   ],
                 ),

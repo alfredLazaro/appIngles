@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
+import 'package:first_app/domain/entities/match_round.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
+import 'package:first_app/domain/repositories/translation_repository.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'practice_event.dart';
@@ -9,12 +11,15 @@ import 'practice_state.dart';
 class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
   final WordRepository _wordRepository;
   final ImageRepository _imageRepository;
+  final TranslationRepository _translationRepository;
 
   PracticeBloc({
     required WordRepository wordRepository,
     required ImageRepository imageRepository,
+    required TranslationRepository translationRepository,
   })  : _wordRepository = wordRepository,
         _imageRepository = imageRepository,
+        _translationRepository = translationRepository,
         super(PracticeInitial()) {
     on<LoadPracticeDataEvent>(_onLoadPracticeData);
     on<StartPracticeEvent>(_onStartPractice);
@@ -34,6 +39,7 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
         case PracticeType.flashcard:
         case PracticeType.spelling:
         case PracticeType.listening:
+        case PracticeType.matching:
           totalCount = await _wordRepository.getTotalWordCount();
           break;
         case PracticeType.sentence:
@@ -46,6 +52,11 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
             ? 'No hay oraciones para practicar'
             : 'No hay palabras para practicar';
         emit(PracticeError(message));
+        return;
+      }
+
+      if (event.type == PracticeType.matching && totalCount < 2) {
+        emit(const PracticeError('Se necesitan al menos 2 palabras para emparejar'));
         return;
       }
 
@@ -79,6 +90,14 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
               '✅ Sentence data loaded: ${(practiceData as SentencePracticeData).sentences.length} sentences');
           break;
 
+        case PracticeType.matching:
+          print('🔗 Loading matching data...');
+          practiceData = await _loadMatchingPractice(event.count);
+          final matchingData = practiceData as MatchingPracticeData;
+          print(
+              '✅ Matching data loaded: ${matchingData.words.length} words, ${matchingData.rounds.length} rounds');
+          break;
+
         case PracticeType.spelling:
         case PracticeType.listening:
           print('⚠️ Practice type not implemented: ${event.type}');
@@ -106,6 +125,22 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     return FlashcardPracticeData(
       words: words,
       imagesMap: images,
+    );
+  }
+
+  Future<MatchingPracticeData> _loadMatchingPractice(int count) async {
+    final words = await _wordRepository.getWordsForPractice(count);
+    final wordIds = words.map((w) => w.id).toList();
+    final translations =
+        await _translationRepository.getTranslationsByWordIds(wordIds);
+    final rounds = MatchRound.generateRounds(
+      allWords: words,
+      allTranslations: translations,
+      batchSize: 4,
+    );
+    return MatchingPracticeData(
+      words: words,
+      rounds: rounds,
     );
   }
 

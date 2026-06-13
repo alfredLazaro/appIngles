@@ -2,6 +2,7 @@
 import 'package:first_app/domain/entities/translation_entity.dart';
 
 abstract class TranslationRepository {
+  Future<List<TranslationEntity>> getTranslationsByWordIds(List<int> wordIds);
   Future<List<TranslationEntity>> getTranslationsByWordId(int wordId);
   Future<List<TranslationEntity>> getAllTranslations();
   Future<List<TranslationEntity>> searchTranslations(String searchTerm);

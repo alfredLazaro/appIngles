@@ -12,6 +12,14 @@ class TranslationRepositoryImpl implements TranslationRepository {
       : _translationDao = translationDao;
 
   @override
+  Future<List<TranslationEntity>> getTranslationsByWordIds(
+    List<int> wordIds,
+  ) async {
+    final results = await _translationDao.getTranslationsByWordIds(wordIds);
+    return _mapper.mapToTranslationEntityList(results);
+  }
+
+  @override
   Future<List<TranslationEntity>> getTranslationsByWordId(
     int wordId,
   ) async {
