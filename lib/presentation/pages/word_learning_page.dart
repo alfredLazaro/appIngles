@@ -290,7 +290,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
 
   Future<void> _showWordsLimitDialog() async {
     // Create a TextEditingController for the input field
-    final TextEditingController _limitController = TextEditingController();
+    final TextEditingController limitController = TextEditingController();
 
     await showDialog(
       context: context,
@@ -302,7 +302,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
             const Text('Ingresa el número de palabras a cargar:'),
             const SizedBox(height: 16),
             TextField(
-              controller: _limitController,
+              controller: limitController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 labelText: 'Límite',
@@ -321,19 +321,20 @@ class _WordLearningPageState extends State<WordLearningPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
+            onPressed: () {
+              limitController.dispose();
+              Navigator.pop(dialogContext);
+            },
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () {
-              final input = _limitController.text.trim();
+              final input = limitController.text.trim();
 
-              // Parse the input
               int limit = 9;
               if (input.isNotEmpty) {
                 limit = int.tryParse(input) ?? 9;
 
-                // Validate the input
                 if (limit <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -342,14 +343,13 @@ class _WordLearningPageState extends State<WordLearningPage> {
                       backgroundColor: Colors.red,
                     ),
                   );
-                  return; // Don't close dialog on invalid input
+                  return;
                 }
               }
 
-              // Close the dialog first
+              limitController.dispose();
               Navigator.pop(dialogContext);
 
-              // Dispatch the event with the limit (or null for default)
               context.read<WordLearningBloc>().add(
                     FetchWordsEvent(limit),
                   );
@@ -360,8 +360,6 @@ class _WordLearningPageState extends State<WordLearningPage> {
         ],
       ),
     );
-
-    // Dispose the controller
   }
 
   void _showSuccessMessage(int? limit) {

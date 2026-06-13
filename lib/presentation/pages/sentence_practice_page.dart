@@ -31,6 +31,7 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
   @override
   void dispose() {
     _pageController.dispose();
+    _ttsService.stop();
     super.dispose();
   }
 
