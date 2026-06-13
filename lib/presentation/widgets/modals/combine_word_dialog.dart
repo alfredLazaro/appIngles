@@ -466,6 +466,7 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                     'partOfSpeech': partOfSpeech,
                     'definition': selectedDef['definition'],
                     'example': selectedDef['example'],
+                    'phonetic': selectedDef['phonetic'],
                     'synonyms': selectedDef['synonyms'] ?? [],
                     'antonyms': selectedDef['antonyms'] ?? [],
                     'images':

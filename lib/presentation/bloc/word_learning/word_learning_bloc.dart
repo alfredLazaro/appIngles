@@ -103,6 +103,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
             return {
               'definition': def.definition,
               'example': def.example,
+              'phonetic': def.phonetic,
             };
           }).toList(),
         };
