@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 
 abstract class WordLearningState extends Equatable {
@@ -65,7 +66,7 @@ class LotWordsInserted extends WordLearningState {
 
 // word_learning_state.dart
 class WordsFetched extends WordLearningState {
-  final List<WordSummary> words;
+  final List<Word> words;
 
   WordsFetched(this.words);
 

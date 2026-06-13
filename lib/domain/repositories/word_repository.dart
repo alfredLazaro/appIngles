@@ -10,6 +10,7 @@ import 'package:first_app/domain/entities/sentence_model.dart';
 /// Contrato del repositorio de palabras
 abstract class WordRepository {
   Future<List<WordSummary>> getRecentWordsSummary({int limit = 9});
+  Future<List<Word>> getRecentWords({int limit = 9});
   Future<int> saveWord(Word word);
   Future<void> updateSentence(int wordId, String newSentence);
   Future<void> deleteWord(int wordId);

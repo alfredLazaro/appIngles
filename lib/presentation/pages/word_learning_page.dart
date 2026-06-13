@@ -1,3 +1,4 @@
+import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/presentation/widgets/bulk_insert_dialog.dart';
 import 'package:first_app/presentation/widgets/modals/combine_word_dialog.dart';
@@ -26,7 +27,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
   List<Map<String, dynamic>>? _tempImages;
   // Cache to keep the last loaded list so it doesn't disappear while searching
   List<WordSummary> _cachedWords = [];
-  List<WordSummary> _selecteWords = [];
+  List<Word> _selecteWords = [];
   int _cachedPage = 0;
   @override
   void initState() {
@@ -85,22 +86,24 @@ class _WordLearningPageState extends State<WordLearningPage> {
   }
 
   Future<void> _copySearchResults() async {
-    List<WordSummary> wordsToCopy = _selecteWords;
+    final wordsToCopy = _selecteWords;
 
     if (wordsToCopy.isEmpty) {
       _showError('No hay palabras para copiar');
       return;
     }
 
-    print('Copying ${wordsToCopy.length} words');
-
     // Format the words for copying
     String result = '';
     for (int i = 0; i < wordsToCopy.length; i++) {
       final word = wordsToCopy[i];
       result += 'id ${word.id}. ${word.word}\n';
+      result += 'phonetic: ${word.phonetic}';
+      result += '\n';
+      result += 'definition: ${word.definition}';
+      result += '\n';
       if (word.sentence.isNotEmpty) {
-        result += ' Ejemplo: ${word.sentence}\n';
+        result += ' sentence: ${word.sentence}\n';
       }
       result += '\n';
     }

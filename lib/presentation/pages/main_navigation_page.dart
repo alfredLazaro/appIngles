@@ -27,6 +27,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
     wordLearningBloc = WordLearningBloc(
       getRecentWords: sl(),
+      getRecentWordsFull: sl(),
       saveWord: sl(),
       deleteWord: sl(),
       updateSentence: sl(),

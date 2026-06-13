@@ -180,6 +180,21 @@ class WordDao {
     }
   }
 
+  Future<List<WordModel>> getLastWords({int limit = 9}) async {
+    try {
+      final db = await dbHelper.database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        'Word',
+        orderBy: 'id DESC',
+        limit: limit,
+      );
+      return maps.map((map) => WordModel.fromMap(map)).toList();
+    } catch (e) {
+      _logError('getLastWords', e);
+      return [];
+    }
+  }
+
   Future<List<Map<String, dynamic>>> getAllWordsWithImages() async {
     try {
       final db = await dbHelper.database;

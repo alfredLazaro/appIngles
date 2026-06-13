@@ -206,6 +206,16 @@ class WordRepositoryImpl implements WordRepository {
   }
 
   @override
+  Future<List<Word>> getRecentWords({int limit = 9}) async {
+    try {
+      final models = await _wordDao.getLastWords(limit: limit);
+      return WordMapper.toEntityList(models);
+    } catch (e) {
+      throw Exception('Error al obtener palabras recientes: $e');
+    }
+  }
+
+  @override
   Future<List<Word>> getAllWords() async {
     try {
       final models = await _wordDao.getAllWords();

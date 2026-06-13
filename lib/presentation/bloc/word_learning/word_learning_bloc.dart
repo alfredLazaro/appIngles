@@ -1,4 +1,5 @@
 import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
+import 'package:first_app/domain/usecases/word/get_recent_words.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/usecases/word/save_word.dart';
@@ -14,6 +15,7 @@ import 'word_learning_state.dart';
 class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
   // Variables con sufijo "UseCase"
   final GetRecentWordsSummaryUseCase _getRecentWords;
+  final GetRecentWordsUseCase _getRecentWordsFull;
   final SaveWordUseCase _saveWord;
   final DeleteWordUseCase _deleteWord;
   final UpdateSentenceUseCase _updateSentence;
@@ -24,6 +26,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
 
   WordLearningBloc({
     required GetRecentWordsSummaryUseCase getRecentWords,
+    required GetRecentWordsUseCase getRecentWordsFull,
     required SaveWordUseCase saveWord,
     required DeleteWordUseCase deleteWord,
     required UpdateSentenceUseCase updateSentence,
@@ -32,6 +35,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     required SaveWordImagesUseCase saveWordImages,
     required InsertLotWordsUseCase saveLotWords,
   })  : _getRecentWords = getRecentWords,
+        _getRecentWordsFull = getRecentWordsFull,
         _saveWord = saveWord,
         _deleteWord = deleteWord,
         _updateSentence = updateSentence,
@@ -78,7 +82,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
   ) async {
     emit(WordLearningLoading());
     try {
-      final words = await _getRecentWords(limit: event.limit);
+      final words = await _getRecentWordsFull(limit: event.limit);
       emit(WordsFetched(words));
     } catch (e) {
       emit(WordLearningError('Error fetching words: $e'));
