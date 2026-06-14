@@ -1,6 +1,7 @@
 import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
+import 'package:first_app/presentation/bloc/word_detail/word_detail_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_state.dart';
@@ -69,11 +70,19 @@ class _ListaCardsState extends State<ListaCards> {
   void _navigateToWordDetail(WordWithImage word) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => WordDetailScreen(
-          wordWithImage: word,
-          onWordUpdated: () {
-            context.read<WordListBloc>().add(const RefreshWordsEvent());
-          },
+        builder: (context) => BlocProvider(
+          create: (_) => WordDetailBloc(
+            wordRepository: sl(),
+            translationRepository: sl(),
+            imageRepository: sl(),
+            deleteWordUseCase: sl(),
+          ),
+          child: WordDetailScreen(
+            wordWithImage: word,
+            onWordUpdated: () {
+              context.read<WordListBloc>().add(const RefreshWordsEvent());
+            },
+          ),
         ),
       ),
     );

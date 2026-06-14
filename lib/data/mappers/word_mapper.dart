@@ -4,15 +4,10 @@ import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
-import 'package:logger/logger.dart';
 
 /// Convierte entre modelo de datos y entidad de dominio
 class WordMapper {
-  static final _logger = Logger();
   static Word toEntity(WordModel model) {
-    _logger.d('Parseando palabra: ${model.word}');
-    _logger.d('createdAt: "${model.createdAt}"');
-    _logger.d('updatedAt: "${model.updatedAt}"');
     return Word(
       id: model.id,
       word: model.word,

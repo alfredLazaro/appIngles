@@ -2,13 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/domain/entities/translation_entity.dart';
-import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
-import 'package:first_app/domain/repositories/translation_repository.dart';
-import 'package:first_app/domain/repositories/word_repository.dart';
-import 'package:first_app/domain/usecases/word/delete_word.dart';
+import 'package:first_app/presentation/bloc/word_detail/word_detail_bloc.dart';
+import 'package:first_app/presentation/bloc/word_detail/word_detail_event.dart';
+import 'package:first_app/presentation/bloc/word_detail/word_detail_state.dart';
 import 'package:first_app/presentation/widgets/learn_progress_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WordDetailScreen extends StatefulWidget {
   final WordWithImage wordWithImage;
@@ -25,17 +25,14 @@ class WordDetailScreen extends StatefulWidget {
 }
 
 class _WordDetailScreenState extends State<WordDetailScreen> {
-  final WordRepository _repository = sl<WordRepository>();
-  final TranslationRepository _translationRepository =
-      sl<TranslationRepository>();
   final TtsService _ttsService = sl<TtsService>();
-  final DeleteWordUseCase _deleteWordUseCase = sl<DeleteWordUseCase>();
 
-  Word? _word;
-  List<TranslationEntity> _translations = [];
-  bool _isLoading = true;
   bool _isEditing = false;
-  bool _isSaving = false;
+  bool _wasSaving = false;
+  bool _controllersInitialized = false;
+
+  final Set<int> _translationsToDelete = {};
+  List<TranslationEntity> _localTranslations = [];
 
   late TextEditingController _wordController;
   late TextEditingController _definitionController;
@@ -43,46 +40,15 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
   late TextEditingController _phoneticController;
   late TextEditingController _newTranslationController;
 
-  final Set<int> _translationsToDelete = {};
-
   @override
   void initState() {
     super.initState();
+    _wordController = TextEditingController();
+    _definitionController = TextEditingController();
+    _sentenceController = TextEditingController();
+    _phoneticController = TextEditingController();
     _newTranslationController = TextEditingController();
-    _loadWord();
-  }
-
-  Future<void> _loadWord() async {
-    try {
-      final results = await Future.wait([
-        _repository.getWordById(widget.wordWithImage.id),
-        _translationRepository.getTranslationsByWordId(
-            widget.wordWithImage.id),
-      ]);
-      final word = results[0] as Word?;
-      final translations = results[1] as List<TranslationEntity>;
-      if (mounted) {
-        setState(() {
-          _word = word;
-          _translations = translations;
-          _isLoading = false;
-          if (word != null) {
-            _initControllers(word);
-          }
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  void _initControllers(Word word) {
-    _wordController = TextEditingController(text: word.word);
-    _definitionController = TextEditingController(text: word.definition);
-    _sentenceController = TextEditingController(text: word.sentence);
-    _phoneticController = TextEditingController(text: word.phonetic);
+    context.read<WordDetailBloc>().add(LoadWordDetailEvent(widget.wordWithImage.id));
   }
 
   @override
@@ -96,206 +62,134 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     super.dispose();
   }
 
-  Future<void> _speak(String text) async {
-    try {
-      await _ttsService.speak(text);
-    } catch (e) {
-      // ignore
-    }
-  }
-
-  void _toggleEditing() {
-    if (!mounted) return;
-    if (_isEditing) {
-      _cancelEditing();
-    } else {
-      setState(() {
-        _isEditing = true;
-        _translationsToDelete.clear();
-        _newTranslationController.clear();
-      });
-    }
-  }
-
-  void _cancelEditing() {
-    if (_word == null) return;
-    setState(() {
-      _isEditing = false;
-      _wordController.text = _word!.word;
-      _definitionController.text = _word!.definition;
-      _sentenceController.text = _word!.sentence;
-      _phoneticController.text = _word!.phonetic;
-      _translationsToDelete.clear();
-      _newTranslationController.clear();
-    });
-  }
-
-  void _addTranslation() {
-    final text = _newTranslationController.text.trim();
-    if (text.isEmpty) return;
-    setState(() {
-      _translations.add(TranslationEntity(
-        wordId: widget.wordWithImage.id,
-        wordTranslate: text,
-      ));
-      _newTranslationController.clear();
-    });
-  }
-
-  void _markTranslationToDelete(int index) {
-    final translation = _translations[index];
-    if (translation.id != null) {
-      _translationsToDelete.add(translation.id!);
-    }
-    setState(() => _translations.removeAt(index));
-  }
-
-  Future<void> _save() async {
-    if (_word == null) return;
-
-    final updatedWord = _word!.copyWith(
-      word: _wordController.text.trim(),
-      definition: _definitionController.text.trim(),
-      sentence: _sentenceController.text.trim(),
-      phonetic: _phoneticController.text.trim(),
-    );
-
-    setState(() => _isSaving = true);
-
-    try {
-      await _repository.updateWord(updatedWord);
-
-      for (final id in _translationsToDelete) {
-        await _translationRepository.deleteTranslation(id);
-      }
-      final newTranslations = _translations
-          .where((t) => t.id == null)
-          .toList();
-      if (newTranslations.isNotEmpty) {
-        await _translationRepository
-            .insertTranslations(widget.wordWithImage.id, newTranslations);
-      }
-
-      final reloadedTranslations = await _translationRepository
-          .getTranslationsByWordId(widget.wordWithImage.id);
-
-      if (mounted) {
-        setState(() {
-          _word = updatedWord;
-          _translations = reloadedTranslations;
-          _translationsToDelete.clear();
-          _newTranslationController.clear();
-          _isEditing = false;
-          _isSaving = false;
-        });
-        widget.onWordUpdated();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Palabra actualizada')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isSaving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _delete() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar palabra'),
-        content: Text('¿Eliminar "${widget.wordWithImage.word}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm != true) return;
-
-    try {
-      await _deleteWordUseCase.call(widget.wordWithImage.id);
-      if (mounted) {
-        widget.onWordUpdated();
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar: $e')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    return BlocListener<WordDetailBloc, WordDetailState>(
+      listener: _onStateChanged,
+      child: BlocBuilder<WordDetailBloc, WordDetailState>(
+        builder: (context, state) {
+          if (state is WordDetailLoading) {
+            return _buildLoadingScaffold();
+          }
+          if (state is WordDetailError && !_controllersInitialized) {
+            return _buildErrorScaffold();
+          }
+          if (state is WordDetailLoaded) {
+            return _buildContentScaffold(state);
+          }
+          return _buildLoadingScaffold();
+        },
+      ),
+    );
+  }
+
+  void _onStateChanged(BuildContext context, WordDetailState state) {
+    if (state is WordDetailLoaded) {
+      if (!_controllersInitialized) {
+        _wordController.text = state.word.word;
+        _definitionController.text = state.word.definition;
+        _sentenceController.text = state.word.sentence;
+        _phoneticController.text = state.word.phonetic;
+        _localTranslations = List.from(state.translations);
+        _controllersInitialized = true;
+      }
+      if (state.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(state.errorMessage!)),
+        );
+      }
+      if (_wasSaving && !state.isSaving && state.errorMessage == null) {
+        _handleSaveSuccess();
+      }
+      _wasSaving = state.isSaving;
+    } else if (state is WordDetailError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(state.message)),
+      );
+    } else if (state is WordDetailDeleted) {
+      widget.onWordUpdated();
+      Navigator.pop(context);
+    }
+  }
+
+  void _handleSaveSuccess() {
+    _wasSaving = false;
+    _translationsToDelete.clear();
+    _newTranslationController.clear();
+    final blocState = context.read<WordDetailBloc>().state;
+    if (blocState is WordDetailLoaded) {
+      _localTranslations = List.from(blocState.translations);
+    }
+    setState(() => _isEditing = false);
+    widget.onWordUpdated();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Palabra actualizada')),
+    );
+  }
+
+  Scaffold _buildLoadingScaffold() {
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.wordWithImage.word)),
+      body: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Scaffold _buildErrorScaffold() {
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.wordWithImage.word)),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('No se pudo cargar la palabra'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                context
+                    .read<WordDetailBloc>()
+                    .add(LoadWordDetailEvent(widget.wordWithImage.id));
+              },
+              child: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Scaffold _buildContentScaffold(WordDetailLoaded state) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_word?.word ?? widget.wordWithImage.word),
+        title: Text(state.word.word),
         centerTitle: true,
         actions: [
-          if (_word != null) ...[
-            if (_isEditing)
-              IconButton(
-                icon: _isSaving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Icon(Icons.check),
-                onPressed: _isSaving ? null : _save,
-              )
-            else
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: _toggleEditing,
-              ),
-          ],
+          if (_isEditing)
+            IconButton(
+              icon: state.isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.check),
+              onPressed: state.isSaving ? null : () => _save(state),
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: _toggleEditing,
+            ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _word == null
-              ? _buildError()
-              : _buildContent(),
+      body: _buildContent(state),
     );
   }
 
-  Widget _buildError() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('No se pudo cargar la palabra'),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadWord,
-            child: const Text('Reintentar'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContent() {
+  Widget _buildContent(WordDetailLoaded state) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildImageSection(),
+          _buildImageSection(state),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -309,26 +203,25 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                   const SizedBox(height: 12),
                   _buildEditableField('Fonética', _phoneticController),
                   const SizedBox(height: 12),
-                  _buildEditableField(
-                      'Definición', _definitionController,
+                  _buildEditableField('Definición', _definitionController,
                       maxLines: 3),
                   const SizedBox(height: 12),
                   _buildEditableField('Oración', _sentenceController,
                       maxLines: 3),
                 ] else ...[
-                  _buildInfoRow(Icons.text_fields, 'Palabra', _word!.word,
-                      onTap: () => _speak(_word!.word)),
-                  if (_word!.phonetic.isNotEmpty)
+                  _buildInfoRow(Icons.text_fields, 'Palabra', state.word.word,
+                      onTap: () => _speak(state.word.word)),
+                  if (state.word.phonetic.isNotEmpty)
                     _buildInfoRow(
-                        Icons.phonelink, 'Fonética', _word!.phonetic),
+                        Icons.phonelink, 'Fonética', state.word.phonetic),
                   _buildInfoRow(
-                      Icons.description, 'Definición', _word!.definition),
-                  if (_word!.sentence.isNotEmpty)
+                      Icons.description, 'Definición', state.word.definition),
+                  if (state.word.sentence.isNotEmpty)
                     _buildInfoRow(
-                        Icons.format_quote, 'Oración', _word!.sentence),
+                        Icons.format_quote, 'Oración', state.word.sentence),
                 ],
                 const SizedBox(height: 20),
-                _buildTranslationsSection(),
+                _buildTranslationsSection(state),
                 const SizedBox(height: 24),
                 if (!_isEditing) _buildDeleteButton(),
               ],
@@ -339,13 +232,14 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     );
   }
 
-  Widget _buildImageSection() {
-    final imageUrl = widget.wordWithImage.tinyImageUrl;
+  Widget _buildImageSection(WordDetailLoaded state) {
+    final imageUrl =
+        state.images.isNotEmpty ? state.images[0].url : '';
     return Container(
       height: 220,
       width: double.infinity,
       color: Colors.grey[200],
-      child: imageUrl != null && imageUrl.isNotEmpty
+      child: imageUrl.isNotEmpty
           ? CachedNetworkImage(
               imageUrl: imageUrl,
               fit: BoxFit.cover,
@@ -374,7 +268,10 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     );
   }
 
-  Widget _buildTranslationsSection() {
+  Widget _buildTranslationsSection(WordDetailLoaded state) {
+    final displayTranslations =
+        _isEditing ? _localTranslations : state.translations;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -384,22 +281,22 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
             const SizedBox(width: 12),
             const Text('Traducciones',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            if (_translations.isNotEmpty) ...[
+            if (displayTranslations.isNotEmpty) ...[
               const SizedBox(width: 8),
-              Text('(${_translations.length})',
+              Text('(${displayTranslations.length})',
                   style: const TextStyle(color: Colors.grey)),
             ],
           ],
         ),
         const SizedBox(height: 8),
-        if (_translations.isEmpty && !_isEditing)
+        if (displayTranslations.isEmpty && !_isEditing)
           const Padding(
             padding: EdgeInsets.only(left: 32, top: 4, bottom: 4),
             child: Text('Sin traducciones',
                 style: TextStyle(color: Colors.grey, fontSize: 14)),
           ),
-        ...List.generate(_translations.length, (i) {
-          final t = _translations[i];
+        ...List.generate(displayTranslations.length, (i) {
+          final t = displayTranslations[i];
           return Padding(
             padding: const EdgeInsets.only(left: 32, top: 4, bottom: 4),
             child: Row(
@@ -430,8 +327,8 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                     decoration: const InputDecoration(
                       hintText: 'Nueva traducción',
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                     onSubmitted: (_) => _addTranslation(),
                   ),
@@ -447,6 +344,105 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
         ],
       ],
     );
+  }
+
+  void _toggleEditing() {
+    if (_isEditing) {
+      _cancelEditing();
+    } else {
+      setState(() {
+        _isEditing = true;
+        _translationsToDelete.clear();
+        _newTranslationController.clear();
+      });
+    }
+  }
+
+  void _cancelEditing() {
+    final blocState = context.read<WordDetailBloc>().state;
+    if (blocState is! WordDetailLoaded) return;
+    _wordController.text = blocState.word.word;
+    _definitionController.text = blocState.word.definition;
+    _sentenceController.text = blocState.word.sentence;
+    _phoneticController.text = blocState.word.phonetic;
+    _localTranslations = List.from(blocState.translations);
+    setState(() {
+      _isEditing = false;
+      _translationsToDelete.clear();
+      _newTranslationController.clear();
+    });
+  }
+
+  void _addTranslation() {
+    final text = _newTranslationController.text.trim();
+    if (text.isEmpty) return;
+    setState(() {
+      _localTranslations.add(TranslationEntity(
+        wordId: widget.wordWithImage.id,
+        wordTranslate: text,
+      ));
+      _newTranslationController.clear();
+    });
+  }
+
+  void _markTranslationToDelete(int index) {
+    final translation = _localTranslations[index];
+    if (translation.id != null) {
+      _translationsToDelete.add(translation.id!);
+    }
+    setState(() => _localTranslations.removeAt(index));
+  }
+
+  void _save(WordDetailLoaded state) {
+    final updatedWord = state.word.copyWith(
+      word: _wordController.text.trim(),
+      definition: _definitionController.text.trim(),
+      sentence: _sentenceController.text.trim(),
+      phonetic: _phoneticController.text.trim(),
+    );
+
+    context.read<WordDetailBloc>().add(SaveWordDetailEvent(
+          updatedWord: updatedWord,
+          translationIdsToDelete: _translationsToDelete.toList(),
+          newTranslations:
+              _localTranslations.where((t) => t.id == null).toList(),
+        ));
+  }
+
+  Future<void> _delete() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar palabra'),
+        content: Text('¿Eliminar "${widget.wordWithImage.word}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+    if (!mounted) return;
+
+    context
+        .read<WordDetailBloc>()
+        .add(DeleteWordDetailEvent(widget.wordWithImage.id));
+  }
+
+  Future<void> _speak(String text) async {
+    try {
+      await _ttsService.speak(text);
+    } catch (e) {
+      // ignore
+    }
   }
 
   Widget _buildInfoRow(IconData icon, String label, String value,
