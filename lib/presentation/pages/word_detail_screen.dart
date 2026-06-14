@@ -8,6 +8,7 @@ import 'package:first_app/presentation/bloc/word_detail/word_detail_event.dart';
 import 'package:first_app/presentation/bloc/word_detail/word_detail_state.dart';
 import 'package:first_app/presentation/widgets/dialogs/delete_confirmation_dialog.dart';
 import 'package:first_app/presentation/widgets/learn_progress_indicator.dart';
+import 'package:first_app/presentation/widgets/translation_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -39,7 +40,6 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
   late TextEditingController _definitionController;
   late TextEditingController _sentenceController;
   late TextEditingController _phoneticController;
-  late TextEditingController _newTranslationController;
 
   @override
   void initState() {
@@ -48,7 +48,6 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     _definitionController = TextEditingController();
     _sentenceController = TextEditingController();
     _phoneticController = TextEditingController();
-    _newTranslationController = TextEditingController();
     context
         .read<WordDetailBloc>()
         .add(LoadWordDetailEvent(widget.wordWithImage.id));
@@ -60,7 +59,6 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     _definitionController.dispose();
     _sentenceController.dispose();
     _phoneticController.dispose();
-    _newTranslationController.dispose();
     _ttsService.stop();
     super.dispose();
   }
@@ -118,7 +116,6 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
   void _handleSaveSuccess() {
     _wasSaving = false;
     _translationsToDelete.clear();
-    _newTranslationController.clear();
     final blocState = context.read<WordDetailBloc>().state;
     if (blocState is WordDetailLoaded) {
       _localTranslations = List.from(blocState.translations);
@@ -224,7 +221,13 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                         Icons.format_quote, 'Oración', state.word.sentence),
                 ],
                 const SizedBox(height: 20),
-                _buildTranslationsSection(state),
+                TranslationSection(
+                  translations:
+                      _isEditing ? _localTranslations : state.translations,
+                  isEditing: _isEditing,
+                  onAdd: _addTranslation,
+                  onRemove: _markTranslationToDelete,
+                ),
                 const SizedBox(height: 24),
                 if (!_isEditing) _buildDeleteButton(),
               ],
@@ -270,84 +273,6 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     );
   }
 
-  Widget _buildTranslationsSection(WordDetailLoaded state) {
-    final displayTranslations =
-        _isEditing ? _localTranslations : state.translations;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(Icons.translate, size: 20, color: Colors.grey),
-            const SizedBox(width: 12),
-            const Text('Traducciones',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            if (displayTranslations.isNotEmpty) ...[
-              const SizedBox(width: 8),
-              Text('(${displayTranslations.length})',
-                  style: const TextStyle(color: Colors.grey)),
-            ],
-          ],
-        ),
-        const SizedBox(height: 8),
-        if (displayTranslations.isEmpty && !_isEditing)
-          const Padding(
-            padding: EdgeInsets.only(left: 32, top: 4, bottom: 4),
-            child: Text('Sin traducciones',
-                style: TextStyle(color: Colors.grey, fontSize: 14)),
-          ),
-        ...List.generate(displayTranslations.length, (i) {
-          final t = displayTranslations[i];
-          return Padding(
-            padding: const EdgeInsets.only(left: 32, top: 4, bottom: 4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(t.wordTranslate,
-                      style: const TextStyle(fontSize: 15)),
-                ),
-                if (_isEditing)
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline,
-                        size: 20, color: Colors.red),
-                    onPressed: () => _markTranslationToDelete(i),
-                  ),
-              ],
-            ),
-          );
-        }),
-        if (_isEditing) ...[
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 32),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _newTranslationController,
-                    decoration: const InputDecoration(
-                      hintText: 'Nueva traducción',
-                      border: OutlineInputBorder(),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    onSubmitted: (_) => _addTranslation(),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.add_circle, color: Colors.teal),
-                  onPressed: _addTranslation,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
   void _toggleEditing() {
     if (_isEditing) {
       _cancelEditing();
@@ -355,7 +280,6 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
       setState(() {
         _isEditing = true;
         _translationsToDelete.clear();
-        _newTranslationController.clear();
       });
     }
   }
@@ -371,19 +295,16 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     setState(() {
       _isEditing = false;
       _translationsToDelete.clear();
-      _newTranslationController.clear();
     });
   }
 
-  void _addTranslation() {
-    final text = _newTranslationController.text.trim();
+  void _addTranslation(String text) {
     if (text.isEmpty) return;
     setState(() {
       _localTranslations.add(TranslationEntity(
         wordId: widget.wordWithImage.id,
         wordTranslate: text,
       ));
-      _newTranslationController.clear();
     });
   }
 
