@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
+import 'package:first_app/presentation/widgets/author_info_button.dart';
 
 class FlashcardImageWidget extends StatelessWidget {
   final List<FlashcardImage> images;
@@ -24,7 +25,14 @@ class FlashcardImageWidget extends StatelessWidget {
           children: [
             _buildImage(context),
             if (images.isNotEmpty && images.first.author != null)
-              _buildAuthorInfo(context),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: AuthorInfoButton(
+                  author: images.first.author,
+                  source: images.first.source,
+                ),
+              ),
           ],
         ),
       ),
@@ -64,34 +72,4 @@ class FlashcardImageWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildAuthorInfo(BuildContext context) {
-    return Positioned(
-      top: 10,
-      right: 10,
-      child: GestureDetector(
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Autor: ${images.first.author}\nFuente: ${images.first.source ?? "Desconocida"}',
-              ),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.info_rounded,
-            size: 18,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
 }

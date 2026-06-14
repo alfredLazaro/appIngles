@@ -2,11 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/domain/entities/translation_entity.dart';
+import 'package:first_app/domain/entities/word_image.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/presentation/bloc/word_detail/word_detail_bloc.dart';
 import 'package:first_app/presentation/bloc/word_detail/word_detail_event.dart';
 import 'package:first_app/presentation/bloc/word_detail/word_detail_state.dart';
 import 'package:first_app/presentation/widgets/dialogs/delete_confirmation_dialog.dart';
+import 'package:first_app/presentation/widgets/author_info_button.dart';
 import 'package:first_app/presentation/widgets/learn_progress_indicator.dart';
 import 'package:first_app/presentation/widgets/translation_section.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +37,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
 
   final Set<int> _translationsToDelete = {};
   List<TranslationEntity> _localTranslations = [];
+  int _currentImageIndex = 0;
 
   late TextEditingController _wordController;
   late TextEditingController _definitionController;
@@ -189,7 +192,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildImageSection(state),
+          _buildImageSection(state.images),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -238,28 +241,75 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     );
   }
 
-  Widget _buildImageSection(WordDetailLoaded state) {
-    final imageUrl = state.images.isNotEmpty ? state.images[0].url : '';
+  Widget _buildImageSection(List<WordImage> images) {
+    if (images.isEmpty) {
+      return Container(
+        height: 220,
+        width: double.infinity,
+        color: Colors.grey[200],
+        child: const Center(
+          child: Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
+        ),
+      );
+    }
+
     return Container(
       height: 220,
       width: double.infinity,
       color: Colors.grey[200],
-      child: imageUrl.isNotEmpty
-          ? CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => const Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
+      child: Stack(
+        children: [
+          PageView.builder(
+            itemCount: images.length,
+            onPageChanged: (index) =>
+                setState(() => _currentImageIndex = index),
+            itemBuilder: (context, index) {
+              return CachedNetworkImage(
+                imageUrl: images[index].url,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (context, url, error) => const Center(
+                  child: Icon(Icons.image_not_supported,
+                      size: 64, color: Colors.grey),
+                ),
+              );
+            },
+          ),
+          if (images[_currentImageIndex].author.isNotEmpty)
+            Positioned(
+              top: 10,
+              right: 10,
+              child: AuthorInfoButton(
+                author: images[_currentImageIndex].author,
+                source: images[_currentImageIndex].source,
               ),
-              errorWidget: (context, url, error) => const Center(
-                child: Icon(Icons.image_not_supported,
-                    size: 64, color: Colors.grey),
-              ),
-            )
-          : const Center(
-              child:
-                  Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
             ),
+          if (images.length > 1)
+            Positioned(
+              bottom: 8,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(images.length, (i) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: _currentImageIndex == i ? 10 : 8,
+                    height: _currentImageIndex == i ? 10 : 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _currentImageIndex == i
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.5),
+                    ),
+                  );
+                }),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
