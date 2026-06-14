@@ -5,6 +5,7 @@ import 'package:first_app/domain/entities/word_image.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/repositories/translation_repository.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
+import 'package:first_app/domain/usecases/image/save_word_images.dart';
 import 'package:first_app/domain/usecases/word/delete_word.dart';
 import 'word_detail_event.dart';
 import 'word_detail_state.dart';
@@ -14,20 +15,24 @@ class WordDetailBloc extends Bloc<WordDetailEvent, WordDetailState> {
   final TranslationRepository _translationRepository;
   final ImageRepository _imageRepository;
   final DeleteWordUseCase _deleteWordUseCase;
+  final SaveWordImagesUseCase _saveWordImages;
 
   WordDetailBloc({
     required WordRepository wordRepository,
     required TranslationRepository translationRepository,
     required ImageRepository imageRepository,
     required DeleteWordUseCase deleteWordUseCase,
+    required SaveWordImagesUseCase saveWordImages,
   })  : _wordRepository = wordRepository,
         _translationRepository = translationRepository,
         _imageRepository = imageRepository,
         _deleteWordUseCase = deleteWordUseCase,
+        _saveWordImages = saveWordImages,
         super(const WordDetailInitial()) {
     on<LoadWordDetailEvent>(_onLoad);
     on<SaveWordDetailEvent>(_onSave);
     on<DeleteWordDetailEvent>(_onDelete);
+    on<AddImagesToWordEvent>(_onAddImages);
   }
 
   Future<void> _onLoad(
@@ -99,6 +104,25 @@ class WordDetailBloc extends Bloc<WordDetailEvent, WordDetailState> {
       } else {
         emit(WordDetailError('Error al eliminar: $e'));
       }
+    }
+  }
+
+  Future<void> _onAddImages(
+    AddImagesToWordEvent event,
+    Emitter<WordDetailState> emit,
+  ) async {
+    if (state is! WordDetailLoaded) return;
+    final loaded = state as WordDetailLoaded;
+    emit(loaded.copyWith(isSaving: true));
+
+    try {
+      await _saveWordImages(event.images, loaded.word.id!);
+      final updatedImages =
+          await _imageRepository.getImagesByWordId(loaded.word.id!);
+      emit(loaded.copyWith(images: updatedImages, isSaving: false));
+    } catch (e) {
+      emit(loaded.copyWith(
+          isSaving: false, errorMessage: 'Error al agregar imágenes: $e'));
     }
   }
 }

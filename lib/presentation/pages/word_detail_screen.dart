@@ -10,6 +10,7 @@ import 'package:first_app/presentation/bloc/word_detail/word_detail_state.dart';
 import 'package:first_app/presentation/widgets/dialogs/delete_confirmation_dialog.dart';
 import 'package:first_app/presentation/widgets/author_info_button.dart';
 import 'package:first_app/presentation/widgets/learn_progress_indicator.dart';
+import 'package:first_app/presentation/widgets/modals/image_search_dialog.dart';
 import 'package:first_app/presentation/widgets/translation_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -242,42 +243,38 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
   }
 
   Widget _buildImageSection(List<WordImage> images) {
-    if (images.isEmpty) {
-      return Container(
-        height: 220,
-        width: double.infinity,
-        color: Colors.grey[200],
-        child: const Center(
-          child: Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
-        ),
-      );
-    }
-
     return Container(
       height: 220,
       width: double.infinity,
       color: Colors.grey[200],
       child: Stack(
         children: [
-          PageView.builder(
-            itemCount: images.length,
-            onPageChanged: (index) =>
-                setState(() => _currentImageIndex = index),
-            itemBuilder: (context, index) {
-              return CachedNetworkImage(
-                imageUrl: images[index].url,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                errorWidget: (context, url, error) => const Center(
-                  child: Icon(Icons.image_not_supported,
-                      size: 64, color: Colors.grey),
-                ),
-              );
-            },
-          ),
-          if (images[_currentImageIndex].author.isNotEmpty)
+          if (images.isEmpty)
+            const Center(
+              child: Icon(Icons.image_not_supported,
+                  size: 64, color: Colors.grey),
+            )
+          else
+            PageView.builder(
+              itemCount: images.length,
+              onPageChanged: (index) =>
+                  setState(() => _currentImageIndex = index),
+              itemBuilder: (context, index) {
+                return CachedNetworkImage(
+                  imageUrl: images[index].url,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  errorWidget: (context, url, error) => const Center(
+                    child: Icon(Icons.image_not_supported,
+                        size: 64, color: Colors.grey),
+                  ),
+                );
+              },
+            ),
+          if (images.isNotEmpty &&
+              images[_currentImageIndex].author.isNotEmpty)
             Positioned(
               top: 10,
               right: 10,
@@ -288,7 +285,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
             ),
           if (images.length > 1)
             Positioned(
-              bottom: 8,
+              bottom: 42,
               left: 0,
               right: 0,
               child: Row(
@@ -308,9 +305,32 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                 }),
               ),
             ),
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: FloatingActionButton.small(
+              heroTag: 'addImage',
+              onPressed: _openImageSearch,
+              child: const Icon(Icons.add_a_photo),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _openImageSearch() async {
+    final state = context.read<WordDetailBloc>().state;
+    if (state is! WordDetailLoaded) return;
+
+    final selected = await showDialog<List<Map<String, dynamic>>>(
+      context: context,
+      builder: (_) => ImageSearchDialog(query: state.word.word),
+    );
+
+    if (selected != null && selected.isNotEmpty && mounted) {
+      context.read<WordDetailBloc>().add(AddImagesToWordEvent(selected));
+    }
   }
 
   Widget _buildLearnProgress() {

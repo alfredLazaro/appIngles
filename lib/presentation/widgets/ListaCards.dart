@@ -76,6 +76,7 @@ class _ListaCardsState extends State<ListaCards> {
             translationRepository: sl(),
             imageRepository: sl(),
             deleteWordUseCase: sl(),
+            saveWordImages: sl(),
           ),
           child: WordDetailScreen(
             wordWithImage: word,

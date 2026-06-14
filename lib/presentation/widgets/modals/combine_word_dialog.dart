@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/presentation/widgets/image_selection_grid.dart';
 import 'package:logger/logger.dart';
 
 class CombinedWordDialog extends StatefulWidget {
@@ -21,9 +22,8 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
   int _currentStep = 0; // 0 = definiciones, 1 = imágenes
   int _selectedMeaningIndex = 0;
   int? _selectedDefinitionIndex;
-  bool _multipleSelection = false; // Toggle para selección múltiple
   final List<Map<String, dynamic>> _selectedImageUrls =
-      []; // Set para múltiples imágenes
+      []; // List para imágenes seleccionadas
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +77,15 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                       esPequeno,
                     ),
                   ] else ...[
-                    _buildImageStep(esPequeno),
+                    Expanded(
+                      child: ImageSelectionGrid(
+                        images: widget.images,
+                        onSelectionChanged: (selected) {
+                          _selectedImageUrls.clear();
+                          _selectedImageUrls.addAll(selected);
+                        },
+                      ),
+                    ),
                   ],
 
                   const SizedBox(height: 16),
@@ -192,194 +200,6 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImageStep(bool esPequeno) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'imagenes:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Transform.scale(
-                scale: MediaQuery.of(context).size.width < 400 ? 0.8 : 1.0,
-                child: Switch(
-                  value: _multipleSelection,
-                  onChanged: (value) {
-                    setState(() {
-                      _multipleSelection = value;
-                      // Si desactiva múltiple, mantener solo la primera seleccionada
-                      if (!value && _selectedImageUrls.length > 1) {
-                        final first = _selectedImageUrls.first;
-                        _selectedImageUrls.clear();
-                        _selectedImageUrls.add(first);
-                      }
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          if (widget.images.isEmpty)
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.image_not_supported,
-                      size: 64,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No hay imágenes disponibles',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Puedes continuar sin imagen',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            Expanded(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: GridView.builder(
-                        padding: const EdgeInsets.all(8),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                        ),
-                        itemCount: widget.images.length,
-                        itemBuilder: (context, index) {
-                          final imageUrl = widget.images[index];
-                          final isSelected =
-                              _selectedImageUrls.contains(imageUrl);
-
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (_multipleSelection) {
-                                  // Modo múltiple: agregar/quitar de la lista
-                                  if (isSelected) {
-                                    _selectedImageUrls.remove(imageUrl);
-                                  } else {
-                                    _selectedImageUrls.add(imageUrl);
-                                  }
-                                } else {
-                                  // Modo simple: solo una imagen
-                                  if (isSelected) {
-                                    _selectedImageUrls.clear();
-                                  } else {
-                                    _selectedImageUrls.clear();
-                                    _selectedImageUrls.add(imageUrl);
-                                  }
-                                }
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: isSelected
-                                      ? Colors.blue
-                                      : Colors.grey.shade300,
-                                  width: isSelected ? 3 : 1,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(6),
-                                    child: Image.network(
-                                      imageUrl['url']['thumb'] ?? '',
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) =>
-                                          const Icon(Icons.broken_image),
-                                    ),
-                                  ),
-                                  if (isSelected)
-                                    Positioned(
-                                      top: 4,
-                                      right: 4,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.blue,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.check,
-                                          color: Colors.white,
-                                          size: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  // Número de orden en selección múltiple
-                                  if (isSelected &&
-                                      _multipleSelection &&
-                                      _selectedImageUrls.length > 1)
-                                    Positioned(
-                                      top: 4,
-                                      left: 4,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(6),
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue[700],
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Text(
-                                          '${_selectedImageUrls.toList().indexOf(imageUrl) + 1}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );

@@ -38,3 +38,12 @@ class DeleteWordDetailEvent extends WordDetailEvent {
   @override
   List<Object?> get props => [wordId];
 }
+
+class AddImagesToWordEvent extends WordDetailEvent {
+  final List<Map<String, dynamic>> images;
+
+  const AddImagesToWordEvent(this.images);
+
+  @override
+  List<Object?> get props => [images];
+}
