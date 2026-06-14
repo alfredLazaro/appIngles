@@ -14,24 +14,39 @@ class ImageSearchDialog extends StatefulWidget {
 
 class _ImageSearchDialogState extends State<ImageSearchDialog> {
   final SearchImagesUseCase _searchImages = sl<SearchImagesUseCase>();
+  final TextEditingController _queryController = TextEditingController();
+
   List<Map<String, dynamic>>? _images;
   List<Map<String, dynamic>> _selected = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
   String? _error;
+  bool _hasSearched = false;
 
   @override
   void initState() {
     super.initState();
-    _search();
+    _queryController.text = widget.query;
+  }
+
+  @override
+  void dispose() {
+    _queryController.dispose();
+    super.dispose();
   }
 
   Future<void> _search() async {
+    final query = _queryController.text.trim();
+    if (query.isEmpty) return;
+
     setState(() {
       _isLoading = true;
       _error = null;
+      _hasSearched = true;
+      _images = null;
+      _selected = [];
     });
     try {
-      final images = await _searchImages.call(widget.query);
+      final images = await _searchImages.call(query);
       if (mounted) {
         setState(() {
           _images = images;
@@ -46,6 +61,15 @@ class _ImageSearchDialogState extends State<ImageSearchDialog> {
         });
       }
     }
+  }
+
+  void _backToEdit() {
+    setState(() {
+      _hasSearched = false;
+      _images = null;
+      _error = null;
+      _selected = [];
+    });
   }
 
   @override
@@ -64,12 +88,37 @@ class _ImageSearchDialogState extends State<ImageSearchDialog> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Buscar imágenes para "${widget.query}"',
+                _hasSearched
+                    ? 'Resultados para "${_queryController.text}"'
+                    : 'Buscar imágenes',
                 style: const TextStyle(
                     fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 16),
-              if (_isLoading)
+              if (!_hasSearched)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextFormField(
+                      controller: _queryController,
+                      decoration: const InputDecoration(
+                        labelText: 'Palabra a buscar',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      autofocus: true,
+                      textInputAction: TextInputAction.search,
+                      onFieldSubmitted: (_) => _search(),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: _search,
+                      icon: const Icon(Icons.search),
+                      label: const Text('Buscar'),
+                    ),
+                  ],
+                )
+              else if (_isLoading)
                 const Expanded(
                   child: Center(child: CircularProgressIndicator()),
                 )
@@ -97,18 +146,32 @@ class _ImageSearchDialogState extends State<ImageSearchDialog> {
                 ),
               const SizedBox(height: 16),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancelar'),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _images != null
-                        ? () => Navigator.pop(context, _selected)
-                        : null,
-                    child: const Text('Agregar'),
+                  if (_hasSearched)
+                    TextButton.icon(
+                      onPressed: _backToEdit,
+                      icon: const Icon(Icons.arrow_back, size: 18),
+                      label: const Text('Volver'),
+                    )
+                  else
+                    const SizedBox.shrink(),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancelar'),
+                      ),
+                      const SizedBox(width: 8),
+                      if (_hasSearched)
+                        ElevatedButton(
+                          onPressed: _images != null
+                              ? () => Navigator.pop(context, _selected)
+                              : null,
+                          child: const Text('Agregar'),
+                        ),
+                    ],
                   ),
                 ],
               ),
