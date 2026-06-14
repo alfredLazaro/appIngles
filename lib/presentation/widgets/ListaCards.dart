@@ -1,3 +1,4 @@
+import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
@@ -17,23 +18,14 @@ class ListaCards extends StatefulWidget {
 }
 
 class _ListaCardsState extends State<ListaCards> {
-  final TtsService _ttsService = TtsService();
+  final TtsService _ttsService = sl<TtsService>();
   final ScrollController _scrollController = ScrollController();
   final log = Logger();
 
   @override
   void initState() {
     super.initState();
-    _initializeTts();
     _scrollController.addListener(_onScroll);
-  }
-
-  Future<void> _initializeTts() async {
-    await _ttsService.initialize(
-      language: 'en-US',
-      pitch: 1.0,
-      speechRate: 0.5,
-    );
   }
 
   void _onScroll() {

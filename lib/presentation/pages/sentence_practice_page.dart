@@ -1,3 +1,4 @@
+import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/domain/entities/sentence_model.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
@@ -17,7 +18,7 @@ class SentencePracticePage extends StatefulWidget {
 }
 
 class _SentencePracticePageState extends State<SentencePracticePage> {
-  final TtsService _ttsService = TtsService();
+  final TtsService _ttsService = sl<TtsService>();
   final PageController _pageController = PageController();
   int get totalSentences => widget.sentences.length;
   int _currentIndex = 0;
