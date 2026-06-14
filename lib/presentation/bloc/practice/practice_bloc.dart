@@ -56,7 +56,8 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
       }
 
       if (event.type == PracticeType.matching && totalCount < 2) {
-        emit(const PracticeError('Se necesitan al menos 2 palabras para emparejar'));
+        emit(const PracticeError(
+            'Se necesitan al menos 2 palabras para emparejar'));
         return;
       }
 
@@ -77,38 +78,23 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
 
       switch (event.type) {
         case PracticeType.flashcard:
-          print('📚 Loading flashcard data...');
           practiceData = await _loadFlashcardPractice(event.count);
-          print(
-              '✅ Flashcard data loaded: ${(practiceData as FlashcardPracticeData).words.length} words');
           break;
 
         case PracticeType.sentence:
-          print('📝 Loading sentence data...');
           practiceData = await _loadSentencePractice(event.count);
-          print(
-              '✅ Sentence data loaded: ${(practiceData as SentencePracticeData).sentences.length} sentences');
           break;
 
         case PracticeType.matching:
-          print('🔗 Loading matching data...');
           practiceData = await _loadMatchingPractice(event.count);
-          final matchingData = practiceData as MatchingPracticeData;
-          print(
-              '✅ Matching data loaded: ${matchingData.words.length} words, ${matchingData.rounds.length} rounds');
           break;
 
         case PracticeType.spelling:
         case PracticeType.listening:
-          print('⚠️ Practice type not implemented: ${event.type}');
           throw UnimplementedError('Práctica no disponible aún');
       }
-
-      print('✅ Emitting PracticeReady state');
       emit(PracticeReady(practiceData));
-    } catch (e, stackTrace) {
-      print('❌ Error preparing practice: $e');
-      print('Stack trace: $stackTrace');
+    } catch (e) {
       emit(PracticeError('Error al preparar práctica: $e'));
     }
   }
