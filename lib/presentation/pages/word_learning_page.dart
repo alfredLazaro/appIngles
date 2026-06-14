@@ -1,6 +1,7 @@
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/presentation/widgets/bulk_insert_dialog.dart';
+import 'package:first_app/presentation/widgets/dialogs/delete_confirmation_dialog.dart';
 import 'package:first_app/presentation/widgets/modals/combine_word_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -260,27 +261,11 @@ class _WordLearningPageState extends State<WordLearningPage> {
     _showSuccess('Texto copiado al portapapeles');
   }
 
-  void _deleteWord(int id) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Confirmar eliminación'),
-        content: const Text('¿Estás seguro de eliminar esta palabra?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<WordLearningBloc>().add(DeleteWordEvent(id));
-              Navigator.pop(dialogContext);
-            },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
+  Future<void> _deleteWord(int id) async {
+    final confirm = await showDeleteConfirmationDialog(context);
+    if (confirm != true) return;
+    if (!mounted) return;
+    context.read<WordLearningBloc>().add(DeleteWordEvent(id));
   }
 
   void _resetTempData() {

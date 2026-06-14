@@ -6,6 +6,7 @@ import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/presentation/bloc/word_detail/word_detail_bloc.dart';
 import 'package:first_app/presentation/bloc/word_detail/word_detail_event.dart';
 import 'package:first_app/presentation/bloc/word_detail/word_detail_state.dart';
+import 'package:first_app/presentation/widgets/dialogs/delete_confirmation_dialog.dart';
 import 'package:first_app/presentation/widgets/learn_progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,7 +49,9 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     _sentenceController = TextEditingController();
     _phoneticController = TextEditingController();
     _newTranslationController = TextEditingController();
-    context.read<WordDetailBloc>().add(LoadWordDetailEvent(widget.wordWithImage.id));
+    context
+        .read<WordDetailBloc>()
+        .add(LoadWordDetailEvent(widget.wordWithImage.id));
   }
 
   @override
@@ -233,8 +236,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
   }
 
   Widget _buildImageSection(WordDetailLoaded state) {
-    final imageUrl =
-        state.images.isNotEmpty ? state.images[0].url : '';
+    final imageUrl = state.images.isNotEmpty ? state.images[0].url : '';
     return Container(
       height: 220,
       width: double.infinity,
@@ -252,8 +254,8 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
               ),
             )
           : const Center(
-              child: Icon(Icons.image_not_supported,
-                  size: 64, color: Colors.grey),
+              child:
+                  Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
             ),
     );
   }
@@ -410,25 +412,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
   }
 
   Future<void> _delete() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar palabra'),
-        content: Text('¿Eliminar "${widget.wordWithImage.word}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
-    );
-
+    final confirm = await showDeleteConfirmationDialog(context);
     if (confirm != true) return;
     if (!mounted) return;
 
@@ -459,8 +443,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style:
-                        const TextStyle(fontSize: 12, color: Colors.grey)),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
                 const SizedBox(height: 2),
                 GestureDetector(
                   onTap: onTap,
@@ -488,14 +471,13 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
         Row(
           children: [
             Text(label,
-                style:
-                    const TextStyle(fontSize: 12, color: Colors.grey)),
+                style: const TextStyle(fontSize: 12, color: Colors.grey)),
             if (onTapSpeak != null) ...[
               const Spacer(),
               GestureDetector(
                 onTap: onTapSpeak,
-                child: const Icon(Icons.volume_up,
-                    size: 18, color: Colors.blue),
+                child:
+                    const Icon(Icons.volume_up, size: 18, color: Colors.blue),
               ),
             ],
           ],
@@ -520,8 +502,8 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
       child: OutlinedButton.icon(
         onPressed: _delete,
         icon: const Icon(Icons.delete, color: Colors.red),
-        label: const Text('Eliminar palabra',
-            style: TextStyle(color: Colors.red)),
+        label:
+            const Text('Eliminar palabra', style: TextStyle(color: Colors.red)),
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Colors.red),
         ),
