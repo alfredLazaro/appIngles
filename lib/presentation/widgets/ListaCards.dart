@@ -25,17 +25,21 @@ class _ListaCardsState extends State<ListaCards> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
+    _scrollController.addListener(_onScrollDebounced);
   }
 
-  void _onScroll() {
+  void _onScrollDebounced() {
     if (_isBottom) {
-      final state = context.read<WordListBloc>().state;
-      if (state is WordListLoaded &&
-          state.hasMorePages &&
-          !state.isLoadingMore) {
-        context.read<WordListBloc>().add(const LoadMoreWordsEvent());
-      }
+      _loadMoreIfNeeded();
+    }
+  }
+
+  void _loadMoreIfNeeded() {
+    final state = context.read<WordListBloc>().state;
+    if (state is WordListLoaded &&
+        state.hasMorePages &&
+        !state.isLoadingMore) {
+      context.read<WordListBloc>().add(const LoadMoreWordsEvent());
     }
   }
 
@@ -56,7 +60,7 @@ class _ListaCardsState extends State<ListaCards> {
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
+    _scrollController.removeListener(_onScrollDebounced);
     _scrollController.dispose();
     _ttsService.stop();
     super.dispose();
@@ -76,42 +80,57 @@ class _ListaCardsState extends State<ListaCards> {
   }
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<WordListBloc, WordListState>(
-      builder: (context, state) {
-        if (state is WordListLoaded) {
-          if (state.words.isEmpty) {
-            return const Center(
-              child: Text('No hay palabras en esta sección.'),
+    return BlocListener<WordListBloc, WordListState>(
+      listenWhen: (previous, current) =>
+          current is WordListLoaded &&
+          current.errorMessage != null &&
+          current.errorMessage !=
+              (previous is WordListLoaded ? previous.errorMessage : null),
+      listener: (context, state) {
+        if (state is WordListLoaded && state.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage!)),
+          );
+        }
+      },
+      child: BlocBuilder<WordListBloc, WordListState>(
+        builder: (context, state) {
+          if (state is WordListLoaded) {
+            if (state.words.isEmpty) {
+              return const Center(
+                child: Text('No hay palabras en esta sección.'),
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async {
+                context
+                    .read<WordListBloc>()
+                    .add(const RefreshWordsEvent());
+              },
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount:
+                    state.words.length + (state.hasMorePages ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index >= state.words.length) {
+                    return _buildLoadingIndicator();
+                  }
+
+                  final word = state.words[index];
+                  return WordCard(
+                    word: word,
+                    onSpeak: () => speakf(word.word),
+                    onTapImage: () => _navigateToWordDetail(word),
+                  );
+                },
+              ),
             );
           }
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              context.read<WordListBloc>().add(const RefreshWordsEvent());
-              await Future.delayed(const Duration(milliseconds: 500));
-            },
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: state.words.length + (state.hasMorePages ? 1 : 0),
-              itemBuilder: (context, index) {
-                // Loading indicator at bottom
-                if (index >= state.words.length) {
-                  return _buildLoadingIndicator();
-                }
-
-                final word = state.words[index];
-                return WordCard(
-                  word: word,
-                  onSpeak: () => speakf(word.word),
-                  onTapImage: () => _navigateToWordDetail(word),
-                );
-              },
-            ),
-          );
-        }
-
-        return const SizedBox.shrink();
-      },
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 

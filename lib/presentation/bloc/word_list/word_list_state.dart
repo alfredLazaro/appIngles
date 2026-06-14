@@ -1,6 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:first_app/domain/entities/flashcard_word.dart';
-import 'package:first_app/domain/entities/word_image.dart';
 import 'package:first_app/domain/entities/word_stats.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 
@@ -29,8 +27,8 @@ class WordListLoaded extends WordListState {
   final bool isLoadingMore;
   final String? filterQuery;
   final int selectedCount;
-  final String? sortType;
   final WordStats? stats;
+  final String? errorMessage;
   const WordListLoaded({
     required this.words,
     this.currentPage = 1,
@@ -38,8 +36,8 @@ class WordListLoaded extends WordListState {
     this.isLoadingMore = false,
     this.filterQuery,
     this.selectedCount = 0,
-    this.sortType,
     this.stats,
+    this.errorMessage,
   });
 
   WordListLoaded copyWith({
@@ -49,8 +47,9 @@ class WordListLoaded extends WordListState {
     bool? isLoadingMore,
     String? filterQuery,
     int? selectedCount,
-    String? sortType,
     WordStats? stats,
+    String? errorMessage,
+    bool clearError = false,
   }) {
     return WordListLoaded(
       words: words ?? this.words,
@@ -59,8 +58,8 @@ class WordListLoaded extends WordListState {
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       filterQuery: filterQuery ?? this.filterQuery,
       selectedCount: selectedCount ?? this.selectedCount,
-      sortType: sortType ?? this.sortType,
       stats: stats ?? this.stats,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
 
@@ -72,20 +71,9 @@ class WordListLoaded extends WordListState {
         isLoadingMore,
         filterQuery,
         selectedCount,
-        sortType,
         stats,
+        errorMessage,
       ];
-}
-
-enum SortType {
-  newest('Más recientes'),
-  oldest('Más antiguas'),
-  alphabetical('A - Z'),
-  learned('Mejor aprendidas');
-
-  final String label;
-
-  const SortType(this.label);
 }
 
 class WordListError extends WordListState {
@@ -95,12 +83,4 @@ class WordListError extends WordListState {
 
   @override
   List<Object?> get props => [message];
-}
-
-class WordLoaded extends WordListState {
-  final FlashcardWord w;
-  final List<WordImage> images;
-  const WordLoaded(this.w, this.images);
-  @override
-  List<Object?> get props => [w, images];
 }

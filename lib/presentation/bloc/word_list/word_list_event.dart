@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'word_list_state.dart'; // Importar para usar SortType
 
 abstract class WordListEvent extends Equatable {
   const WordListEvent();
@@ -55,15 +54,6 @@ class FilterWordsEvent extends WordListEvent {
   List<Object?> get props => [query];
 }
 
-class SortWordsEvent extends WordListEvent {
-  final SortType sortType;
-
-  const SortWordsEvent(this.sortType);
-
-  @override
-  List<Object?> get props => [sortType];
-}
-
 class ClearSelectionEvent extends WordListEvent {
   const ClearSelectionEvent();
 
@@ -71,12 +61,6 @@ class ClearSelectionEvent extends WordListEvent {
   List<Object?> get props => [];
 }
 
-class LoadWord extends WordListEvent {
-  final int wordId;
-  const LoadWord(this.wordId);
-  @override
-  List<Object?> get props => [wordId];
-}
 class LoadWordStatsEvent extends WordListEvent {
   const LoadWordStatsEvent();
 

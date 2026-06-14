@@ -1,6 +1,5 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
-import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/usecases/word/get_word_statistics.dart';
 
 import 'word_list_event.dart';
@@ -8,17 +7,14 @@ import 'word_list_state.dart';
 
 class WordListBloc extends Bloc<WordListEvent, WordListState> {
   final WordRepository _wordRepository;
-  final ImageRepository _imageRepository;
   final GetWordStatisticsUseCase _getWordStatisticsUseCase;
   final Set<int> _selectedWordIds = {};
   final int _pageSize = 20;
 
   WordListBloc({
     required WordRepository wordRepository,
-    required ImageRepository imageRepository,
     required GetWordStatisticsUseCase getWordStatisticsUseCase,
   })  : _wordRepository = wordRepository,
-        _imageRepository = imageRepository,
         _getWordStatisticsUseCase = getWordStatisticsUseCase,
         super(const WordListInitial()) {
     on<LoadWordsEvent>(_onLoadWords);
@@ -28,7 +24,6 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     on<ToggleWordSelectionEvent>(_onToggleWordSelection);
     on<FilterWordsEvent>(_onFilterWords);
     on<LoadWordStatsEvent>(_onLoadWordStats);
-/*     on<SortWordsEvent>(_onSortWords); */
     on<ClearSelectionEvent>(_onClearSelection);
   }
 
@@ -90,15 +85,13 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         isLoadingMore: false,
         filterQuery: currentState.filterQuery,
         selectedCount: currentState.selectedCount,
-        sortType: currentState.sortType,
         stats: currentState.stats,
       ));
     } catch (e) {
-      // Keep current state but show error
       emit(currentState.copyWith(
         isLoadingMore: false,
+        errorMessage: 'Error al cargar más palabras: $e',
       ));
-      emit(WordListError('Error al cargar más palabras: $e'));
     }
   }
 
@@ -126,6 +119,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
           currentPage: 1,
           hasMorePages: result.hasNextPage,
           stats: stats,
+          clearError: true,
         ));
       } else {
         emit(WordListLoaded(
@@ -137,6 +131,10 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
       }
     } catch (e) {
       if (state is WordListLoaded) {
+        emit((state as WordListLoaded).copyWith(
+          errorMessage: 'Error al actualizar: $e',
+        ));
+      } else {
         emit(WordListError('Error al actualizar: $e'));
       }
     }
@@ -180,7 +178,9 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     FilterWordsEvent event,
     Emitter<WordListState> emit,
   ) async {
-    // Trigger new search with filter
+    final previousLoadedState =
+        state is WordListLoaded ? state as WordListLoaded : null;
+
     emit(const WordListLoading());
 
     try {
@@ -189,15 +189,23 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         pageSize: _pageSize,
         searchQuery: event.query,
       );
+      final stats = await _getWordStatisticsUseCase();
 
       emit(WordListLoaded(
         words: result.items,
         currentPage: 1,
         hasMorePages: result.hasNextPage,
         filterQuery: event.query,
+        stats: stats,
       ));
     } catch (e) {
-      emit(WordListError('Error al filtrar: $e'));
+      if (previousLoadedState != null) {
+        emit(previousLoadedState.copyWith(
+          errorMessage: 'Error al filtrar: $e',
+        ));
+      } else {
+        emit(WordListError('Error al filtrar: $e'));
+      }
     }
   }
 
@@ -216,16 +224,6 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
       // Keep current state if stats loading fails
     }
   }
-/*   void _onSortWords(
-    SortWordsEvent event,
-    Emitter<WordListState> emit,
-  ) {
-    if (state is! WordListLoaded) return;
-
-    final currentState = state as WordListLoaded;
-    emit(currentState.copyWith(sortType: event.sortType));
-  } */
-
   void _onClearSelection(
     ClearSelectionEvent event,
     Emitter<WordListState> emit,
