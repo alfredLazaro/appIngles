@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
+import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
@@ -41,6 +42,13 @@ class MyApp extends StatelessWidget {
             wordRepository: sl(),
             getWordStatisticsUseCase: sl(),
           )..add(const LoadWordsEvent()),
+        ),
+        BlocProvider<PracticeBloc>(
+          create: (_) => PracticeBloc(
+            wordRepository: sl(),
+            imageRepository: sl(),
+            translationRepository: sl(),
+          ),
         ),
       ],
       child: MaterialApp(

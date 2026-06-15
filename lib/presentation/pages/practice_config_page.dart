@@ -1,4 +1,3 @@
-import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
@@ -24,64 +23,55 @@ class PracticeConfigPage extends StatefulWidget {
 }
 
 class _PracticeConfigPageState extends State<PracticeConfigPage> {
-  late final PracticeBloc _practiceBloc;
   bool _hasNavigated = false;
   bool _hasShownModal = false;
   bool _practiceStarted = false;
+
   @override
   void initState() {
     super.initState();
-    _practiceBloc = PracticeBloc(
-      wordRepository: sl(),
-      imageRepository: sl(),
-      translationRepository: sl(),
-    )..add(LoadPracticeDataEvent(widget.practiceType));
-  }
-
-  @override
-  void dispose() {
-    _practiceBloc.close();
-    super.dispose();
+    Future.microtask(() {
+      if (mounted) {
+        context.read<PracticeBloc>().add(LoadPracticeDataEvent(widget.practiceType));
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _practiceBloc,
-      child: BlocConsumer<PracticeBloc, PracticeState>(
-        listener: (context, state) {
-          if (state is PracticeError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
-            Navigator.pop(context);
-          }
-
-          if (state is PracticeReady && !_hasNavigated) {
-            _navigateToPractice(context, state);
-          }
-
-          if (state is PracticeCompleted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Progreso guardado: ${state.result.correctItems} de ${state.result.totalItems} correctos',
-                ),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-          if (state is PracticeDataLoaded && !_hasShownModal) {
-            _hasShownModal = true;
-            _showPracticeModal(context, state.totalCount);
-          }
-        },
-        builder: (context, state) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+    return BlocConsumer<PracticeBloc, PracticeState>(
+      listener: (context, state) {
+        if (state is PracticeError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
           );
-        },
-      ),
+          Navigator.pop(context);
+        }
+
+        if (state is PracticeReady && !_hasNavigated) {
+          _navigateToPractice(context, state);
+        }
+
+        if (state is PracticeCompleted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Progreso guardado: ${state.result.correctItems} de ${state.result.totalItems} correctos',
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+        if (state is PracticeDataLoaded && !_hasShownModal) {
+          _hasShownModal = true;
+          _showPracticeModal(context, state.totalCount);
+        }
+      },
+      builder: (context, state) {
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      },
     );
   }
 
@@ -93,7 +83,7 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
         totalWords: totalCount,
         practiceType: widget.practiceType,
         onStartPractice: (count) {
-          _practiceStarted = false;
+          _practiceStarted = true;
           Navigator.pop(dialogContext);
           context.read<PracticeBloc>().add(
                 StartPracticeEvent(count, widget.practiceType),
@@ -101,9 +91,8 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
         },
       ),
     ).then((_) {
-      // If dialog is dismissed without starting, go back
-      if (!_practiceStarted) {
-        Navigator.pop(context);
+      if (mounted && !_practiceStarted) {
+        Navigator.pop(this.context);
       }
     });
   }
@@ -114,10 +103,7 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider.value(
-          value: _practiceBloc,
-          child: _buildPracticePage(state),
-        ),
+        builder: (context) => _buildPracticePage(state),
       ),
     );
   }
