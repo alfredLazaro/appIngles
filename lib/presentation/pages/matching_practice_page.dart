@@ -23,20 +23,18 @@ class MatchingPracticePage extends StatefulWidget {
 
 class _MatchingPracticePageState extends State<MatchingPracticePage> {
   bool _resultSubmitted = false;
-
+  int get _totalPairs => widget.data.rounds.fold<int>(
+        0,
+        (sum, r) => sum + r.words.length,
+      );
   void _submitResult(MatchingCompleted state) {
     if (_resultSubmitted) return;
     _resultSubmitted = true;
 
-    final totalPairs = widget.data.rounds.fold<int>(
-      0,
-      (sum, r) => sum + r.words.length,
-    );
-
     final result = PracticeResult(
       type: PracticeType.matching,
       learnCountUpdates: state.learnCountUpdates,
-      totalItems: totalPairs,
+      totalItems: _totalPairs,
       correctItems: state.totalCorrect,
     );
 
@@ -51,10 +49,14 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
         bloc.add(InitializeMatching(rounds: widget.data.rounds));
         return bloc;
       },
-      child: BlocBuilder<MatchingBloc, MatchingState>(
-        builder: (context, state) {
+      child: BlocConsumer<MatchingBloc, MatchingState>(
+        listener: (context, state) {
           if (state is MatchingCompleted) {
             _submitResult(state);
+          }
+        },
+        builder: (context, state) {
+          if (state is MatchingCompleted) {
             return _buildResults(context, state);
           }
           if (state is MatchingRoundReady) {
@@ -69,10 +71,8 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
   }
 
   Widget _buildResults(BuildContext context, MatchingCompleted state) {
-    final totalPairs = widget.data.rounds.fold<int>(
-      0,
-      (sum, r) => sum + r.words.length,
-    );
+    final percentage =
+        _totalPairs == 0 ? 0 : (state.totalCorrect / _totalPairs * 100);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Emparejar - Resultados'),
@@ -87,13 +87,13 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
               Icon(
                 Icons.emoji_events,
                 size: 80,
-                color: state.totalCorrect == totalPairs
+                color: state.totalCorrect == _totalPairs
                     ? Colors.amber
                     : Colors.grey,
               ),
               const SizedBox(height: 24),
               Text(
-                state.totalCorrect == totalPairs
+                state.totalCorrect == _totalPairs
                     ? '¡Perfecto!'
                     : 'Práctica completada',
                 style: const TextStyle(
@@ -103,7 +103,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
               ),
               const SizedBox(height: 16),
               Text(
-                '${state.totalCorrect} de $totalPairs aciertos',
+                '${state.totalCorrect} de $_totalPairs aciertos',
                 style: const TextStyle(
                   fontSize: 20,
                   color: Colors.grey,
@@ -111,11 +111,11 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
               ),
               const SizedBox(height: 8),
               Text(
-                '${(state.totalCorrect / totalPairs * 100).toStringAsFixed(0)}%',
+                '${percentage.toStringAsFixed(0)}%',
                 style: TextStyle(
                   fontSize: 48,
                   fontWeight: FontWeight.bold,
-                  color: state.totalCorrect == totalPairs
+                  color: state.totalCorrect == _totalPairs
                       ? Colors.green
                       : Colors.orange,
                 ),
@@ -192,9 +192,8 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                         text: state.round.words[i].word,
                         isSelected: state.selectedLeftIndex == i,
                         isMatched: state.matchedWordIndices.contains(i),
-                        isCorrect: state.matchedWordIndices.contains(i)
-                            ? true
-                            : null,
+                        isCorrect:
+                            state.matchedWordIndices.contains(i) ? true : null,
                         color: Colors.teal,
                         onTap: () => context
                             .read<MatchingBloc>()
@@ -211,8 +210,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                       (i) => MatchingTile(
                         text: state.round.translations[i].wordTranslate,
                         isSelected: state.selectedRightIndex == i,
-                        isMatched:
-                            state.matchedTranslationIndices.contains(i),
+                        isMatched: state.matchedTranslationIndices.contains(i),
                         isCorrect: state.matchedTranslationIndices.contains(i)
                             ? true
                             : null,

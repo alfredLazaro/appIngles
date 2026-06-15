@@ -98,11 +98,9 @@ class MatchingBloc extends Bloc<MatchingEvent, MatchingState> {
       final current = _learnCounts[wordId] ?? 0;
       _learnCounts[wordId] = current + 2;
 
-      final newMatchedWord = Set<int>.from(state.matchedWordIndices)
-        ..add(wIdx);
+      final newMatchedWord = Set<int>.from(state.matchedWordIndices)..add(wIdx);
       final newMatchedTranslations =
-          Set<int>.from(state.matchedTranslationIndices)
-            ..add(tIdx);
+          Set<int>.from(state.matchedTranslationIndices)..add(tIdx);
 
       emit(state.copyWith(
         selectedLeftIndex: leftIndex ?? state.selectedLeftIndex,
@@ -134,7 +132,7 @@ class MatchingBloc extends Bloc<MatchingEvent, MatchingState> {
     if (state is! MatchingRoundReady) return;
 
     final nextIndex = state.roundIndex + 1;
-    if (nextIndex >= _rounds.length) {
+    if (nextIndex > _rounds.length) {
       emit(MatchingCompleted(
         totalRounds: _rounds.length,
         totalCorrect: state.totalCorrect,

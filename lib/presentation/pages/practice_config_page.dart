@@ -26,7 +26,8 @@ class PracticeConfigPage extends StatefulWidget {
 class _PracticeConfigPageState extends State<PracticeConfigPage> {
   late final PracticeBloc _practiceBloc;
   bool _hasNavigated = false;
-
+  bool _hasShownModal = false;
+  bool _practiceStarted = false;
   @override
   void initState() {
     super.initState();
@@ -70,14 +71,12 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
               ),
             );
           }
+          if (state is PracticeDataLoaded && !_hasShownModal) {
+            _hasShownModal = true;
+            _showPracticeModal(context, state.totalCount);
+          }
         },
         builder: (context, state) {
-          if (state is PracticeDataLoaded) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _showPracticeModal(context, state.totalCount);
-            });
-          }
-
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
@@ -94,6 +93,7 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
         totalWords: totalCount,
         practiceType: widget.practiceType,
         onStartPractice: (count) {
+          _practiceStarted = false;
           Navigator.pop(dialogContext);
           context.read<PracticeBloc>().add(
                 StartPracticeEvent(count, widget.practiceType),
@@ -102,7 +102,7 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
       ),
     ).then((_) {
       // If dialog is dismissed without starting, go back
-      if (context.read<PracticeBloc>().state is! PracticeReady) {
+      if (!_practiceStarted) {
         Navigator.pop(context);
       }
     });
