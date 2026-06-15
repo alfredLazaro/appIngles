@@ -102,6 +102,8 @@ class WordCard extends StatelessWidget {
                   Text(
                     word.definition,
                     style: const TextStyle(fontSize: 14),
+                    maxLines: 2, // ← Cambia a 1 o 2 según prefieras
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
