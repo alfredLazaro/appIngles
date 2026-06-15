@@ -21,13 +21,13 @@ class FlashcardBack extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Container(
-          padding: EdgeInsets.all(constraints.maxHeight * 0.02),
+          padding: EdgeInsets.all((constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
           constraints: BoxConstraints(
             minHeight: constraints.minHeight,
             maxWidth: constraints.maxWidth,
           ),
             child: Padding(
-              padding: EdgeInsets.all(constraints.maxHeight * 0.02),
+              padding: EdgeInsets.all((constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -45,7 +45,7 @@ class FlashcardBack extends StatelessWidget {
                   Text(
                     FlashcardConstants.tapToSeeWord,
                     style: TextStyle(
-                      fontSize: constraints.maxHeight * 0.022,
+                      fontSize: (constraints.maxHeight * 0.022).clamp(10.0, 14.0),
                       fontStyle: FontStyle.italic,
                       color: textColor.withOpacity(0.6),
                     ),
@@ -68,14 +68,14 @@ class FlashcardBack extends StatelessWidget {
             Text(
               FlashcardConstants.definitionLabel,
               style: TextStyle(
-                fontSize: constraints.maxHeight * 0.03,
+                fontSize: (constraints.maxHeight * 0.03).clamp(12.0, 18.0),
                 fontWeight: FontWeight.bold,
                 color: textColor,
               ),
             ),
             const Spacer(),
             IconButton(
-              icon: Icon(Icons.volume_up, size: constraints.maxHeight * 0.05),
+              icon: Icon(Icons.volume_up, size: (constraints.maxHeight * 0.05).clamp(20.0, 30.0)),
               onPressed: () => context
                   .read<FlashcardBloc>()
                   .add(SpeakFlashcardText(word.definition)),
@@ -86,7 +86,7 @@ class FlashcardBack extends StatelessWidget {
         Text(
           word.definition,
           style: TextStyle(
-            fontSize: constraints.maxHeight * 0.03,
+            fontSize: (constraints.maxHeight * 0.03).clamp(12.0, 18.0),
             color: textColor,
           ),
           textAlign: TextAlign.start,
@@ -105,14 +105,14 @@ class FlashcardBack extends StatelessWidget {
             Text(
               FlashcardConstants.exampleLabel,
               style: TextStyle(
-                fontSize: constraints.maxHeight * 0.03,
+                fontSize: (constraints.maxHeight * 0.03).clamp(12.0, 18.0),
                 fontWeight: FontWeight.bold,
                 color: textColor,
               ),
             ),
             const Spacer(),
             IconButton(
-              icon: Icon(Icons.volume_up, size: constraints.maxHeight * 0.05),
+              icon: Icon(Icons.volume_up, size: (constraints.maxHeight * 0.05).clamp(20.0, 30.0)),
               onPressed: () => context
                   .read<FlashcardBloc>()
                   .add(SpeakFlashcardText(word.sentence)),
@@ -123,7 +123,7 @@ class FlashcardBack extends StatelessWidget {
         Text(
           '"${word.sentence}"',
           style: TextStyle(
-            fontSize: constraints.maxHeight * 0.03,
+            fontSize: (constraints.maxHeight * 0.03).clamp(12.0, 18.0),
             fontStyle: FontStyle.italic,
             color: textColor,
           ),

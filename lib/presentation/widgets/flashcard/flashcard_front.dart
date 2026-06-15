@@ -29,13 +29,13 @@ class FlashcardFront extends StatelessWidget {
             minHeight: constraints.minHeight,
             maxWidth: constraints.maxWidth,
           ),
-          padding: EdgeInsets.all(constraints.maxHeight * 0.02),
+          padding: EdgeInsets.all((constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               FlashcardImageWidget(
                 images: images,
-                height: constraints.maxHeight * 0.5,
+                height: (constraints.maxHeight * 0.5).clamp(120.0, 300.0),
               ),
               const SizedBox(height: 2),
               Flexible(
@@ -44,7 +44,7 @@ class FlashcardFront extends StatelessWidget {
                   child: Text(
                     word.word.isNotEmpty ? word.word : 'Word not found',
                     style: TextStyle(
-                      fontSize: constraints.maxHeight * 0.1,
+                      fontSize: (constraints.maxHeight * 0.1).clamp(26.0, 48.0),
                       fontWeight: FontWeight.bold,
                       color: textColor,
                     ),
@@ -56,16 +56,16 @@ class FlashcardFront extends StatelessWidget {
               Text(
                 FlashcardConstants.tapToSeeDefinition,
                 style: TextStyle(
-                  fontSize: constraints.maxHeight * 0.02,
+                  fontSize: (constraints.maxHeight * 0.02).clamp(10.0, 14.0),
                   fontStyle: FontStyle.italic,
                   color: textColor.withOpacity(0.6),
                 ),
               ),
               const SizedBox(height: 10),
               FlashcardControls(
-                height: constraints.maxHeight * 0.2,
-                fontSize: constraints.maxHeight * 0.03,
-                iconSize: constraints.maxHeight * 0.04,
+                height: (constraints.maxHeight * 0.2).clamp(50.0, 120.0),
+                fontSize: (constraints.maxHeight * 0.03).clamp(11.0, 18.0),
+                iconSize: (constraints.maxHeight * 0.04).clamp(18.0, 28.0),
                 onLearned: () =>
                     context.read<FlashcardBloc>().add(IncrementLearnCount()),
                 onReset: () =>

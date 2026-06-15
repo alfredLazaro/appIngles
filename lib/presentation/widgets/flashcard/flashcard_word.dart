@@ -39,7 +39,7 @@ class WordFlashcard extends StatelessWidget {
               minHeight: constraints.maxHeight,
               maxWidth: constraints.maxWidth,
             ),
-            padding: EdgeInsets.all(constraints.maxHeight * 0.03),
+            padding: EdgeInsets.all((constraints.maxHeight * 0.03).clamp(8.0, 20.0)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -47,7 +47,7 @@ class WordFlashcard extends StatelessWidget {
                 // Imágenes
                 FlashcardImageWidget(
                   images: images,
-                  height: constraints.maxHeight * 0.35,
+                  height: (constraints.maxHeight * 0.35).clamp(100.0, 220.0),
                 ),
 
                 SizedBox(height: constraints.maxHeight * 0.02),
@@ -59,7 +59,7 @@ class WordFlashcard extends StatelessWidget {
                     child: Text(
                       word.word.isNotEmpty ? word.word : 'Word not found',
                       style: TextStyle(
-                        fontSize: constraints.maxHeight * 0.08,
+                        fontSize: (constraints.maxHeight * 0.08).clamp(22.0, 40.0),
                         fontWeight: FontWeight.bold,
                         color: textColor,
                       ),

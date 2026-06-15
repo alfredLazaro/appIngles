@@ -43,7 +43,7 @@ class _WordTestInputState extends State<WordTestInput> {
               border: const OutlineInputBorder(),
               isDense: true,
               contentPadding:
-                  EdgeInsets.all(widget.constraints.maxHeight * 0.015),
+                  EdgeInsets.all((widget.constraints.maxHeight * 0.015).clamp(8.0, 12.0)),
             ),
             onSubmitted: (value) {
               widget.onSubmit(value);
@@ -60,11 +60,11 @@ class _WordTestInputState extends State<WordTestInput> {
               _controller.clear();
             },
             style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.all(widget.constraints.maxHeight * 0.015),
+              padding: EdgeInsets.all((widget.constraints.maxHeight * 0.015).clamp(8.0, 12.0)),
             ),
             child: Icon(
               Icons.send,
-              size: widget.constraints.maxHeight * 0.04,
+              size: (widget.constraints.maxHeight * 0.04).clamp(18.0, 24.0),
             ),
           ),
         ),
