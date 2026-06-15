@@ -32,7 +32,9 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
     super.initState();
     Future.microtask(() {
       if (mounted) {
-        context.read<PracticeBloc>().add(LoadPracticeDataEvent(widget.practiceType));
+        context
+            .read<PracticeBloc>()
+            .add(LoadPracticeDataEvent(widget.practiceType));
       }
     });
   }
@@ -100,7 +102,7 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
   void _navigateToPractice(BuildContext context, PracticeReady state) {
     _hasNavigated = true;
 
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => _buildPracticePage(state),
