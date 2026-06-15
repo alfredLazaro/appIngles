@@ -57,3 +57,4 @@ DEPENDENCIES:
 - dio: ^5.0.0
 DATA FLOWS:
 Exercise: practice_selection_page → Choose type → practice_config_page → Configure → Generate entities → [flashcard_practice_page OR sentence_practice_page]
+

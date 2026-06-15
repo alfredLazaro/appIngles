@@ -132,7 +132,7 @@ class MatchingBloc extends Bloc<MatchingEvent, MatchingState> {
     if (state is! MatchingRoundReady) return;
 
     final nextIndex = state.roundIndex + 1;
-    if (nextIndex > _rounds.length) {
+    if (nextIndex >= _rounds.length) {
       emit(MatchingCompleted(
         totalRounds: _rounds.length,
         totalCorrect: state.totalCorrect,
