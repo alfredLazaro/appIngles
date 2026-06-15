@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 
 abstract class PracticeEvent extends Equatable {
@@ -21,4 +22,13 @@ class StartPracticeEvent extends PracticeEvent {
 
   @override
   List<Object> get props => [count, type];
+}
+
+class FinishPracticeEvent extends PracticeEvent {
+  final PracticeResult result;
+
+  const FinishPracticeEvent(this.result);
+
+  @override
+  List<Object> get props => [result];
 }

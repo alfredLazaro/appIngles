@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:first_app/domain/entities/match_round.dart';
 import 'package:first_app/presentation/bloc/matching/matching_event.dart';
@@ -5,6 +6,7 @@ import 'package:first_app/presentation/bloc/matching/matching_state.dart';
 
 class MatchingBloc extends Bloc<MatchingEvent, MatchingState> {
   late List<MatchRound> _rounds;
+  final Map<int, int> _learnCounts = {};
 
   MatchingBloc() : super(const MatchingInitial()) {
     on<InitializeMatching>(_onInitialize);
@@ -19,6 +21,14 @@ class MatchingBloc extends Bloc<MatchingEvent, MatchingState> {
     Emitter<MatchingState> emit,
   ) {
     _rounds = event.rounds;
+    _learnCounts.clear();
+
+    for (final round in _rounds) {
+      for (final word in round.words) {
+        _learnCounts[word.id] = word.learnCount;
+      }
+    }
+
     if (_rounds.isEmpty) {
       emit(const MatchingCompleted(totalRounds: 0, totalCorrect: 0));
       return;
@@ -81,9 +91,13 @@ class MatchingBloc extends Bloc<MatchingEvent, MatchingState> {
 
     if (wIdx == null || tIdx == null) return;
 
+    final wordId = state.round.words[wIdx].id;
     final isCorrect = state.round.correctMapping[wIdx] == tIdx;
 
     if (isCorrect) {
+      final current = _learnCounts[wordId] ?? 0;
+      _learnCounts[wordId] = current + 2;
+
       final newMatchedWord = Set<int>.from(state.matchedWordIndices)
         ..add(wIdx);
       final newMatchedTranslations =
@@ -100,6 +114,9 @@ class MatchingBloc extends Bloc<MatchingEvent, MatchingState> {
         clearSelection: true,
       ));
     } else {
+      final current = _learnCounts[wordId] ?? 0;
+      _learnCounts[wordId] = max(0, current - 1);
+
       emit(state.copyWith(
         selectedLeftIndex: leftIndex ?? state.selectedLeftIndex,
         selectedRightIndex: rightIndex ?? state.selectedRightIndex,
@@ -121,6 +138,7 @@ class MatchingBloc extends Bloc<MatchingEvent, MatchingState> {
       emit(MatchingCompleted(
         totalRounds: _rounds.length,
         totalCorrect: state.totalCorrect,
+        learnCountUpdates: Map.from(_learnCounts),
       ));
       return;
     }
@@ -143,6 +161,7 @@ class MatchingBloc extends Bloc<MatchingEvent, MatchingState> {
     emit(MatchingCompleted(
       totalRounds: _rounds.length,
       totalCorrect: state.totalCorrect,
+      learnCountUpdates: Map.from(_learnCounts),
     ));
   }
 }

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
+import 'package:first_app/presentation/bloc/practice/practice_event.dart';
 import 'package:first_app/presentation/bloc/matching/matching_bloc.dart';
 import 'package:first_app/presentation/bloc/matching/matching_event.dart';
 import 'package:first_app/presentation/bloc/matching/matching_state.dart';
 import 'package:first_app/presentation/widgets/matching_tile.dart';
+import 'package:first_app/presentation/pages/practice_selection_page.dart';
 
-class MatchingPracticePage extends StatelessWidget {
+class MatchingPracticePage extends StatefulWidget {
   final MatchingPracticeData data;
 
   const MatchingPracticePage({
@@ -15,16 +18,43 @@ class MatchingPracticePage extends StatelessWidget {
   });
 
   @override
+  State<MatchingPracticePage> createState() => _MatchingPracticePageState();
+}
+
+class _MatchingPracticePageState extends State<MatchingPracticePage> {
+  bool _resultSubmitted = false;
+
+  void _submitResult(MatchingCompleted state) {
+    if (_resultSubmitted) return;
+    _resultSubmitted = true;
+
+    final totalPairs = widget.data.rounds.fold<int>(
+      0,
+      (sum, r) => sum + r.words.length,
+    );
+
+    final result = PracticeResult(
+      type: PracticeType.matching,
+      learnCountUpdates: state.learnCountUpdates,
+      totalItems: totalPairs,
+      correctItems: state.totalCorrect,
+    );
+
+    context.read<PracticeBloc>().add(FinishPracticeEvent(result));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
         final bloc = MatchingBloc();
-        bloc.add(InitializeMatching(rounds: data.rounds));
+        bloc.add(InitializeMatching(rounds: widget.data.rounds));
         return bloc;
       },
       child: BlocBuilder<MatchingBloc, MatchingState>(
         builder: (context, state) {
           if (state is MatchingCompleted) {
+            _submitResult(state);
             return _buildResults(context, state);
           }
           if (state is MatchingRoundReady) {
@@ -39,7 +69,7 @@ class MatchingPracticePage extends StatelessWidget {
   }
 
   Widget _buildResults(BuildContext context, MatchingCompleted state) {
-    final totalPairs = data.rounds.fold<int>(
+    final totalPairs = widget.data.rounds.fold<int>(
       0,
       (sum, r) => sum + r.words.length,
     );

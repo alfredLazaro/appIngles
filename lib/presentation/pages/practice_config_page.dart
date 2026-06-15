@@ -11,7 +11,7 @@ import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/modals/practice_selection_modal.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 
-class PracticeConfigPage extends StatelessWidget {
+class PracticeConfigPage extends StatefulWidget {
   final PracticeType practiceType;
 
   const PracticeConfigPage({
@@ -20,13 +20,33 @@ class PracticeConfigPage extends StatelessWidget {
   });
 
   @override
+  State<PracticeConfigPage> createState() => _PracticeConfigPageState();
+}
+
+class _PracticeConfigPageState extends State<PracticeConfigPage> {
+  late final PracticeBloc _practiceBloc;
+  bool _hasNavigated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _practiceBloc = PracticeBloc(
+      wordRepository: sl(),
+      imageRepository: sl(),
+      translationRepository: sl(),
+    )..add(LoadPracticeDataEvent(widget.practiceType));
+  }
+
+  @override
+  void dispose() {
+    _practiceBloc.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => PracticeBloc(
-        wordRepository: sl(),
-        imageRepository: sl(),
-        translationRepository: sl(),
-      )..add(LoadPracticeDataEvent(practiceType)),
+    return BlocProvider.value(
+      value: _practiceBloc,
       child: BlocConsumer<PracticeBloc, PracticeState>(
         listener: (context, state) {
           if (state is PracticeError) {
@@ -36,19 +56,23 @@ class PracticeConfigPage extends StatelessWidget {
             Navigator.pop(context);
           }
 
-          if (state is PracticeReady) {
+          if (state is PracticeReady && !_hasNavigated) {
             _navigateToPractice(context, state);
+          }
+
+          if (state is PracticeCompleted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Progreso guardado: ${state.result.correctItems} de ${state.result.totalItems} correctos',
+                ),
+                backgroundColor: Colors.green,
+              ),
+            );
           }
         },
         builder: (context, state) {
-          if (state is PracticeLoading) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
-
           if (state is PracticeDataLoaded) {
-            // Show modal automatically when data is loaded
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _showPracticeModal(context, state.totalCount);
             });
@@ -68,11 +92,11 @@ class PracticeConfigPage extends StatelessWidget {
       barrierDismissible: false,
       builder: (dialogContext) => PracticeSelectionModal(
         totalWords: totalCount,
-        practiceType: practiceType,
+        practiceType: widget.practiceType,
         onStartPractice: (count) {
           Navigator.pop(dialogContext);
           context.read<PracticeBloc>().add(
-                StartPracticeEvent(count, practiceType),
+                StartPracticeEvent(count, widget.practiceType),
               );
         },
       ),
@@ -85,35 +109,41 @@ class PracticeConfigPage extends StatelessWidget {
   }
 
   void _navigateToPractice(BuildContext context, PracticeReady state) {
-    Navigator.pushAndRemoveUntil(
+    _hasNavigated = true;
+
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) {
-          switch (practiceType) {
-            case PracticeType.flashcard:
-              final flashcardData = state.practiceData as FlashcardPracticeData;
-              return FlashcardPracticePage(
-                words: flashcardData.words,
-                imagesMap: flashcardData.imagesMap,
-              );
-            case PracticeType.sentence:
-              final sentenceData = state.practiceData as SentencePracticeData;
-              return SentencePracticePage(
-                sentences: sentenceData.sentences,
-              );
-            case PracticeType.matching:
-              final matchingData = state.practiceData as MatchingPracticeData;
-              return MatchingPracticePage(
-                data: matchingData,
-              );
-            default:
-              return const Scaffold(
-                body: Center(child: Text('Práctica no disponible')),
-              );
-          }
-        },
+        builder: (context) => BlocProvider.value(
+          value: _practiceBloc,
+          child: _buildPracticePage(state),
+        ),
       ),
-      (route) => route.isFirst,
     );
+  }
+
+  Widget _buildPracticePage(PracticeReady state) {
+    switch (widget.practiceType) {
+      case PracticeType.flashcard:
+        final flashcardData = state.practiceData as FlashcardPracticeData;
+        return FlashcardPracticePage(
+          words: flashcardData.words,
+          imagesMap: flashcardData.imagesMap,
+        );
+      case PracticeType.sentence:
+        final sentenceData = state.practiceData as SentencePracticeData;
+        return SentencePracticePage(
+          sentences: sentenceData.sentences,
+        );
+      case PracticeType.matching:
+        final matchingData = state.practiceData as MatchingPracticeData;
+        return MatchingPracticePage(
+          data: matchingData,
+        );
+      default:
+        return const Scaffold(
+          body: Center(child: Text('Práctica no disponible')),
+        );
+    }
   }
 }

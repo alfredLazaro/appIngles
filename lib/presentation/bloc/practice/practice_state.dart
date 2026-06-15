@@ -33,6 +33,15 @@ class PracticeReady extends PracticeState {
   List<Object> get props => [practiceData];
 }
 
+class PracticeCompleted extends PracticeState {
+  final PracticeResult result;
+
+  const PracticeCompleted(this.result);
+
+  @override
+  List<Object> get props => [result];
+}
+
 class PracticeError extends PracticeState {
   final String message;
 

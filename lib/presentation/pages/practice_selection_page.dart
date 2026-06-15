@@ -69,6 +69,17 @@ class PracticeSelectionPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     PracticeCard(
+                      icon: Icons.compare_arrows,
+                      title: 'Emparejar',
+                      description: 'Relaciona palabras con sus traducciones',
+                      color: Colors.teal,
+                      onTap: () => _navigateToConfig(
+                        context,
+                        PracticeType.matching,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    PracticeCard(
                       icon: Icons.keyboard,
                       title: 'Spelling',
                       description:
@@ -91,17 +102,6 @@ class PracticeSelectionPage extends StatelessWidget {
                         PracticeType.listening,
                       ),
                       isComingSoon: true,
-                    ),
-                    const SizedBox(height: 16),
-                    PracticeCard(
-                      icon: Icons.compare_arrows,
-                      title: 'Emparejar',
-                      description: 'Relaciona palabras con sus traducciones',
-                      color: Colors.teal,
-                      onTap: () => _navigateToConfig(
-                        context,
-                        PracticeType.matching,
-                      ),
                     ),
                   ],
                 ),

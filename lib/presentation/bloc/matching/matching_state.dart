@@ -82,12 +82,14 @@ class MatchingRoundReady extends MatchingState {
 class MatchingCompleted extends MatchingState {
   final int totalRounds;
   final int totalCorrect;
+  final Map<int, int> learnCountUpdates;
 
   const MatchingCompleted({
     required this.totalRounds,
     required this.totalCorrect,
+    this.learnCountUpdates = const {},
   });
 
   @override
-  List<Object?> get props => [totalRounds, totalCorrect];
+  List<Object?> get props => [totalRounds, totalCorrect, learnCountUpdates];
 }

@@ -23,6 +23,7 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
         super(PracticeInitial()) {
     on<LoadPracticeDataEvent>(_onLoadPracticeData);
     on<StartPracticeEvent>(_onStartPractice);
+    on<FinishPracticeEvent>(_onFinishPractice);
   }
 
   Future<void> _onLoadPracticeData(
@@ -138,5 +139,18 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     return SentencePracticeData(
       sentences: sentences,
     );
+  }
+
+  Future<void> _onFinishPractice(
+    FinishPracticeEvent event,
+    Emitter<PracticeState> emit,
+  ) async {
+    try {
+      await _wordRepository.batchUpdateLearnCounts(
+          event.result.learnCountUpdates);
+      emit(PracticeCompleted(event.result));
+    } catch (e) {
+      emit(PracticeError('Error al guardar progreso: $e'));
+    }
   }
 }

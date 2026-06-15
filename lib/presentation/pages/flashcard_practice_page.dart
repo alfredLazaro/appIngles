@@ -1,6 +1,10 @@
 import 'package:first_app/presentation/bloc/flashcard/flashcard_bloc.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_state.dart';
+import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
+import 'package:first_app/presentation/bloc/practice/practice_data.dart';
+import 'package:first_app/presentation/bloc/practice/practice_event.dart';
+import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
 import 'package:first_app/presentation/widgets/flashcard/flashcard_word.dart';
@@ -10,7 +14,6 @@ import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
 import 'package:first_app/domain/usecases/speak_text.dart';
-import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/presentation/widgets/flashcard/english_flashcard.dart';
 
@@ -39,7 +42,6 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     _bloc = FlashcardBloc(
       validateWordAnswer: sl<ValidateWordAnswer>(),
       speakText: sl<SpeakText>(),
-      wordRepository: sl<WordRepository>(),
     );
     _bloc.add(InitializeSession(
       words: widget.words,
@@ -56,6 +58,20 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
 
   bool _isLastPage(FlashcardLoaded state) {
     return state.currentIndex >= state.sessions.length - 1;
+  }
+
+  void _submitResult() {
+    final state = _bloc.state;
+    if (state is! FlashcardLoaded) return;
+
+    final result = PracticeResult(
+      type: PracticeType.flashcard,
+      learnCountUpdates: state.scores,
+      totalItems: widget.words.length,
+      correctItems: state.scores.values.where((s) => s > 0).length,
+    );
+
+    context.read<PracticeBloc>().add(FinishPracticeEvent(result));
   }
 
   void _showCompletionDialog(FlashcardLoaded state) {
@@ -83,6 +99,8 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
         primaryColor: Theme.of(dialogContext).colorScheme.secondary,
       ),
     );
+
+    _submitResult();
   }
 
   Color _getModeColor(FlashcardMode mode) {

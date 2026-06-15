@@ -1,6 +1,5 @@
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
-import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
 import 'package:first_app/domain/usecases/speak_text.dart';
@@ -10,7 +9,6 @@ import 'flashcard_state.dart';
 class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   final ValidateWordAnswer _validateWordAnswer;
   final SpeakText _speakText;
-  final WordRepository _wordRepository;
 
   List<FlashcardSession> _sessions = [];
   int _currentIndex = 0;
@@ -20,10 +18,8 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   FlashcardBloc({
     required ValidateWordAnswer validateWordAnswer,
     required SpeakText speakText,
-    required WordRepository wordRepository,
   })  : _validateWordAnswer = validateWordAnswer,
         _speakText = speakText,
-        _wordRepository = wordRepository,
         super(const FlashcardInitial()) {
     on<InitializeSession>(_onInitializeSession);
     on<NextFlashcard>(_onNextFlashcard);
@@ -128,7 +124,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   }
 
   void _onIncrementLearnCount(
-      IncrementLearnCount event, Emitter<FlashcardState> emit) async {
+      IncrementLearnCount event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final increment = event.amount ?? 1;
@@ -136,13 +132,11 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
 
       _scores[currentState.word.id] = newCount;
       emit(currentState.copyWith(learnCount: newCount, scores: Map.from(_scores)));
-
-      await _wordRepository.updateLearnCount(currentState.word.id, newCount);
     }
   }
 
   void _onDecrementLearnCount(
-      DecrementLearnCount event, Emitter<FlashcardState> emit) async {
+      DecrementLearnCount event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final decrement = event.amount ?? 1;
@@ -151,25 +145,21 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
 
       _scores[currentState.word.id] = newCount;
       emit(currentState.copyWith(learnCount: newCount, scores: Map.from(_scores)));
-
-      await _wordRepository.updateLearnCount(currentState.word.id, newCount);
     }
   }
 
   void _onResetLearnCount(
-      ResetLearnCount event, Emitter<FlashcardState> emit) async {
+      ResetLearnCount event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
 
       _scores[currentState.word.id] = 0;
       emit(currentState.copyWith(learnCount: 0, scores: Map.from(_scores)));
-
-      await _wordRepository.updateLearnCount(currentState.word.id, 0);
     }
   }
 
   void _onValidateAnswer(
-      ValidateAnswer event, Emitter<FlashcardState> emit) async {
+      ValidateAnswer event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final isCorrect =
@@ -180,14 +170,12 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         _scores[currentState.word.id] = newCount;
         emit(currentState.copyWith(
             learnCount: newCount, isAnswerCorrect: true, scores: Map.from(_scores)));
-        await _wordRepository.updateLearnCount(currentState.word.id, newCount);
       } else {
         final newCount =
             (currentState.learnCount - 1).clamp(0, double.infinity).toInt();
         _scores[currentState.word.id] = newCount;
         emit(currentState.copyWith(
             learnCount: newCount, isAnswerCorrect: false, scores: Map.from(_scores)));
-        await _wordRepository.updateLearnCount(currentState.word.id, newCount);
       }
     }
   }
@@ -198,27 +186,23 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   }
 
   void _onMarkAsKnown(
-      MarkAsKnown event, Emitter<FlashcardState> emit) async {
+      MarkAsKnown event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final masteryLevel = event.masteryLevel ?? 5;
 
       _scores[currentState.word.id] = masteryLevel;
       emit(currentState.copyWith(learnCount: masteryLevel, scores: Map.from(_scores)));
-
-      await _wordRepository.updateLearnCount(currentState.word.id, masteryLevel);
     }
   }
 
   void _onMarkAsUnknown(
-      MarkAsUnknown event, Emitter<FlashcardState> emit) async {
+      MarkAsUnknown event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
 
       _scores[currentState.word.id] = 0;
       emit(currentState.copyWith(learnCount: 0, scores: Map.from(_scores)));
-
-      await _wordRepository.updateLearnCount(currentState.word.id, 0);
     }
   }
 }
