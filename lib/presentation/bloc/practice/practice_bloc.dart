@@ -5,7 +5,6 @@ import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/repositories/translation_repository.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
-import 'package:logger/logger.dart';
 import 'practice_event.dart';
 import 'practice_state.dart';
 
@@ -121,14 +120,11 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     final wordIds = words.map((w) => w.id).toList();
     final translations =
         await _translationRepository.getTranslationsByWordIds(wordIds);
-    Logger logg = Logger();
     final rounds = MatchRound.generateRounds(
       allWords: words,
       allTranslations: translations,
       batchSize: 4,
     );
-    logg.i(
-        'numero de palabras ${words.length}, numero de traducciones ${translations.length}, rondas ${rounds.length}');
     return MatchingPracticeData(
       words: words,
       rounds: rounds,
