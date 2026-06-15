@@ -91,8 +91,8 @@ class _ImageSearchDialogState extends State<ImageSearchDialog> {
                 _hasSearched
                     ? 'Resultados para "${_queryController.text}"'
                     : 'Buscar imágenes',
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 16),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 16),
               if (!_hasSearched)
@@ -139,10 +139,12 @@ class _ImageSearchDialogState extends State<ImageSearchDialog> {
                   ),
                 )
               else
-                ImageSelectionGrid(
-                  images: _images!,
-                  initiallyMultiple: true,
-                  onSelectionChanged: (selected) => _selected = selected,
+                Expanded(
+                  child: ImageSelectionGrid(
+                    images: _images!,
+                    initiallyMultiple: true,
+                    onSelectionChanged: (selected) => _selected = selected,
+                  ),
                 ),
               const SizedBox(height: 16),
               Row(
