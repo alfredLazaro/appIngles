@@ -21,38 +21,37 @@ class FlashcardBack extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Container(
-          padding: EdgeInsets.all((constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
           constraints: BoxConstraints(
             minHeight: constraints.minHeight,
             maxWidth: constraints.maxWidth,
           ),
-            child: Padding(
-              padding: EdgeInsets.all((constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  WordTestInput(
-                    onSubmit: (answer) => context
-                        .read<FlashcardBloc>()
-                        .add(ValidateAnswer(answer)),
-                    constraints: constraints,
+          child: Padding(
+            padding:
+                EdgeInsets.all((constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                WordTestInput(
+                  onSubmit: (answer) =>
+                      context.read<FlashcardBloc>().add(ValidateAnswer(answer)),
+                  constraints: constraints,
+                ),
+                SizedBox(height: constraints.maxHeight * 0.02),
+                _buildDefinitionSection(context, constraints),
+                SizedBox(height: constraints.maxHeight * 0.02),
+                _buildExampleSection(context, constraints),
+                SizedBox(height: constraints.maxHeight * 0.04),
+                Text(
+                  FlashcardConstants.tapToSeeWord,
+                  style: TextStyle(
+                    fontSize: (constraints.maxHeight * 0.022).clamp(10.0, 14.0),
+                    fontStyle: FontStyle.italic,
+                    color: textColor.withOpacity(0.6),
                   ),
-                  SizedBox(height: constraints.maxHeight * 0.02),
-                  _buildDefinitionSection(context, constraints),
-                  SizedBox(height: constraints.maxHeight * 0.02),
-                  _buildExampleSection(context, constraints),
-                  SizedBox(height: constraints.maxHeight * 0.04),
-                  Text(
-                    FlashcardConstants.tapToSeeWord,
-                    style: TextStyle(
-                      fontSize: (constraints.maxHeight * 0.022).clamp(10.0, 14.0),
-                      fontStyle: FontStyle.italic,
-                      color: textColor.withOpacity(0.6),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
         );
       },
     );
@@ -75,7 +74,8 @@ class FlashcardBack extends StatelessWidget {
             ),
             const Spacer(),
             IconButton(
-              icon: Icon(Icons.volume_up, size: (constraints.maxHeight * 0.05).clamp(20.0, 30.0)),
+              icon: Icon(Icons.volume_up,
+                  size: (constraints.maxHeight * 0.05).clamp(20.0, 30.0)),
               onPressed: () => context
                   .read<FlashcardBloc>()
                   .add(SpeakFlashcardText(word.definition)),
@@ -112,7 +112,8 @@ class FlashcardBack extends StatelessWidget {
             ),
             const Spacer(),
             IconButton(
-              icon: Icon(Icons.volume_up, size: (constraints.maxHeight * 0.05).clamp(20.0, 30.0)),
+              icon: Icon(Icons.volume_up,
+                  size: (constraints.maxHeight * 0.05).clamp(20.0, 30.0)),
               onPressed: () => context
                   .read<FlashcardBloc>()
                   .add(SpeakFlashcardText(word.sentence)),
