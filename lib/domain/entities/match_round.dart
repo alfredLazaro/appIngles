@@ -22,30 +22,52 @@ class MatchRound extends Equatable {
     final rounds = <MatchRound>[];
     final random = Random();
 
-    for (int i = 0; i < allWords.length; i += batchSize) {
-      final end = (i + batchSize < allWords.length)
+    // Agrupar traducciones por wordId
+    final Map<int, List<TranslationEntity>> translationsByWordId = {};
+    for (final translation in allTranslations) {
+      translationsByWordId
+          .putIfAbsent(translation.wordId, () => [])
+          .add(translation);
+    }
+
+    // Filtrar palabras que NO tienen traducciones (no se pueden usar)
+    final validWords = allWords.where((word) {
+      final hasTranslations = translationsByWordId.containsKey(word.id);
+      if (!hasTranslations) {
+        print(
+            '⚠️ Palabra " ${word.word} " no tiene traducciones y será omitida');
+      }
+      return hasTranslations;
+    }).toList();
+
+    for (int i = 0; i < validWords.length; i += batchSize) {
+      final end = (i + batchSize < validWords.length)
           ? i + batchSize
-          : allWords.length;
-      final batchWords = allWords.sublist(i, end);
+          : validWords.length;
+      final batchWords = validWords.sublist(i, end);
 
-      final usedWordIds = batchWords.map((w) => w.id).toSet();
+      // Seleccionar UNA traducción al azar por palabra
+      final Map<int, TranslationEntity> selectedTranslations = {};
+      final List<TranslationEntity> batchTranslations = [];
 
-      final batchTranslations = allTranslations
-          .where((t) => usedWordIds.contains(t.wordId))
-          .toList();
-
-      if (batchTranslations.length != batchWords.length) {
-        continue;
+      for (final word in batchWords) {
+        final translations = translationsByWordId[word.id]!;
+        // Selección aleatoria
+        final selected = translations[random.nextInt(translations.length)];
+        selectedTranslations[word.id] = selected;
+        batchTranslations.add(selected);
       }
 
-      final shuffledTranslations = List<TranslationEntity>.from(batchTranslations)
-        ..shuffle(random);
+      // Mezclar traducciones
+      final shuffledTranslations =
+          List<TranslationEntity>.from(batchTranslations)..shuffle(random);
 
+      // Crear mapeo correcto
       final correctMapping = <int, int>{};
       for (int wi = 0; wi < batchWords.length; wi++) {
         final wordId = batchWords[wi].id;
-        final ti = shuffledTranslations
-            .indexWhere((t) => t.wordId == wordId);
+        final selectedId = selectedTranslations[wordId]!.id;
+        final ti = shuffledTranslations.indexWhere((t) => t.id == selectedId);
         correctMapping[wi] = ti;
       }
 
