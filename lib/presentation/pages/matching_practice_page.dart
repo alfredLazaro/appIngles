@@ -214,7 +214,9 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                         ? 'Definiciones'
                         : 'Traducciones',
                     items: List.generate(
-                      state.round.translations.length,
+                      widget.isDefinitionMode
+                          ? state.round.definitions!.length
+                          : state.round.translations.length,
                       (i) => MatchingTile(
                         text: widget.isDefinitionMode
                             ? state.round.definitions![i]
