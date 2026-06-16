@@ -2,6 +2,7 @@ import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/insertion_result.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
 import 'package:first_app/domain/entities/word.dart';
+import 'package:first_app/domain/entities/word_def.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
@@ -28,6 +29,7 @@ abstract class WordRepository {
   });
   Future<List<FlashcardWord>> getWordsForPractice(int limit);
   Future<List<SentenceModel>> getSentencesForPractice({int limit});
+  Future<List<WordDef>> gettWordDefForPractice(int limit);
   Future<List<Word>> searchWords(String query);
   Future<int> getTotalWordCount();
   Future<void> batchUpdateLearnCounts(Map<int, int> updates);

@@ -6,6 +6,7 @@ import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
+import 'package:first_app/domain/entities/word_def.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
@@ -179,6 +180,16 @@ class WordRepositoryImpl implements WordRepository {
   }
 
   @override
+  Future<List<WordDef>> gettWordDefForPractice(int limit) async {
+    try {
+      final maps = await _wordDao.gettWordDefForPractice(limit);
+      return WordMapper.toWordDefList(maps);
+    } catch (e) {
+      throw Exception('Error al obtener oraciones para practicar: $e');
+    }
+  }
+
+  @override
   Future<List<Word>> searchWords(String query) async {
     try {
       final models = await _wordDao.searchWords(query);
@@ -252,9 +263,11 @@ class WordRepositoryImpl implements WordRepository {
     List<Map<String, String>> ls =
         words.map((word) => WordMapper.toMapInsertion(word)).toList();
     final list = await _wordDao.insertLotWords(ls);
-    return list.map((map) => InsertionResult(
-          id: map['id'] as int,
-          word: map['word'] as String,
-        )).toList();
+    return list
+        .map((map) => InsertionResult(
+              id: map['id'] as int,
+              word: map['word'] as String,
+            ))
+        .toList();
   }
 }

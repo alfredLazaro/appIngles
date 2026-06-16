@@ -1,6 +1,7 @@
 import 'package:first_app/data/models/word_model.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/word.dart';
+import 'package:first_app/domain/entities/word_def.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
@@ -45,8 +46,20 @@ class WordMapper {
     );
   }
 
+  static WordDef toWordDefEntity(Map<String, dynamic> map) {
+    return WordDef(
+      id: map['id'],
+      word: map['word'] ?? '',
+      sentence: map['definition'] ?? '',
+    );
+  }
+
   static List<WordSummary> toSummaryList(List<Map<String, dynamic>> maps) {
     return maps.map((map) => toSummaryEntity(map)).toList();
+  }
+
+  static List<WordDef> toWordDefList(List<Map<String, dynamic>> maps) {
+    return maps.map((map) => toWordDefEntity(map)).toList();
   }
 
   static WordWithImage toWordWithImage(Map<String, dynamic> map) {
