@@ -264,6 +264,23 @@ class WordDao {
     }
   }
 
+  Future<List<Map<String, dynamic>>> gettWordDefForPractice(int limit) async {
+    try {
+      final db = await dbHelper.database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        'Word',
+        columns: ['id', 'word', 'definition'],
+        orderBy: 'learn ASC, id DESC',
+        limit: limit,
+      );
+
+      return maps;
+    } catch (e) {
+      _logError('gettWordDefForPractice', e);
+      return [];
+    }
+  }
+
   // ============ HELPER METHOD FOR LOGGING ============
   void _logError(String methodName, dynamic error,
       [Map<String, dynamic>? context]) {
