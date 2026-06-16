@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/match_round.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
@@ -41,6 +42,7 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
         case PracticeType.spelling:
         case PracticeType.listening:
         case PracticeType.matching:
+        case PracticeType.matchingDefinition:
           totalCount = await _wordRepository.getTotalWordCount();
           break;
         case PracticeType.sentence:
@@ -56,7 +58,9 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
         return;
       }
 
-      if (event.type == PracticeType.matching && totalCount < 2) {
+      if ((event.type == PracticeType.matching ||
+              event.type == PracticeType.matchingDefinition) &&
+          totalCount < 2) {
         emit(const PracticeError(
             'Se necesitan al menos 2 palabras para emparejar'));
         return;
@@ -88,6 +92,10 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
 
         case PracticeType.matching:
           practiceData = await _loadMatchingPractice(event.count);
+          break;
+
+        case PracticeType.matchingDefinition:
+          practiceData = await _loadMatchingDefPractice(event.count);
           break;
 
         case PracticeType.spelling:
@@ -138,6 +146,23 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
 
     return SentencePracticeData(
       sentences: sentences,
+    );
+  }
+
+  Future<MatchingDefPracticeData> _loadMatchingDefPractice(int count) async {
+    final wordDefs = await _wordRepository.gettWordDefForPractice(count);
+    final rounds = MatchRound.generateDefRounds(allWords: wordDefs);
+    final flashcardWords = wordDefs
+        .map((wd) => FlashcardWord(
+              id: wd.id,
+              word: wd.word,
+              definition: wd.definition,
+              sentence: '',
+            ))
+        .toList();
+    return MatchingDefPracticeData(
+      words: flashcardWords,
+      rounds: rounds,
     );
   }
 

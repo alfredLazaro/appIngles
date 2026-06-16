@@ -50,7 +50,7 @@ class WordMapper {
     return WordDef(
       id: map['id'],
       word: map['word'] ?? '',
-      sentence: map['definition'] ?? '',
+      definition: map['definition'] ?? '',
     );
   }
 

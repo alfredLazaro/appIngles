@@ -11,10 +11,12 @@ import 'package:first_app/presentation/pages/practice_selection_page.dart';
 
 class MatchingPracticePage extends StatefulWidget {
   final MatchingPracticeData data;
+  final bool isDefinitionMode;
 
   const MatchingPracticePage({
     super.key,
     required this.data,
+    this.isDefinitionMode = false,
   });
 
   @override
@@ -32,7 +34,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
     _resultSubmitted = true;
 
     final result = PracticeResult(
-      type: PracticeType.matching,
+      type: widget.isDefinitionMode ? PracticeType.matchingDefinition : PracticeType.matching,
       learnCountUpdates: state.learnCountUpdates,
       totalItems: _totalPairs,
       correctItems: state.totalCorrect,
@@ -204,11 +206,13 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                 ),
                 Expanded(
                   child: _buildColumn(
-                    title: 'Traducciones',
+                    title: widget.isDefinitionMode ? 'Definiciones' : 'Traducciones',
                     items: List.generate(
                       state.round.translations.length,
                       (i) => MatchingTile(
-                        text: state.round.translations[i].wordTranslate,
+                        text: widget.isDefinitionMode
+                            ? state.round.definitions![i]
+                            : state.round.translations[i].wordTranslate,
                         isSelected: state.selectedRightIndex == i,
                         isMatched: state.matchedTranslationIndices.contains(i),
                         isCorrect: state.matchedTranslationIndices.contains(i)

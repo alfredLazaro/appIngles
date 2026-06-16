@@ -128,6 +128,12 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
         return MatchingPracticePage(
           data: matchingData,
         );
+      case PracticeType.matchingDefinition:
+        final defData = state.practiceData as MatchingDefPracticeData;
+        return MatchingPracticePage(
+          data: MatchingPracticeData(words: defData.words, rounds: defData.rounds),
+          isDefinitionMode: true,
+        );
       default:
         return const Scaffold(
           body: Center(child: Text('Práctica no disponible')),

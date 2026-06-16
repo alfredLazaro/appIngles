@@ -36,6 +36,16 @@ class MatchingPracticeData extends PracticeData {
   });
 }
 
+class MatchingDefPracticeData extends PracticeData {
+  final List<FlashcardWord> words;
+  final List<MatchRound> rounds;
+
+  const MatchingDefPracticeData({
+    required this.words,
+    required this.rounds,
+  });
+}
+
 class PracticeResult {
   final PracticeType type;
   final Map<int, int> learnCountUpdates;

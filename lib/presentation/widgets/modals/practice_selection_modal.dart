@@ -19,7 +19,8 @@ class PracticeSelectionModal extends StatefulWidget {
 
 class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
   late int _selectedCount;
-
+  double get _totalMax =>
+      (widget.totalWords > 30 ? 30.0 : widget.totalWords.toDouble());
   @override
   void initState() {
     super.initState();
@@ -104,8 +105,10 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
               child: Slider(
                 value: _selectedCount.toDouble(),
                 min: 1,
-                max: widget.totalWords.toDouble(),
-                divisions: widget.totalWords > 1 ? widget.totalWords - 1 : 1,
+                max: _totalMax,
+                divisions: widget.totalWords > 30
+                    ? 29 // 30 - 1 = 29 divisiones para 30 valores
+                    : (widget.totalWords > 1 ? widget.totalWords - 1 : 1),
                 label: _selectedCount.toString(),
                 onChanged: (value) {
                   setState(() {
@@ -130,7 +133,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                     ),
                   ),
                   Text(
-                    '${widget.totalWords}',
+                    '$_totalMax',
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 12,
@@ -236,7 +239,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
 
   Widget _buildPracticeInfo() {
     final infoPoints = _getInfoPoints();
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -326,6 +329,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return 'Listening';
       case PracticeType.matching:
         return 'Emparejar';
+      case PracticeType.matchingDefinition:
+        return 'Emparejar-Definicion';
     }
   }
 
@@ -340,6 +345,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
       case PracticeType.listening:
         return '¿Cuántas palabras escuchar?';
       case PracticeType.matching:
+        return '¿Cuántas palabras emparejar?';
+      case PracticeType.matchingDefinition:
         return '¿Cuántas palabras emparejar?';
     }
   }
@@ -356,6 +363,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return Icons.headphones;
       case PracticeType.matching:
         return Icons.compare_arrows;
+      case PracticeType.matchingDefinition:
+        return Icons.menu_book;
     }
   }
 
@@ -371,6 +380,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return Colors.purple;
       case PracticeType.matching:
         return Colors.teal;
+      case PracticeType.matchingDefinition:
+        return Colors.amber;
     }
   }
 
@@ -403,6 +414,12 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
       case PracticeType.matching:
         return [
           'Relaciona cada palabra con su traducción',
+          'Selecciona un tile de cada columna',
+          'Recibirás feedback visual inmediato',
+        ];
+      case PracticeType.matchingDefinition:
+        return [
+          'Relaciona cada palabra con su definición',
           'Selecciona un tile de cada columna',
           'Recibirás feedback visual inmediato',
         ];

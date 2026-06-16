@@ -8,6 +8,7 @@ enum PracticeType {
   spelling,
   listening,
   matching,
+  matchingDefinition,
 }
 
 class PracticeSelectionPage extends StatelessWidget {
@@ -76,6 +77,17 @@ class PracticeSelectionPage extends StatelessWidget {
                       onTap: () => _navigateToConfig(
                         context,
                         PracticeType.matching,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    PracticeCard(
+                      icon: Icons.menu_book,
+                      title: 'Emparejar-Definicion',
+                      description: 'Relaciona palabras con sus definiciones',
+                      color: Colors.amber,
+                      onTap: () => _navigateToConfig(
+                        context,
+                        PracticeType.matchingDefinition,
                       ),
                     ),
                     const SizedBox(height: 16),

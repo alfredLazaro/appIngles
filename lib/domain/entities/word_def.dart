@@ -1,11 +1,11 @@
 class WordDef {
   final int id;
   final String word;
-  final String sentence;
+  final String definition;
 
   const WordDef({
     required this.id,
     required this.word,
-    required this.sentence,
+    required this.definition,
   });
 }
