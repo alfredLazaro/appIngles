@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/presentation/widgets/image_selection_grid.dart';
 import 'package:logger/logger.dart';
 
 class CombinedWordDialog extends StatefulWidget {
   final String word;
   final List<Map<String, dynamic>> meanings;
-  final List<Map<String, dynamic>> images;
+  final List<ImageSearchResult> images;
 
   const CombinedWordDialog({
     super.key,
@@ -22,8 +23,7 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
   int _currentStep = 0; // 0 = definiciones, 1 = imágenes
   int _selectedMeaningIndex = 0;
   int? _selectedDefinitionIndex;
-  final List<Map<String, dynamic>> _selectedImageUrls =
-      []; // List para imágenes seleccionadas
+  final List<ImageSearchResult> _selectedImageUrls = [];
 
   @override
   Widget build(BuildContext context) {
@@ -289,8 +289,7 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                     'phonetic': selectedDef['phonetic'],
                     'synonyms': selectedDef['synonyms'] ?? [],
                     'antonyms': selectedDef['antonyms'] ?? [],
-                    'images':
-                        _selectedImageUrls, // Ahora es List<Map<String, dynamic>>
+                    'images': _selectedImageUrls,
                   });
                 },
                 icon: const Icon(Icons.save, size: 18),

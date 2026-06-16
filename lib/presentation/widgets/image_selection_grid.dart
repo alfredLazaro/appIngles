@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/domain/entities/image_search_result.dart';
 
 class ImageSelectionGrid extends StatefulWidget {
-  final List<Map<String, dynamic>> images;
+  final List<ImageSearchResult> images;
   final bool initiallyMultiple;
-  final ValueChanged<List<Map<String, dynamic>>>? onSelectionChanged;
+  final ValueChanged<List<ImageSearchResult>>? onSelectionChanged;
 
   const ImageSelectionGrid({
     super.key,
@@ -18,7 +19,7 @@ class ImageSelectionGrid extends StatefulWidget {
 
 class _ImageSelectionGridState extends State<ImageSelectionGrid> {
   bool _multipleSelection = false;
-  final List<Map<String, dynamic>> _selected = [];
+  final List<ImageSearchResult> _selected = [];
 
   @override
   void initState() {
@@ -26,7 +27,7 @@ class _ImageSelectionGridState extends State<ImageSelectionGrid> {
     _multipleSelection = widget.initiallyMultiple;
   }
 
-  void _toggle(Map<String, dynamic> image) {
+  void _toggle(ImageSearchResult image) {
     final isSelected = _selected.contains(image);
     setState(() {
       if (_multipleSelection) {
@@ -140,7 +141,7 @@ class _ImageSelectionGridState extends State<ImageSelectionGrid> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(6),
                                 child: Image.network(
-                                  image['url']['thumb'] ?? '',
+                                  image.thumbUrl,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) =>
                                       const Icon(Icons.broken_image),

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
-import 'package:first_app/core/services/tts_service.dart';
+import 'package:first_app/domain/services/tts_service_interface.dart';
+import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/entities/translation_entity.dart';
 import 'package:first_app/domain/entities/word_image.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
@@ -30,7 +31,7 @@ class WordDetailScreen extends StatefulWidget {
 }
 
 class _WordDetailScreenState extends State<WordDetailScreen> {
-  final TtsService _ttsService = sl<TtsService>();
+  final ITtsService _ttsService = sl<ITtsService>();
 
   bool _isEditing = false;
   bool _wasSaving = false;
@@ -323,7 +324,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     final state = context.read<WordDetailBloc>().state;
     if (state is! WordDetailLoaded) return;
 
-    final selected = await showDialog<List<Map<String, dynamic>>>(
+    final selected = await showDialog<List<ImageSearchResult>>(
       context: context,
       builder: (_) => ImageSearchDialog(query: state.word.word),
     );

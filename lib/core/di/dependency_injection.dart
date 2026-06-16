@@ -1,4 +1,5 @@
 import 'package:first_app/core/services/tts_service.dart';
+import 'package:first_app/core/services/speech_to_text_service.dart';
 import 'package:first_app/data/datasources/local/word_dao.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/datasources/local/translation_dao.dart';
@@ -10,6 +11,8 @@ import 'package:first_app/data/repositories/translation_repository_impl.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/repositories/translation_repository.dart';
+import 'package:first_app/domain/services/tts_service_interface.dart';
+import 'package:first_app/domain/services/speech_to_text_interface.dart';
 import 'package:first_app/domain/usecases/word/save_word.dart';
 import 'package:first_app/domain/usecases/word/delete_word.dart';
 import 'package:first_app/domain/usecases/word/update_sentence.dart';
@@ -89,9 +92,10 @@ void setupDependencies() {
   );
 
   // === Services ===
-  sl.registerLazySingleton<TtsService>(() => TtsService());
+  sl.registerLazySingleton<ITtsService>(() => TtsService());
+  sl.registerLazySingleton<ISpeechToTextService>(() => SpeechToTextService());
 
   // === Use cases (shared) ===
   sl.registerLazySingleton<ValidateWordAnswer>(() => ValidateWordAnswer());
-  sl.registerLazySingleton<SpeakText>(() => SpeakText(sl<TtsService>()));
+  sl.registerLazySingleton<SpeakText>(() => SpeakText(sl<ITtsService>()));
 }

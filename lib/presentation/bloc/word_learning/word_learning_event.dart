@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:equatable/equatable.dart';
+import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 
 abstract class WordLearningEvent extends Equatable {
@@ -31,7 +34,7 @@ class SearchWordImagesEvent extends WordLearningEvent {
 
 class SaveNewWordEvent extends WordLearningEvent {
   final Map<String, dynamic> wordData;
-  final List<Map<String, dynamic>> selectedImages;
+  final List<ImageSearchResult> selectedImages;
 
   SaveNewWordEvent({
     required this.wordData,
@@ -75,8 +78,9 @@ class ChangePageEvent extends WordLearningEvent {
 
 class InsertLotWordsEvent extends WordLearningEvent {
   final List<WordInsertion> words;
+  final VoidCallback? onCompleted;
 
-  InsertLotWordsEvent(this.words);
+  InsertLotWordsEvent(this.words, {this.onCompleted});
 }
 
 // word_learning_event.dart

@@ -1,8 +1,9 @@
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:logger/logger.dart';
+import 'package:first_app/domain/services/tts_service_interface.dart';
 
 /// Servicio de Text-to-Speech reutilizable (Singleton)
-class TtsService {
+class TtsService implements ITtsService {
   // Singleton pattern
   static final TtsService _instance = TtsService._internal();
   factory TtsService() => _instance;
@@ -13,6 +14,7 @@ class TtsService {
   bool _isInitialized = false;
 
   /// Inicializa el servicio TTS con configuración por defecto
+  @override
   Future<void> initialize({
     String language = 'en-US',
     double pitch = 1.0,
@@ -38,6 +40,7 @@ class TtsService {
   }
 
   /// Reproduce el texto dado
+  @override
   Future<void> speak(String text) async {
     if (!_isInitialized) {
       _logger.w('TTS no inicializado, inicializando ahora...');
@@ -56,6 +59,7 @@ class TtsService {
   }
 
   /// Detiene la reproducción actual
+  @override
   Future<void> stop() async {
     try {
       await _flutterTts.stop();
@@ -65,6 +69,7 @@ class TtsService {
   }
 
   /// Verifica si el TTS está hablando actualmente
+  @override
   Future<bool> get isSpeaking async {
     try {
       final speaking = await _flutterTts.awaitSpeakCompletion(false);
@@ -76,6 +81,7 @@ class TtsService {
   }
 
   /// Cambia el idioma del TTS
+  @override
   Future<void> setLanguage(String language) async {
     try {
       await _flutterTts.setLanguage(language);
@@ -86,6 +92,7 @@ class TtsService {
   }
 
   /// Limpia recursos (llamar cuando la app se cierre)
+  @override
   void dispose() {
     _flutterTts.stop();
     _isInitialized = false;

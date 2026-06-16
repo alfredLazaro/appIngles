@@ -4,7 +4,7 @@ import 'package:first_app/presentation/widgets/controlers/page_navegation_contro
 import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
 import 'package:first_app/presentation/widgets/sentence/sentence_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/core/services/tts_service.dart';
+import 'package:first_app/domain/services/tts_service_interface.dart';
 
 class SentencePracticePage extends StatefulWidget {
   final List<SentenceModel> sentences;
@@ -18,7 +18,7 @@ class SentencePracticePage extends StatefulWidget {
 }
 
 class _SentencePracticePageState extends State<SentencePracticePage> {
-  final TtsService _ttsService = sl<TtsService>();
+  final ITtsService _ttsService = sl<ITtsService>();
   final PageController _pageController = PageController();
   int get totalSentences => widget.sentences.length;
   int _currentIndex = 0;

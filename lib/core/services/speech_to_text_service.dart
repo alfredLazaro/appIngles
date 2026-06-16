@@ -1,14 +1,17 @@
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:logger/logger.dart';
+import 'package:first_app/domain/services/speech_to_text_interface.dart';
 
 /// Servicio reutilizable de voz a texto
-class SpeechToTextService {
+class SpeechToTextService implements ISpeechToTextService {
   final stt.SpeechToText _speech = stt.SpeechToText();
   final Logger _logger = Logger();
   bool _isListening = false;
 
+  @override
   bool get isListening => _isListening;
 
+  @override
   Future<void> startListening({
     required Function(String) onResult,
   }) async {
@@ -27,12 +30,14 @@ class SpeechToTextService {
     }
   }
 
+  @override
   Future<void> stopListening() async {
     if (!_isListening) return;
     _isListening = false;
     await _speech.stop();
   }
 
+  @override
   void dispose() {
     _speech.cancel();
   }

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/entities/translation_entity.dart';
 import 'package:first_app/domain/entities/word.dart';
 
@@ -40,7 +41,7 @@ class DeleteWordDetailEvent extends WordDetailEvent {
 }
 
 class AddImagesToWordEvent extends WordDetailEvent {
-  final List<Map<String, dynamic>> images;
+  final List<ImageSearchResult> images;
 
   const AddImagesToWordEvent(this.images);
 

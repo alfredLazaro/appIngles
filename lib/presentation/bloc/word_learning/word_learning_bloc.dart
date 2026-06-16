@@ -1,3 +1,4 @@
+import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
 import 'package:first_app/domain/usecases/word/get_recent_words.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -113,7 +114,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
         };
       }).toList();
 
-      final images = results[1] as List<Map<String, dynamic>>;
+      final images = results[1] as List<ImageSearchResult>;
 
       emit(WordDataLoaded(meanings: meanings, images: images));
     } catch (e) {
@@ -127,7 +128,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
   ) async {
     try {
       final images = await _searchImages(event.query);
-      emit(ImagesLoaded(images));
+      emit(ImagesLoaded(images: images));
     } catch (e) {
       emit(WordLearningError('Error buscando imágenes: $e'));
     }
@@ -205,6 +206,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     try {
       final results = await _saveLotWords(event.words);
       emit(LotWordsInserted(results: results));
+      if (event.onCompleted != null) event.onCompleted!();
 
       // Optionally reload recent words
       add(LoadRecentWordsEvent());

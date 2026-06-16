@@ -1,4 +1,5 @@
 import 'package:first_app/domain/entities/flashcard_word.dart';
+import 'package:first_app/domain/entities/insertion_result.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
@@ -246,11 +247,14 @@ class WordRepositoryImpl implements WordRepository {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> insertLotWords(
+  Future<List<InsertionResult>> insertLotWords(
       List<WordInsertion> words) async {
     List<Map<String, String>> ls =
         words.map((word) => WordMapper.toMapInsertion(word)).toList();
     final list = await _wordDao.insertLotWords(ls);
-    return list;
+    return list.map((map) => InsertionResult(
+          id: map['id'] as int,
+          word: map['word'] as String,
+        )).toList();
   }
 }

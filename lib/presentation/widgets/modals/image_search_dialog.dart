@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
+import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/usecases/image/search_images.dart';
 import 'package:first_app/presentation/widgets/image_selection_grid.dart';
 
@@ -16,8 +17,8 @@ class _ImageSearchDialogState extends State<ImageSearchDialog> {
   final SearchImagesUseCase _searchImages = sl<SearchImagesUseCase>();
   final TextEditingController _queryController = TextEditingController();
 
-  List<Map<String, dynamic>>? _images;
-  List<Map<String, dynamic>> _selected = [];
+  List<ImageSearchResult>? _images;
+  List<ImageSearchResult> _selected = [];
   bool _isLoading = false;
   String? _error;
   bool _hasSearched = false;

@@ -1,3 +1,4 @@
+import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 
 class SaveWordImagesUseCase {
@@ -6,7 +7,7 @@ class SaveWordImagesUseCase {
   SaveWordImagesUseCase(this._repository);
 
   Future<List<int>> call(
-    List<Map<String, dynamic>> images,
+    List<ImageSearchResult> images,
     int wordId,
   ) async {
     if (wordId <= 0) {

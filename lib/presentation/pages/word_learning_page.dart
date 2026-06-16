@@ -5,8 +5,10 @@ import 'package:first_app/presentation/widgets/dialogs/delete_confirmation_dialo
 import 'package:first_app/presentation/widgets/modals/combine_word_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:first_app/core/services/speech_to_text_service.dart';
+import 'package:first_app/domain/entities/image_search_result.dart';
+import 'package:first_app/domain/services/speech_to_text_interface.dart';
 import 'package:first_app/core/utils/clipboard_helper.dart';
+import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_event.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_state.dart';
@@ -23,9 +25,9 @@ class WordLearningPage extends StatefulWidget {
 class _WordLearningPageState extends State<WordLearningPage> {
   final TextEditingController _wordController = TextEditingController();
   final PageController _pageController = PageController();
-  final SpeechToTextService _speechService = SpeechToTextService();
+  final ISpeechToTextService _speechService = sl<ISpeechToTextService>();
   List<Map<String, dynamic>>? _tempDefinitions;
-  List<Map<String, dynamic>>? _tempImages;
+  List<ImageSearchResult>? _tempImages;
   // Cache to keep the last loaded list so it doesn't disappear while searching
   List<WordSummary> _cachedWords = [];
   List<Word> _selecteWords = [];
@@ -225,8 +227,8 @@ class _WordLearningPageState extends State<WordLearningPage> {
     );
 
     if (result != null && mounted) {
-      // Preparar las imágenes en el formato esperado
-      final selectedImages = result['images'] ?? <Map<String, dynamic>>[];
+      final selectedImages =
+          (result['images'] as List<ImageSearchResult>?) ?? [];
 
       context.read<WordLearningBloc>().add(
             SaveNewWordEvent(
