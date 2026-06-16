@@ -295,7 +295,7 @@ class WordDao {
     try {
       final db = await dbHelper.database;
       final result = await db.rawQuery(
-        'SELECT COUNT(*) FROM Word WHERE LOWER(word) = LOWER(?)',
+        'SELECT COUNT(*) FROM Word WHERE word=?',
         [word.trim()],
       );
 
@@ -412,5 +412,4 @@ class WordDao {
     final rows = await db.rawQuery('SELECT learn FROM Word');
     return rows.map((r) => (r['learn'] as int?) ?? 0).toList();
   }
-
 }
