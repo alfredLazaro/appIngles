@@ -36,10 +36,7 @@ class MatchRound extends Equatable {
     // Filtrar palabras que NO tienen traducciones (no se pueden usar)
     final validWords = allWords.where((word) {
       final hasTranslations = translationsByWordId.containsKey(word.id);
-      if (!hasTranslations) {
-        print(
-            '⚠️ Palabra " ${word.word} " no tiene traducciones y será omitida');
-      }
+      if (!hasTranslations) {}
       return hasTranslations;
     }).toList();
 
@@ -92,17 +89,18 @@ class MatchRound extends Equatable {
     final random = Random();
 
     for (int i = 0; i < allWords.length; i += batchSize) {
-      final end = (i + batchSize < allWords.length)
-          ? i + batchSize
-          : allWords.length;
+      final end =
+          (i + batchSize < allWords.length) ? i + batchSize : allWords.length;
       final batchWords = allWords.sublist(i, end);
 
-      final flashcardWords = batchWords.map((wd) => FlashcardWord(
-        id: wd.id,
-        word: wd.word,
-        definition: wd.definition,
-        sentence: '',
-      )).toList();
+      final flashcardWords = batchWords
+          .map((wd) => FlashcardWord(
+                id: wd.id,
+                word: wd.word,
+                definition: wd.definition,
+                sentence: '',
+              ))
+          .toList();
 
       final definitions = batchWords.map((wd) => wd.definition).toList();
       final shuffled = List<String>.from(definitions)..shuffle(random);
