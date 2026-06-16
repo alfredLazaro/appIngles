@@ -6,6 +6,7 @@ import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/repositories/translation_repository.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
+import 'package:logger/logger.dart';
 import 'practice_event.dart';
 import 'practice_state.dart';
 
@@ -160,6 +161,9 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
               sentence: '',
             ))
         .toList();
+    Logger log = Logger();
+    log.d('words: ${wordDefs.length}, rounds: ${rounds.length}');
+    log.i(rounds);
     return MatchingDefPracticeData(
       words: flashcardWords,
       rounds: rounds,

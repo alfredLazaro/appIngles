@@ -8,6 +8,7 @@ import 'package:first_app/presentation/bloc/matching/matching_event.dart';
 import 'package:first_app/presentation/bloc/matching/matching_state.dart';
 import 'package:first_app/presentation/widgets/matching_tile.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
+import 'package:logger/logger.dart';
 
 class MatchingPracticePage extends StatefulWidget {
   final MatchingPracticeData data;
@@ -25,6 +26,7 @@ class MatchingPracticePage extends StatefulWidget {
 
 class _MatchingPracticePageState extends State<MatchingPracticePage> {
   bool _resultSubmitted = false;
+  Logger l = Logger();
   int get _totalPairs => widget.data.rounds.fold<int>(
         0,
         (sum, r) => sum + r.words.length,
@@ -34,7 +36,9 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
     _resultSubmitted = true;
 
     final result = PracticeResult(
-      type: widget.isDefinitionMode ? PracticeType.matchingDefinition : PracticeType.matching,
+      type: widget.isDefinitionMode
+          ? PracticeType.matchingDefinition
+          : PracticeType.matching,
       learnCountUpdates: state.learnCountUpdates,
       totalItems: _totalPairs,
       correctItems: state.totalCorrect,
@@ -206,7 +210,9 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                 ),
                 Expanded(
                   child: _buildColumn(
-                    title: widget.isDefinitionMode ? 'Definiciones' : 'Traducciones',
+                    title: widget.isDefinitionMode
+                        ? 'Definiciones'
+                        : 'Traducciones',
                     items: List.generate(
                       state.round.translations.length,
                       (i) => MatchingTile(
