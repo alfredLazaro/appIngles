@@ -250,7 +250,8 @@ class WordDao {
       final List<Map<String, dynamic>> result = await db.rawQuery('''
         SELECT 
           id,
-          sentence
+          sentence,
+          learn
         FROM Word
         WHERE sentence IS NOT NULL AND sentence != ''
         ORDER BY learn ASC, id DESC

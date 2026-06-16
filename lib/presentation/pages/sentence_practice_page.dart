@@ -1,9 +1,14 @@
 import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/domain/entities/sentence_model.dart';
+import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
+import 'package:first_app/presentation/bloc/practice/practice_data.dart';
+import 'package:first_app/presentation/bloc/practice/practice_event.dart';
+import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
 import 'package:first_app/presentation/widgets/sentence/sentence_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/services/tts_service_interface.dart';
 
 class SentencePracticePage extends StatefulWidget {
@@ -112,9 +117,21 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
       barrierDismissible: false,
       builder: (dialogContext) => CompletionDialog(
           totalItems: widget.sentences.length,
-          learnedCount: 0,
+          learnedCount: widget.sentences.length,
           itemName: 'sentence',
           onFinish: () {
+            final learnCountUpdates = <int, int>{
+              for (final s in widget.sentences)
+                s.id: s.learnCount + 1,
+            };
+            context.read<PracticeBloc>().add(
+                  FinishPracticeEvent(PracticeResult(
+                    type: PracticeType.sentence,
+                    learnCountUpdates: learnCountUpdates,
+                    totalItems: widget.sentences.length,
+                    correctItems: widget.sentences.length,
+                  )),
+                );
             Navigator.pop(dialogContext);
             Navigator.pop(context);
           },
