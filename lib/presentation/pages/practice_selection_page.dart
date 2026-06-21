@@ -101,7 +101,6 @@ class PracticeSelectionPage extends StatelessWidget {
                         context,
                         PracticeType.spelling,
                       ),
-                      isComingSoon: true,
                     ),
                     const SizedBox(height: 16),
                     PracticeCard(

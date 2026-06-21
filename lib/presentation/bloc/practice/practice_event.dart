@@ -17,11 +17,12 @@ class LoadPracticeDataEvent extends PracticeEvent {
 class StartPracticeEvent extends PracticeEvent {
   final int count;
   final PracticeType type;
+  final int maxAudioPlays;
 
-  const StartPracticeEvent(this.count, this.type);
+  const StartPracticeEvent(this.count, this.type, {this.maxAudioPlays = 0});
 
   @override
-  List<Object> get props => [count, type];
+  List<Object> get props => [count, type, maxAudioPlays];
 }
 
 class FinishPracticeEvent extends PracticeEvent {

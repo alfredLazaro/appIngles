@@ -7,6 +7,7 @@ class MatchingTile extends StatelessWidget {
   final bool? isCorrect;
   final Color color;
   final VoidCallback? onTap;
+  final bool shrinkWrap;
 
   const MatchingTile({
     super.key,
@@ -16,6 +17,7 @@ class MatchingTile extends StatelessWidget {
     this.isCorrect,
     this.color = Colors.teal,
     this.onTap,
+    this.shrinkWrap = false,
   });
 
   @override
@@ -76,9 +78,10 @@ class MatchingTile extends StatelessWidget {
           ],
         ),
         child: Row(
+          mainAxisSize: shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
           children: [
-            Expanded(
-              child: Text(
+            if (shrinkWrap)
+              Text(
                 text,
                 style: TextStyle(
                   fontSize: 16,
@@ -86,8 +89,20 @@ class MatchingTile extends StatelessWidget {
                       isSelected || isMatched ? FontWeight.bold : FontWeight.normal,
                   color: textColor,
                 ),
+              )
+            else
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: isSelected || isMatched
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: textColor,
+                  ),
+                ),
               ),
-            ),
             if (icon != null)
               Icon(
                 icon,

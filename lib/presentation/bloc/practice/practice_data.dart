@@ -46,6 +46,16 @@ class MatchingDefPracticeData extends PracticeData {
   });
 }
 
+class SpellingPracticeData extends PracticeData {
+  final List<FlashcardWord> words;
+  final int maxAudioPlays;
+
+  const SpellingPracticeData({
+    required this.words,
+    this.maxAudioPlays = 0,
+  });
+}
+
 class PracticeResult {
   final PracticeType type;
   final Map<int, int> learnCountUpdates;

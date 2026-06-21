@@ -187,55 +187,131 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
               ),
             ),
           Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildColumn(
-                    title: 'Palabras',
-                    items: List.generate(
-                      state.round.words.length,
-                      (i) => MatchingTile(
-                        text: state.round.words[i].word,
-                        isSelected: state.selectedLeftIndex == i,
-                        isMatched: state.matchedWordIndices.contains(i),
-                        isCorrect:
-                            state.matchedWordIndices.contains(i) ? true : null,
-                        color: Colors.teal,
-                        onTap: () => context
-                            .read<MatchingBloc>()
-                            .add(SelectLeftTile(wordIndex: i)),
+            child: widget.isDefinitionMode
+                ? Column(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Column(
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 16),
+                              child: Text(
+                                'Palabras',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Center(
+                                child: SingleChildScrollView(
+                                  child: Wrap(
+                                    spacing: 8,
+                                    runSpacing: 4,
+                                    alignment: WrapAlignment.center,
+                                    children: List.generate(
+                                      state.round.words.length,
+                                      (i) => MatchingTile(
+                                        text: state.round.words[i].word,
+                                        shrinkWrap: true,
+                                        isSelected:
+                                            state.selectedLeftIndex == i,
+                                        isMatched:
+                                            state.matchedWordIndices
+                                                .contains(i),
+                                        isCorrect:
+                                            state.matchedWordIndices
+                                                    .contains(i)
+                                                ? true
+                                                : null,
+                                        color: Colors.teal,
+                                        onTap: () => context
+                                            .read<MatchingBloc>()
+                                            .add(SelectLeftTile(
+                                                wordIndex: i)),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: _buildColumn(
-                    title: widget.isDefinitionMode
-                        ? 'Definiciones'
-                        : 'Traducciones',
-                    items: List.generate(
-                      widget.isDefinitionMode
-                          ? state.round.definitions!.length
-                          : state.round.translations.length,
-                      (i) => MatchingTile(
-                        text: widget.isDefinitionMode
-                            ? state.round.definitions![i]
-                            : state.round.translations[i].wordTranslate,
-                        isSelected: state.selectedRightIndex == i,
-                        isMatched: state.matchedTranslationIndices.contains(i),
-                        isCorrect: state.matchedTranslationIndices.contains(i)
-                            ? true
-                            : null,
-                        color: Colors.indigo,
-                        onTap: () => context
-                            .read<MatchingBloc>()
-                            .add(SelectRightTile(translationIndex: i)),
+                      Expanded(
+                        flex: 2,
+                        child: _buildColumn(
+                          title: 'Definiciones',
+                          items: List.generate(
+                            state.round.definitions!.length,
+                            (i) => MatchingTile(
+                              text: state.round.definitions![i],
+                              isSelected: state.selectedRightIndex == i,
+                              isMatched:
+                                  state.matchedTranslationIndices.contains(i),
+                              isCorrect:
+                                  state.matchedTranslationIndices.contains(i)
+                                      ? true
+                                      : null,
+                              color: Colors.indigo,
+                              onTap: () => context
+                                  .read<MatchingBloc>()
+                                  .add(SelectRightTile(translationIndex: i)),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Expanded(
+                        child: _buildColumn(
+                          title: 'Palabras',
+                          items: List.generate(
+                            state.round.words.length,
+                            (i) => MatchingTile(
+                              text: state.round.words[i].word,
+                              isSelected: state.selectedLeftIndex == i,
+                              isMatched: state.matchedWordIndices.contains(i),
+                              isCorrect: state.matchedWordIndices.contains(i)
+                                  ? true
+                                  : null,
+                              color: Colors.teal,
+                              onTap: () => context
+                                  .read<MatchingBloc>()
+                                  .add(SelectLeftTile(wordIndex: i)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: _buildColumn(
+                          title: 'Traducciones',
+                          items: List.generate(
+                            state.round.translations.length,
+                            (i) => MatchingTile(
+                              text: state.round.translations[i].wordTranslate,
+                              isSelected: state.selectedRightIndex == i,
+                              isMatched:
+                                  state.matchedTranslationIndices.contains(i),
+                              isCorrect:
+                                  state.matchedTranslationIndices.contains(i)
+                                      ? true
+                                      : null,
+                              color: Colors.indigo,
+                              onTap: () => context
+                                  .read<MatchingBloc>()
+                                  .add(SelectRightTile(translationIndex: i)),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
           if (isRoundComplete)
             Padding(

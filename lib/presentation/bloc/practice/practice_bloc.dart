@@ -100,6 +100,12 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
           break;
 
         case PracticeType.spelling:
+          practiceData = await _loadSpellingPractice(
+            event.count,
+            maxAudioPlays: event.maxAudioPlays,
+          );
+          break;
+
         case PracticeType.listening:
           throw UnimplementedError('Práctica no disponible aún');
       }
@@ -167,6 +173,17 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     return MatchingDefPracticeData(
       words: flashcardWords,
       rounds: rounds,
+    );
+  }
+
+  Future<SpellingPracticeData> _loadSpellingPractice(
+    int count, {
+    int maxAudioPlays = 0,
+  }) async {
+    final words = await _wordRepository.getWordsForPractice(count);
+    return SpellingPracticeData(
+      words: words,
+      maxAudioPlays: maxAudioPlays,
     );
   }
 

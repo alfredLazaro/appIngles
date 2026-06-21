@@ -6,6 +6,7 @@ import 'package:first_app/presentation/bloc/practice/practice_state.dart';
 import 'package:first_app/presentation/pages/flashcard_practice_page.dart';
 import 'package:first_app/presentation/pages/sentence_practice_page.dart';
 import 'package:first_app/presentation/pages/matching_practice_page.dart';
+import 'package:first_app/presentation/pages/spelling_practice_page.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/modals/practice_selection_modal.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
@@ -84,11 +85,11 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
       builder: (dialogContext) => PracticeSelectionModal(
         totalWords: totalCount,
         practiceType: widget.practiceType,
-        onStartPractice: (count) {
+        onStartPractice: (count, {int maxAudioPlays = 0}) {
           _practiceStarted = true;
           Navigator.pop(dialogContext);
           context.read<PracticeBloc>().add(
-                StartPracticeEvent(count, widget.practiceType),
+                StartPracticeEvent(count, widget.practiceType, maxAudioPlays: maxAudioPlays),
               );
         },
       ),
@@ -133,6 +134,12 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
         return MatchingPracticePage(
           data: MatchingPracticeData(words: defData.words, rounds: defData.rounds),
           isDefinitionMode: true,
+        );
+      case PracticeType.spelling:
+        final spellData = state.practiceData as SpellingPracticeData;
+        return SpellingPracticePage(
+          words: spellData.words,
+          maxAudioPlays: spellData.maxAudioPlays,
         );
       default:
         return const Scaffold(

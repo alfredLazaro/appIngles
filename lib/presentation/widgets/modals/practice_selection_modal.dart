@@ -3,7 +3,7 @@ import 'package:first_app/presentation/pages/practice_selection_page.dart';
 
 class PracticeSelectionModal extends StatefulWidget {
   final int totalWords;
-  final Function(int) onStartPractice;
+  final Function(int count, {int maxAudioPlays}) onStartPractice;
   final PracticeType practiceType;
 
   const PracticeSelectionModal({
@@ -19,6 +19,7 @@ class PracticeSelectionModal extends StatefulWidget {
 
 class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
   late int _selectedCount;
+  int _maxAudioPlays = 1;
   double get _totalMax =>
       (widget.totalWords > 30 ? 30.0 : widget.totalWords.toDouble());
   @override
@@ -33,9 +34,14 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Padding(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
+        child: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: Column(
+        child: SingleChildScrollView(
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Header with icon
@@ -158,6 +164,12 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
             ),
             const SizedBox(height: 24),
 
+            // Audio config (only for spelling)
+            if (widget.practiceType == PracticeType.spelling) ...[
+              _buildAudioConfig(),
+              const SizedBox(height: 16),
+            ],
+
             // Practice info
             _buildPracticeInfo(),
             const SizedBox(height: 24),
@@ -185,8 +197,10 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      //Navigator.pop(context); //no es necesario ponerlo aqui
-                      widget.onStartPractice(_selectedCount);
+                      widget.onStartPractice(
+                        _selectedCount,
+                        maxAudioPlays: _maxAudioPlays,
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _getColor(),
@@ -205,6 +219,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
               ],
             ),
           ],
+        ),
+        ),
         ),
       ),
     );
@@ -293,6 +309,63 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
               )),
         ],
       ),
+    );
+  }
+
+  Widget _buildAudioConfig() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.volume_up, size: 18, color: _getColor()),
+            const SizedBox(width: 8),
+            Text(
+              'Reproducciones de audio',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _buildAudioChip(0, 'Sin audio'),
+            _buildAudioChip(1, '1 vez'),
+            _buildAudioChip(3, '3 veces'),
+            _buildAudioChip(-1, 'Ilimitado'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAudioChip(int value, String label) {
+    final isSelected = _maxAudioPlays == value;
+    return ChoiceChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 13,
+          color: isSelected ? Colors.white : Colors.black87,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      selected: isSelected,
+      selectedColor: _getColor(),
+      showCheckmark: false,
+      onSelected: (selected) {
+        if (selected) {
+          setState(() {
+            _maxAudioPlays = value;
+          });
+        }
+      },
     );
   }
 
@@ -401,9 +474,9 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         ];
       case PracticeType.spelling:
         return [
-          'Escucha la pronunciación',
-          'Escribe correctamente',
-          'Mejora tu ortografía',
+          'Ve la definición de cada palabra',
+          'Escribe la palabra correcta en inglés',
+          'Activa el audio si lo necesitas',
         ];
       case PracticeType.listening:
         return [
