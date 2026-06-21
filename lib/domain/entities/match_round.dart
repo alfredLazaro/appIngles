@@ -88,9 +88,20 @@ class MatchRound extends Equatable {
     final rounds = <MatchRound>[];
     final random = Random();
 
-    for (int i = 0; i < allWords.length; i += batchSize) {
-      final end =
-          (i + batchSize < allWords.length) ? i + batchSize : allWords.length;
+    int i = 0;
+    while (i < allWords.length) {
+      final remaining = allWords.length - i;
+
+      int currentBatchSize;
+      if (remaining > batchSize && remaining - batchSize == 1) {
+        // Si después de este batch quedaría exactamente 1 elemento solo,
+        // absorbe ese elemento en este batch.
+        currentBatchSize = batchSize + 1;
+      } else {
+        currentBatchSize = remaining < batchSize ? remaining : batchSize;
+      }
+
+      final end = i + currentBatchSize;
       final batchWords = allWords.sublist(i, end);
 
       final flashcardWords = batchWords
