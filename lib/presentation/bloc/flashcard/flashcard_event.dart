@@ -69,3 +69,7 @@ class MarkAsKnown extends FlashcardEvent {
 }
 
 class MarkAsUnknown extends FlashcardEvent {}
+
+class RevealAnswer extends FlashcardEvent {
+  const RevealAnswer();
+}

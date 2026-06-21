@@ -38,6 +38,8 @@ class FlashcardLoaded extends FlashcardState {
   final int learnCount;
   final Map<int, int> scores;
   final bool? isAnswerCorrect;
+  final bool isAnswerRevealed;
+  final String userAnswer;
 
   const FlashcardLoaded({
     required this.sessions,
@@ -50,6 +52,8 @@ class FlashcardLoaded extends FlashcardState {
     this.learnCount = 0,
     required this.scores,
     this.isAnswerCorrect,
+    this.isAnswerRevealed = false,
+    this.userAnswer = '',
   });
 
   FlashcardLoaded copyWith({
@@ -57,6 +61,8 @@ class FlashcardLoaded extends FlashcardState {
     int? learnCount,
     bool? isAnswerCorrect,
     Map<int, int>? scores,
+    bool? isAnswerRevealed,
+    String? userAnswer,
   }) {
     return FlashcardLoaded(
       sessions: sessions,
@@ -69,6 +75,8 @@ class FlashcardLoaded extends FlashcardState {
       learnCount: learnCount ?? this.learnCount,
       scores: scores ?? this.scores,
       isAnswerCorrect: isAnswerCorrect ?? this.isAnswerCorrect,
+      isAnswerRevealed: isAnswerRevealed ?? this.isAnswerRevealed,
+      userAnswer: userAnswer ?? this.userAnswer,
     );
   }
 
@@ -84,5 +92,7 @@ class FlashcardLoaded extends FlashcardState {
         learnCount,
         scores,
         isAnswerCorrect,
+        isAnswerRevealed,
+        userAnswer,
       ];
 }

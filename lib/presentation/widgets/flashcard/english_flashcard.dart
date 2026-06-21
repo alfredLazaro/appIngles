@@ -7,20 +7,18 @@ import 'package:first_app/presentation/bloc/flashcard/flashcard_state.dart';
 import 'flashcard_front.dart';
 import 'flashcard_back.dart';
 
-/// Widget principal de la flashcard (ahora solo maneja UI)
 class EnglishFlashCard extends StatelessWidget {
   final Color cardColor;
   final Color textColor;
   final double borderRadius;
-  final double? minHeight;
   final double? maxWidth;
+
   const EnglishFlashCard({
     super.key,
     this.cardColor = Colors.white,
     this.textColor = Colors.black,
     this.borderRadius = FlashcardConstants.defaultBorderRadius,
-    this.minHeight = 550.0, //valor por defecto: 550px
-    this.maxWidth = 450.0, // Valor por defecto: 450px
+    this.maxWidth = 450.0,
   });
 
   @override
@@ -37,7 +35,6 @@ class EnglishFlashCard extends StatelessWidget {
         return Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: minHeight ?? 0,
               maxWidth: maxWidth ?? double.infinity,
             ),
             child: GestureDetector(

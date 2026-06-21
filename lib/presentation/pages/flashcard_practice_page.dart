@@ -131,30 +131,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   Widget build(BuildContext context) {
     return BlocProvider<FlashcardBloc>.value(
       value: _bloc,
-      child: BlocListener<FlashcardBloc, FlashcardState>(
-        listenWhen: (previous, current) {
-          if (current is! FlashcardLoaded) return false;
-          return current.isAnswerCorrect != null &&
-              (previous is! FlashcardLoaded || previous.isAnswerCorrect == null);
-        },
-        listener: (context, state) {
-          if (state is! FlashcardLoaded || state.isAnswerCorrect == null) return;
-          if (state.mode != FlashcardMode.test) return;
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.isAnswerCorrect!
-                    ? '¡Correcto! ✅'
-                    : 'Incorrecto ❌',
-              ),
-              backgroundColor:
-                  state.isAnswerCorrect! ? Colors.green : Colors.red,
-              duration: const Duration(seconds: 1),
-            ),
-          );
-        },
-        child: BlocBuilder<FlashcardBloc, FlashcardState>(
+      child: BlocBuilder<FlashcardBloc, FlashcardState>(
           builder: (context, state) {
             if (state is! FlashcardLoaded) {
               return const Scaffold(
@@ -261,7 +238,6 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             );
           },
         ),
-      ),
     );
   }
 }

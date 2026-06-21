@@ -32,6 +32,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     on<SpeakFlashcardText>(_onSpeakText);
     on<MarkAsKnown>(_onMarkAsKnown);
     on<MarkAsUnknown>(_onMarkAsUnknown);
+    on<RevealAnswer>(_onRevealAnswer);
   }
 
   List<FlashcardSession> _generateSessions(
@@ -44,11 +45,13 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final batch = words.sublist(i, end);
 
       for (int j = 0; j < batch.length; j++) {
-        sessions.add(FlashcardSession(
-          word: batch[j],
-          mode: FlashcardMode.learn,
-          originalIndex: i + j,
-        ));
+        if (batch[j].learnCount <= 0) {
+          sessions.add(FlashcardSession(
+            word: batch[j],
+            mode: FlashcardMode.learn,
+            originalIndex: i + j,
+          ));
+        }
       }
 
       for (int j = 0; j < batch.length; j++) {
@@ -77,6 +80,9 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       showFront: true,
       learnCount: _scores[session.word.id] ?? session.word.learnCount,
       scores: Map.from(_scores),
+      isAnswerCorrect: null,
+      isAnswerRevealed: false,
+      userAnswer: '',
     );
   }
 
@@ -166,16 +172,22 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
           _validateWordAnswer(event.userAnswer, currentState.word.word);
 
       if (isCorrect) {
-        final newCount = currentState.learnCount + 2;
+        final newCount = currentState.learnCount + 3;
         _scores[currentState.word.id] = newCount;
         emit(currentState.copyWith(
-            learnCount: newCount, isAnswerCorrect: true, scores: Map.from(_scores)));
+            learnCount: newCount,
+            isAnswerCorrect: true,
+            userAnswer: event.userAnswer,
+            scores: Map.from(_scores)));
       } else {
         final newCount =
             (currentState.learnCount - 1).clamp(0, double.infinity).toInt();
         _scores[currentState.word.id] = newCount;
         emit(currentState.copyWith(
-            learnCount: newCount, isAnswerCorrect: false, scores: Map.from(_scores)));
+            learnCount: newCount,
+            isAnswerCorrect: false,
+            userAnswer: event.userAnswer,
+            scores: Map.from(_scores)));
       }
     }
   }
@@ -203,6 +215,21 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
 
       _scores[currentState.word.id] = 0;
       emit(currentState.copyWith(learnCount: 0, scores: Map.from(_scores)));
+    }
+  }
+
+  void _onRevealAnswer(
+      RevealAnswer event, Emitter<FlashcardState> emit) {
+    if (state is FlashcardLoaded) {
+      final currentState = state as FlashcardLoaded;
+      final wordId = currentState.word.id;
+      final newCount =
+          (currentState.learnCount - 1).clamp(0, double.infinity).toInt();
+      _scores[wordId] = newCount;
+      emit(currentState.copyWith(
+          learnCount: newCount,
+          isAnswerRevealed: true,
+          scores: Map.from(_scores)));
     }
   }
 }
