@@ -22,87 +22,57 @@ class MatchRound extends Equatable {
     required List<TranslationEntity> allTranslations,
     int batchSize = 4,
   }) {
-    final rounds = <MatchRound>[];
     final random = Random();
 
-    // Agrupar traducciones por wordId
-    final Map<int, List<TranslationEntity>> translationsByWordId = {};
-    for (final translation in allTranslations) {
-      translationsByWordId
-          .putIfAbsent(translation.wordId, () => [])
-          .add(translation);
+    final translationsByWordId = <int, List<TranslationEntity>>{};
+    for (final t in allTranslations) {
+      translationsByWordId.putIfAbsent(t.wordId, () => []).add(t);
     }
 
-    // Filtrar palabras que NO tienen traducciones (no se pueden usar)
-    final validWords = allWords.where((word) {
-      final hasTranslations = translationsByWordId.containsKey(word.id);
-      if (!hasTranslations) {}
-      return hasTranslations;
-    }).toList();
+    final validWords =
+        allWords.where((w) => translationsByWordId.containsKey(w.id)).toList();
 
-    for (int i = 0; i < validWords.length; i += batchSize) {
-      final end = (i + batchSize < validWords.length)
-          ? i + batchSize
-          : validWords.length;
-      final batchWords = validWords.sublist(i, end);
+    final batches = _createBatches(validWords, batchSize);
 
-      // Seleccionar UNA traducción al azar por palabra
-      final Map<int, TranslationEntity> selectedTranslations = {};
-      final List<TranslationEntity> batchTranslations = [];
+    return batches.map((batchWords) {
+      // Una traducción al azar por palabra, elegida una sola vez (no en cada shuffle)
+      final selectedByWordId = <int, TranslationEntity>{
+        for (final word in batchWords)
+          word.id: translationsByWordId[word.id]![
+              random.nextInt(translationsByWordId[word.id]!.length)],
+      };
 
-      for (final word in batchWords) {
-        final translations = translationsByWordId[word.id]!;
-        // Selección aleatoria
-        final selected = translations[random.nextInt(translations.length)];
-        selectedTranslations[word.id] = selected;
-        batchTranslations.add(selected);
-      }
+      final (shuffled, correctMapping) =
+          _shuffleAndMap<FlashcardWord, TranslationEntity, int>(
+        batch: batchWords,
+        optionOf: (word) => selectedByWordId[word.id]!,
+        keyOf: (t) => t.id!,
+        random: random,
+      );
 
-      // Mezclar traducciones
-      final shuffledTranslations =
-          List<TranslationEntity>.from(batchTranslations)..shuffle(random);
-
-      // Crear mapeo correcto
-      final correctMapping = <int, int>{};
-      for (int wi = 0; wi < batchWords.length; wi++) {
-        final wordId = batchWords[wi].id;
-        final selectedId = selectedTranslations[wordId]!.id;
-        final ti = shuffledTranslations.indexWhere((t) => t.id == selectedId);
-        correctMapping[wi] = ti;
-      }
-
-      rounds.add(MatchRound(
+      return MatchRound(
         words: batchWords,
-        translations: shuffledTranslations,
+        translations: shuffled,
         correctMapping: correctMapping,
-      ));
-    }
-
-    return rounds;
+      );
+    }).toList();
   }
 
   static List<MatchRound> generateDefRounds({
     required List<WordDef> allWords,
     int batchSize = 4,
   }) {
-    final rounds = <MatchRound>[];
     final random = Random();
+    final batches = _createBatches(allWords, batchSize);
 
-    int i = 0;
-    while (i < allWords.length) {
-      final remaining = allWords.length - i;
-
-      int currentBatchSize;
-      if (remaining > batchSize && remaining - batchSize == 1) {
-        // Si después de este batch quedaría exactamente 1 elemento solo,
-        // absorbe ese elemento en este batch.
-        currentBatchSize = batchSize + 1;
-      } else {
-        currentBatchSize = remaining < batchSize ? remaining : batchSize;
-      }
-
-      final end = i + currentBatchSize;
-      final batchWords = allWords.sublist(i, end);
+    return batches.map((batchWords) {
+      final (shuffled, correctMapping) =
+          _shuffleAndMap<WordDef, String, String>(
+        batch: batchWords,
+        optionOf: (wd) => wd.definition,
+        keyOf: (def) => def,
+        random: random,
+      );
 
       final flashcardWords = batchWords
           .map((wd) => FlashcardWord(
@@ -113,25 +83,54 @@ class MatchRound extends Equatable {
               ))
           .toList();
 
-      final definitions = batchWords.map((wd) => wd.definition).toList();
-      final shuffled = List<String>.from(definitions)..shuffle(random);
-
-      final correctMapping = <int, int>{};
-      for (int wi = 0; wi < batchWords.length; wi++) {
-        final originalDef = batchWords[wi].definition;
-        final si = shuffled.indexWhere((d) => d == originalDef);
-        correctMapping[wi] = si;
-      }
-
-      rounds.add(MatchRound(
+      return MatchRound(
         words: flashcardWords,
         translations: const [],
         definitions: shuffled,
         correctMapping: correctMapping,
-      ));
-    }
+      );
+    }).toList();
+  }
 
-    return rounds;
+  /// Divide [items] en lotes de tamaño [batchSize].
+  /// Si el último lote quedaría con un único elemento, lo fusiona
+  /// con el lote anterior para evitar dejarlo solo.
+  static List<List<T>> _createBatches<T>(List<T> items, int batchSize) {
+    final batches = <List<T>>[];
+    int i = 0;
+    while (i < items.length) {
+      final remaining = items.length - i;
+
+      final currentBatchSize =
+          (remaining > batchSize && remaining - batchSize == 1)
+              ? batchSize + 1
+              : (remaining < batchSize ? remaining : batchSize);
+
+      final end = i + currentBatchSize;
+      batches.add(items.sublist(i, end));
+      i = end;
+    }
+    return batches;
+  }
+
+  /// Para cada item del batch obtiene su "opción" (vía [optionOf]), las mezcla,
+  /// y devuelve tanto la lista mezclada como el mapeo índice-original -> índice-mezclado,
+  /// usando [keyOf] para identificar coincidencias.
+  static (List<O>, Map<int, int>) _shuffleAndMap<T, O, K>({
+    required List<T> batch,
+    required O Function(T item) optionOf,
+    required K Function(O option) keyOf,
+    required Random random,
+  }) {
+    final options = batch.map(optionOf).toList();
+    final shuffled = List<O>.from(options)..shuffle(random);
+
+    final correctMapping = <int, int>{};
+    for (int wi = 0; wi < batch.length; wi++) {
+      final targetKey = keyOf(options[wi]);
+      correctMapping[wi] = shuffled.indexWhere((o) => keyOf(o) == targetKey);
+    }
+    return (shuffled, correctMapping);
   }
 
   @override
