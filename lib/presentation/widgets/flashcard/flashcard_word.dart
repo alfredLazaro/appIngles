@@ -57,20 +57,50 @@ class WordFlashcard extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            word.word.isNotEmpty ? word.word : 'Word not found',
-                            style: const TextStyle(
-                              fontSize: 48,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.02,
-                              color: Color(0xFF191C1E),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                word.word.isNotEmpty ? word.word : 'Word not found',
+                                style: const TextStyle(
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.02,
+                                  color: Color(0xFF191C1E),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                            textAlign: TextAlign.center,
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFC0C9FD).withOpacity(0.3),
+                              shape: BoxShape.circle,
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.volume_up,
+                                size: 22,
+                                color: Color(0xFF535C89),
+                              ),
+                              onPressed: () {
+                                context.read<FlashcardBloc>().add(
+                                      SpeakFlashcardText(word.word),
+                                    );
+                              },
+                              tooltip: 'Escuchar',
+                              constraints: const BoxConstraints(
+                                minWidth: 36,
+                                minHeight: 36,
+                              ),
+                              padding: EdgeInsets.zero,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       _buildPhoneticRow(context),
@@ -97,38 +127,13 @@ class WordFlashcard extends StatelessWidget {
   }
 
   Widget _buildPhoneticRow(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          word.phonetic.isNotEmpty ? word.phonetic : '/${word.word}/',
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-            color: Color(0xFF535C89),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFC0C9FD).withOpacity(0.3),
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            icon: const Icon(
-              Icons.volume_up,
-              size: 22,
-              color: Color(0xFF535C89),
-            ),
-            onPressed: () {
-              context.read<FlashcardBloc>().add(
-                    SpeakFlashcardText(word.word),
-                  );
-            },
-            tooltip: 'Escuchar',
-          ),
-        ),
-      ],
+    return Text(
+      word.phonetic.isNotEmpty ? word.phonetic : '/${word.word}/',
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w400,
+        color: Color(0xFF535C89),
+      ),
     );
   }
 
