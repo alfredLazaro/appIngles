@@ -70,7 +70,8 @@ class _FlashcardFrontState extends State<FlashcardFront> {
               ),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.all((constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
+                padding: EdgeInsets.all(
+                    (constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -78,9 +79,12 @@ class _FlashcardFrontState extends State<FlashcardFront> {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          widget.word.word.isNotEmpty ? widget.word.word : 'Word not found',
+                          widget.word.word.isNotEmpty
+                              ? widget.word.word
+                              : 'Word not found',
                           style: TextStyle(
-                            fontSize: (constraints.maxHeight * 0.1).clamp(26.0, 48.0),
+                            fontSize:
+                                (constraints.maxHeight * 0.1).clamp(26.0, 48.0),
                             fontWeight: FontWeight.bold,
                             color: widget.textColor,
                           ),
@@ -92,7 +96,8 @@ class _FlashcardFrontState extends State<FlashcardFront> {
                     Text(
                       FlashcardConstants.tapToSeeDefinition,
                       style: TextStyle(
-                        fontSize: (constraints.maxHeight * 0.02).clamp(10.0, 14.0),
+                        fontSize:
+                            (constraints.maxHeight * 0.02).clamp(10.0, 14.0),
                         fontStyle: FontStyle.italic,
                         color: widget.textColor.withOpacity(0.6),
                       ),
@@ -160,10 +165,26 @@ class _FlashcardFrontState extends State<FlashcardFront> {
             Positioned.fill(
               child: ColorFiltered(
                 colorFilter: const ColorFilter.matrix(<double>[
-                  0.33, 0.33, 0.33, 0, 0,
-                  0.33, 0.33, 0.33, 0, 0,
-                  0.33, 0.33, 0.33, 0, 0,
-                  0, 0, 0, 1, 0,
+                  0.33,
+                  0.33,
+                  0.33,
+                  0,
+                  0,
+                  0.33,
+                  0.33,
+                  0.33,
+                  0,
+                  0,
+                  0.33,
+                  0.33,
+                  0.33,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
                 ]),
                 child: Image.network(
                   widget.images.first.url,
@@ -196,42 +217,6 @@ class _FlashcardFrontState extends State<FlashcardFront> {
                     Colors.white,
                   ],
                 ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 16,
-            left: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(9999),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.lightbulb_outline,
-                    size: 18,
-                    color: const Color(0xFF535C89),
-                  ),
-                  const SizedBox(width: 6),
-                  const Text(
-                    'Pista visual',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF535C89),
-                    ),
-                  ),
-                ],
               ),
             ),
           ),
@@ -341,7 +326,8 @@ class _FlashcardFrontState extends State<FlashcardFront> {
         const SizedBox(height: 8),
         Center(
           child: TextButton(
-            onPressed: () => context.read<FlashcardBloc>().add(const RevealAnswer()),
+            onPressed: () =>
+                context.read<FlashcardBloc>().add(const RevealAnswer()),
             child: const Text(
               'Mostrar respuesta',
               style: TextStyle(
@@ -456,14 +442,10 @@ class _FlashcardFrontState extends State<FlashcardFront> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isCorrect
-            ? const Color(0xFFD1FAE5)
-            : const Color(0xFFFFDAD6),
+        color: isCorrect ? const Color(0xFFD1FAE5) : const Color(0xFFFFDAD6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isCorrect
-              ? const Color(0xFF059669)
-              : const Color(0xFFBA1A1A),
+          color: isCorrect ? const Color(0xFF059669) : const Color(0xFFBA1A1A),
           width: 2,
         ),
       ),
@@ -471,9 +453,8 @@ class _FlashcardFrontState extends State<FlashcardFront> {
         children: [
           Icon(
             isCorrect ? Icons.check_circle : Icons.cancel,
-            color: isCorrect
-                ? const Color(0xFF059669)
-                : const Color(0xFFBA1A1A),
+            color:
+                isCorrect ? const Color(0xFF059669) : const Color(0xFFBA1A1A),
             size: 28,
           ),
           const SizedBox(width: 12),

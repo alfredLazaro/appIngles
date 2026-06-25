@@ -67,7 +67,7 @@ class EnglishFlashCard extends StatelessWidget {
                   },
                   child: state.showFront
                       ? FlashcardFront(
-                          key: const ValueKey('front'),
+                          key: ValueKey(state.word.id),
                           word: state.word,
                           images: state.images,
                           textColor: textColor,

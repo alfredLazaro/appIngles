@@ -140,6 +140,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             }
 
             final currentMode = state.mode;
+            final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
             return Scaffold(
               resizeToAvoidBottomInset: true,
               appBar: AppBar(
@@ -198,41 +199,42 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                       child: _buildFlashcard(state),
                     ),
                   ),
-                  PageNavigationControls(
-                    currentIndex: state.currentIndex,
-                    totalPages: state.sessions.length,
-                    onPrevious: () => _bloc.add(PreviousFlashcard()),
-                    onNext: _isLastPage(state)
-                        ? () => _showCompletionDialog(state)
-                        : () => _bloc.add(NextFlashcard()),
-                    centerWidget: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${state.currentIndex + 1} / ${state.sessions.length}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Palabra ${state.originalIndex + 1}/${widget.words.length}',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        if (state.scores.isNotEmpty)
+                  if (!keyboardOpen)
+                    PageNavigationControls(
+                      currentIndex: state.currentIndex,
+                      totalPages: state.sessions.length,
+                      onPrevious: () => _bloc.add(PreviousFlashcard()),
+                      onNext: _isLastPage(state)
+                          ? () => _showCompletionDialog(state)
+                          : () => _bloc.add(NextFlashcard()),
+                      centerWidget: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           Text(
-                            '${state.scores.values.where((s) => s > 0).length} aprendidas',
+                            '${state.currentIndex + 1} / ${state.sessions.length}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Palabra ${state.originalIndex + 1}/${widget.words.length}',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 11,
                               color: Colors.grey[600],
                             ),
                           ),
-                      ],
+                          if (state.scores.isNotEmpty)
+                            Text(
+                              '${state.scores.values.where((s) => s > 0).length} aprendidas',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             );
