@@ -180,8 +180,8 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
             )
           else
             IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: _toggleEditing,
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: _delete,
             ),
         ],
       ),
@@ -234,7 +234,6 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                   onRemove: _markTranslationToDelete,
                 ),
                 const SizedBox(height: 24),
-                if (!_isEditing) _buildDeleteButton(),
               ],
             ),
           ),
@@ -340,6 +339,12 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
         LearnProgressIndicator(learnValue: widget.wordWithImage.learn),
         const SizedBox(width: 8),
         Text('${widget.wordWithImage.learn} % aprendido'),
+        const Spacer(),
+        if (!_isEditing)
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: _toggleEditing,
+          ),
       ],
     );
   }
@@ -488,18 +493,4 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     );
   }
 
-  Widget _buildDeleteButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: _delete,
-        icon: const Icon(Icons.delete, color: Colors.red),
-        label:
-            const Text('Eliminar palabra', style: TextStyle(color: Colors.red)),
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.red),
-        ),
-      ),
-    );
-  }
 }
