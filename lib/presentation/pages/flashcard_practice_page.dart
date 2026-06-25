@@ -199,7 +199,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                       child: _buildFlashcard(state),
                     ),
                   ),
-                  if (!keyboardOpen)
+                  if (!keyboardOpen && state.mode == FlashcardMode.learn)
                     PageNavigationControls(
                       currentIndex: state.currentIndex,
                       totalPages: state.sessions.length,

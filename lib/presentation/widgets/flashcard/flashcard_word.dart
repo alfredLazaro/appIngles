@@ -137,7 +137,7 @@ class WordFlashcard extends StatelessWidget {
     return Text(
       word.phonetic.isNotEmpty ? word.phonetic : '/${word.word}/',
       style: const TextStyle(
-        fontSize: 20,
+        fontSize: 16,
         fontWeight: FontWeight.w400,
         color: Color(0xFF535C89),
       ),
@@ -148,16 +148,6 @@ class WordFlashcard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'DEFINITION',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.05,
-            color: Color(0xFF454651),
-          ),
-        ),
-        const SizedBox(height: 8),
         Expanded(
           child: SingleChildScrollView(
             child: Text(
@@ -169,6 +159,16 @@ class WordFlashcard extends StatelessWidget {
                 color: Color(0xFF191C1E),
               ),
             ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'example',
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.05,
+            color: Color(0xFF454651),
           ),
         ),
       ],

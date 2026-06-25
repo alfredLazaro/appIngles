@@ -6,7 +6,6 @@ class FlashcardControls extends StatelessWidget {
   final double fontSize;
   final double iconSize;
   final VoidCallback onLearned;
-  final VoidCallback onReset;
 
   const FlashcardControls({
     super.key,
@@ -14,7 +13,6 @@ class FlashcardControls extends StatelessWidget {
     required this.fontSize,
     required this.iconSize,
     required this.onLearned,
-    required this.onReset,
   });
 
   @override
@@ -22,54 +20,11 @@ class FlashcardControls extends StatelessWidget {
     return SizedBox(
       height: height,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildNavButton(
-            icon: Icons.chevron_left,
-            label: FlashcardConstants.againButtonLabel,
-            color: const Color(0xFF535C89),
-            onPressed: onReset,
-          ),
           _buildPrimaryButton(
-            icon: Icons.check_circle,
             label: FlashcardConstants.learnedButtonLabel,
             onPressed: onLearned,
-          ),
-          _buildNavButton(
-            icon: Icons.chevron_right,
-            label: FlashcardConstants.againButtonLabel,
-            color: const Color(0xFF535C89),
-            onPressed: onReset,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onPressed,
-  }) {
-    return TextButton(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: iconSize, color: color),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.05,
-              color: color,
-            ),
           ),
         ],
       ),
@@ -77,7 +32,6 @@ class FlashcardControls extends StatelessWidget {
   }
 
   Widget _buildPrimaryButton({
-    required IconData icon,
     required String label,
     required VoidCallback onPressed,
   }) {
@@ -96,12 +50,6 @@ class FlashcardControls extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  icon,
-                  size: iconSize,
-                  color: Colors.white,
-                ),
-                const SizedBox(height: 4),
                 Text(
                   label,
                   style: TextStyle(
