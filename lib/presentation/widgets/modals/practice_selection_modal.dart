@@ -39,188 +39,189 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
           maxHeight: MediaQuery.of(context).size.height * 0.85,
         ),
         child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: SingleChildScrollView(
-          child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header with icon
-            _buildHeader(),
-            const SizedBox(height: 20),
-
-            // Total words badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: _getColor().withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'Tienes ${widget.totalWords} palabras disponibles',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: _getColor(),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Selected count display
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.all(24.0),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: Text(
-                    _getDescription(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
+                // Header with icon
+                _buildHeader(),
+                const SizedBox(height: 20),
+
+                // Total words badge
                 Container(
-                  width: 50,
-                  height: 50,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: _getColor(),
-                    shape: BoxShape.circle,
+                    color: _getColor().withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Center(
-                    child: Text(
-                      '$_selectedCount',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                  child: Text(
+                    'Tienes ${widget.totalWords} palabras',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: _getColor(),
                     ),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
-            // Slider
-            SliderTheme(
-              data: SliderThemeData(
-                activeTrackColor: _getColor(),
-                thumbColor: _getColor(),
-                overlayColor: _getColor().withOpacity(0.2),
-              ),
-              child: Slider(
-                value: _selectedCount.toDouble(),
-                min: 1,
-                max: _totalMax,
-                divisions: widget.totalWords > 30
-                    ? 29 // 30 - 1 = 29 divisiones para 30 valores
-                    : (widget.totalWords > 1 ? widget.totalWords - 1 : 1),
-                label: _selectedCount.toString(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCount = value.toInt();
-                  });
-                },
-              ),
-            ),
-
-            // Min/Max labels
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '1',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                // Selected count display
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _getDescription(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
-                  ),
-                  Text(
-                    '$_totalMax',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Quick selection chips
-            Wrap(
-              spacing: 8,
-              alignment: WrapAlignment.center,
-              children: [
-                if (widget.totalWords >= 5) _buildQuickButton(5),
-                if (widget.totalWords >= 10) _buildQuickButton(10),
-                if (widget.totalWords >= 30) _buildQuickButton(30),
-                if (widget.totalWords >= 50) _buildQuickButton(50),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Audio config (only for spelling)
-            if (widget.practiceType == PracticeType.spelling) ...[
-              _buildAudioConfig(),
-              const SizedBox(height: 16),
-            ],
-
-            // Practice info
-            _buildPracticeInfo(),
-            const SizedBox(height: 24),
-
-            // Action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: BorderSide(color: _getColor()),
-                    ),
-                    child: Text(
-                      'Cancelar',
-                      style: TextStyle(
-                        fontSize: 16,
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
                         color: _getColor(),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$_selectedCount',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Slider
+                SliderTheme(
+                  data: SliderThemeData(
+                    activeTrackColor: _getColor(),
+                    thumbColor: _getColor(),
+                    overlayColor: _getColor().withOpacity(0.2),
+                  ),
+                  child: Slider(
+                    value: _selectedCount.toDouble(),
+                    min: 1,
+                    max: _totalMax,
+                    divisions: widget.totalWords > 30
+                        ? 29 // 30 - 1 = 29 divisiones para 30 valores
+                        : (widget.totalWords > 1 ? widget.totalWords - 1 : 1),
+                    label: _selectedCount.toString(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedCount = value.toInt();
+                      });
+                    },
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      widget.onStartPractice(
-                        _selectedCount,
-                        maxAudioPlays: _maxAudioPlays,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _getColor(),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: const Text(
-                      'Comenzar',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+
+                // Min/Max labels
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '1',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        '$_totalMax',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Quick selection chips
+                Wrap(
+                  spacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    if (widget.totalWords >= 5) _buildQuickButton(5),
+                    if (widget.totalWords >= 10) _buildQuickButton(10),
+                    if (widget.totalWords >= 30) _buildQuickButton(30),
+                    if (widget.totalWords >= 50) _buildQuickButton(50),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Audio config (only for spelling)
+                if (widget.practiceType == PracticeType.spelling) ...[
+                  _buildAudioConfig(),
+                  const SizedBox(height: 16),
+                ],
+
+                // Practice info
+                _buildPracticeInfo(),
+                const SizedBox(height: 24),
+
+                // Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          side: BorderSide(color: _getColor()),
+                        ),
+                        child: Text(
+                          'Cancelar',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: _getColor(),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          widget.onStartPractice(
+                            _selectedCount,
+                            maxAudioPlays: _maxAudioPlays,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _getColor(),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: const Text(
+                          'Comenzar',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-        ),
+          ),
         ),
       ),
     );
