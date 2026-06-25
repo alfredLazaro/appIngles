@@ -24,17 +24,14 @@ class MatchingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     Color backgroundColor;
     Color textColor;
-    IconData? icon;
 
     if (isMatched) {
       if (isCorrect == true) {
         backgroundColor = Colors.green.shade100;
         textColor = Colors.green.shade800;
-        icon = Icons.check_circle;
       } else if (isCorrect == false) {
         backgroundColor = Colors.red.shade100;
         textColor = Colors.red.shade800;
-        icon = Icons.cancel;
       } else {
         backgroundColor = Colors.grey.shade200;
         textColor = Colors.grey.shade600;
@@ -51,8 +48,8 @@ class MatchingTile extends StatelessWidget {
       onTap: isMatched && isCorrect != false ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
@@ -102,12 +99,6 @@ class MatchingTile extends StatelessWidget {
                     color: textColor,
                   ),
                 ),
-              ),
-            if (icon != null)
-              Icon(
-                icon,
-                size: 24,
-                color: isCorrect == true ? Colors.green : Colors.red,
               ),
           ],
         ),

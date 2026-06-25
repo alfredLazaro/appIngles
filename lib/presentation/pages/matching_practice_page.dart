@@ -209,8 +209,8 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                               child: Center(
                                 child: SingleChildScrollView(
                                   child: Wrap(
-                                    spacing: 8,
-                                    runSpacing: 4,
+                                    spacing: 4,
+                                    runSpacing: 2,
                                     alignment: WrapAlignment.center,
                                     children: List.generate(
                                       state.round.words.length,
@@ -219,19 +219,16 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                                         shrinkWrap: true,
                                         isSelected:
                                             state.selectedLeftIndex == i,
-                                        isMatched:
-                                            state.matchedWordIndices
-                                                .contains(i),
+                                        isMatched: state.matchedWordIndices
+                                            .contains(i),
                                         isCorrect:
-                                            state.matchedWordIndices
-                                                    .contains(i)
+                                            state.matchedWordIndices.contains(i)
                                                 ? true
                                                 : null,
                                         color: Colors.teal,
                                         onTap: () => context
                                             .read<MatchingBloc>()
-                                            .add(SelectLeftTile(
-                                                wordIndex: i)),
+                                            .add(SelectLeftTile(wordIndex: i)),
                                       ),
                                     ),
                                   ),
@@ -242,7 +239,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                         ),
                       ),
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: _buildColumn(
                           title: 'Definiciones',
                           items: List.generate(
@@ -348,7 +345,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
           child: Text(
             title,
             style: const TextStyle(
