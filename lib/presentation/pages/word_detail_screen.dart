@@ -168,21 +168,10 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
         title: Text(state.word.word),
         centerTitle: true,
         actions: [
-          if (_isEditing)
-            IconButton(
-              icon: state.isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Icon(Icons.check),
-              onPressed: state.isSaving ? null : () => _save(state),
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: _delete,
-            ),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: _delete,
+          ),
         ],
       ),
       body: _buildContent(state),
@@ -200,7 +189,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildLearnProgress(),
+                _buildLearnProgress(state),
                 const SizedBox(height: 16),
                 if (_isEditing) ...[
                   _buildEditableField('Palabra', _wordController,
@@ -333,14 +322,24 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     }
   }
 
-  Widget _buildLearnProgress() {
+  Widget _buildLearnProgress(WordDetailLoaded state) {
     return Row(
       children: [
         LearnProgressIndicator(learnValue: widget.wordWithImage.learn),
         const SizedBox(width: 8),
         Text('${widget.wordWithImage.learn} % aprendido'),
         const Spacer(),
-        if (!_isEditing)
+        if (_isEditing)
+          IconButton(
+            icon: state.isSaving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.check),
+            onPressed: state.isSaving ? null : () => _save(state),
+          )
+        else
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: _toggleEditing,

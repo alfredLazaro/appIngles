@@ -105,8 +105,13 @@ class WordFlashcard extends StatelessWidget {
                       const SizedBox(height: 12),
                       _buildPhoneticRow(context),
                       const SizedBox(height: 24),
-                      _buildDefinitionSection(),
-                      const Spacer(),
+                      if (word.definition.isNotEmpty)
+                        Expanded(
+                          child: _buildDefinitionSection(),
+                        )
+                      else
+                        const Spacer(),
+                      const SizedBox(height: 8),
                       Text(
                         'Tap to see definition',
                         style: TextStyle(
@@ -138,8 +143,6 @@ class WordFlashcard extends StatelessWidget {
   }
 
   Widget _buildDefinitionSection() {
-    if (word.definition.isEmpty) return const SizedBox.shrink();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -153,13 +156,17 @@ class WordFlashcard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          word.definition,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-            height: 1.6,
-            color: Color(0xFF191C1E),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Text(
+              word.definition,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                height: 1.6,
+                color: Color(0xFF191C1E),
+              ),
+            ),
           ),
         ),
       ],
