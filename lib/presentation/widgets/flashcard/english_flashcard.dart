@@ -8,16 +8,14 @@ import 'flashcard_front.dart';
 import 'flashcard_back.dart';
 
 class EnglishFlashCard extends StatelessWidget {
-  final Color cardColor;
   final Color textColor;
   final double borderRadius;
   final double? maxWidth;
 
   const EnglishFlashCard({
     super.key,
-    this.cardColor = Colors.white,
-    this.textColor = Colors.black,
-    this.borderRadius = FlashcardConstants.defaultBorderRadius,
+    this.textColor = const Color(0xFF191C1E),
+    this.borderRadius = 12.0,
     this.maxWidth = 450.0,
   });
 
@@ -41,13 +39,24 @@ class EnglishFlashCard extends StatelessWidget {
               onTap: () {
                 context.read<FlashcardBloc>().add(FlipFlashcard());
               },
-              child: Card(
-                elevation: 5.0,
+              child: Container(
                 margin: EdgeInsets.all(isPortrait ? 8.0 : 4.0),
-                shape: RoundedRectangleBorder(
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(borderRadius),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: const Color(0xFFC6C5D3).withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
-                color: cardColor,
+                clipBehavior: Clip.antiAlias,
                 child: AnimatedSwitcher(
                   duration: const Duration(
                     milliseconds: FlashcardConstants.flipAnimationDuration,

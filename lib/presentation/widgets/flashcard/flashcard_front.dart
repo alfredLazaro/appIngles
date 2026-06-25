@@ -51,45 +51,57 @@ class _FlashcardFrontState extends State<FlashcardFront> {
   Widget _buildLearnFront(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Container(
-          constraints: BoxConstraints(
-            minHeight: constraints.minHeight,
-            maxWidth: constraints.maxWidth,
-          ),
-          padding: EdgeInsets.all((constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              FlashcardImageWidget(
-                images: widget.images,
+        return Column(
+          children: [
+            if (widget.images.isNotEmpty)
+              SizedBox(
                 height: (constraints.maxHeight * 0.5).clamp(120.0, 300.0),
-              ),
-              const SizedBox(height: 2),
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    widget.word.word.isNotEmpty ? widget.word.word : 'Word not found',
-                    style: TextStyle(
-                      fontSize: (constraints.maxHeight * 0.1).clamp(26.0, 48.0),
-                      fontWeight: FontWeight.bold,
-                      color: widget.textColor,
-                    ),
-                    textAlign: TextAlign.center,
+                width: double.infinity,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                  child: FlashcardImageWidget(
+                    images: widget.images,
+                    height: (constraints.maxHeight * 0.5).clamp(120.0, 300.0),
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
-              Text(
-                FlashcardConstants.tapToSeeDefinition,
-                style: TextStyle(
-                  fontSize: (constraints.maxHeight * 0.02).clamp(10.0, 14.0),
-                  fontStyle: FontStyle.italic,
-                  color: widget.textColor.withOpacity(0.6),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all((constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          widget.word.word.isNotEmpty ? widget.word.word : 'Word not found',
+                          style: TextStyle(
+                            fontSize: (constraints.maxHeight * 0.1).clamp(26.0, 48.0),
+                            fontWeight: FontWeight.bold,
+                            color: widget.textColor,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      FlashcardConstants.tapToSeeDefinition,
+                      style: TextStyle(
+                        fontSize: (constraints.maxHeight * 0.02).clamp(10.0, 14.0),
+                        fontStyle: FontStyle.italic,
+                        color: widget.textColor.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
@@ -98,183 +110,37 @@ class _FlashcardFrontState extends State<FlashcardFront> {
   Widget _buildTestFront(BuildContext context, FlashcardLoaded state) {
     final hasSubmitted = state.isAnswerCorrect != null;
     final isRevealed = state.isAnswerRevealed;
+    final isCorrect = state.isAnswerCorrect ?? false;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
-          padding: EdgeInsets.all((constraints.maxHeight * 0.02).clamp(12.0, 20.0)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(
-                Icons.menu_book,
-                size: 28,
-                color: Colors.grey[600],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Escribe la palabra en inglés',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey[500],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.orange.shade200),
-                ),
-                child: Text(
-                  widget.word.definition.isNotEmpty
-                      ? widget.word.definition
-                      : 'No definition available',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    height: 1.4,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Center(
-                child: IconButton.filled(
-                  onPressed: () => context
-                      .read<FlashcardBloc>()
-                      .add(SpeakFlashcardText(widget.word.word)),
-                  icon: const Icon(Icons.volume_up, size: 24),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                  ),
-                  tooltip: 'Escuchar palabra',
-                ),
-              ),
-              const SizedBox(height: 12),
-              if (!hasSubmitted && !isRevealed) ...[
-                TextField(
-                  controller: _controller,
-                  textAlign: TextAlign.center,
-                  textCapitalization: TextCapitalization.none,
-                  decoration: InputDecoration(
-                    hintText: 'Escribe la palabra aquí...',
-                    filled: true,
-                    fillColor: Colors.grey[50],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.orange, width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 14,
-                    ),
-                  ),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 1.5,
-                  ),
-                  onSubmitted: (value) {
-                    if (value.trim().isNotEmpty) {
-                      context.read<FlashcardBloc>().add(ValidateAnswer(value.trim()));
-                    }
-                  },
-                ),
-                const SizedBox(height: 8),
-                Row(
+              _buildHintImage(context),
+              Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => context.read<FlashcardBloc>().add(const RevealAnswer()),
-                        icon: const Icon(Icons.visibility, size: 18),
-                        label: const Text('Mostrar respuesta'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.grey[700],
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          final text = _controller.text.trim();
-                          if (text.isNotEmpty) {
-                            context.read<FlashcardBloc>().add(ValidateAnswer(text));
-                          }
-                        },
-                        icon: const Icon(Icons.check, size: 18),
-                        label: const Text('Comprobar'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-              if (hasSubmitted) _buildFeedback(state),
-              if (isRevealed && !hasSubmitted)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.blue.shade200),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: Colors.blue[700], size: 24),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Respuesta:',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.blue[800],
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              widget.word.word,
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue[900],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    _buildDefinition(),
+                    const SizedBox(height: 24),
+                    if (!hasSubmitted && !isRevealed) ...[
+                      _buildInputSection(context, state),
                     ],
-                  ),
-                ),
-              const SizedBox(height: 8),
-              Text(
-                'Toca la tarjeta para ver la respuesta completa',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey[400],
+                    if (hasSubmitted) ...[
+                      _buildResultFeedback(state),
+                      const SizedBox(height: 16),
+                      if (isCorrect)
+                        _buildContinueButton(context)
+                      else
+                        _buildInputSection(context, state),
+                    ],
+                    if (isRevealed && !hasSubmitted) ...[
+                      _buildRevealedAnswer(state),
+                    ],
+                  ],
                 ),
               ),
             ],
@@ -284,15 +150,320 @@ class _FlashcardFrontState extends State<FlashcardFront> {
     );
   }
 
-  Widget _buildFeedback(FlashcardLoaded state) {
+  Widget _buildHintImage(BuildContext context) {
+    final hasImage = widget.images.isNotEmpty;
+    return SizedBox(
+      height: 192,
+      child: Stack(
+        children: [
+          if (hasImage)
+            Positioned.fill(
+              child: ColorFiltered(
+                colorFilter: const ColorFilter.matrix(<double>[
+                  0.33, 0.33, 0.33, 0, 0,
+                  0.33, 0.33, 0.33, 0, 0,
+                  0.33, 0.33, 0.33, 0, 0,
+                  0, 0, 0, 1, 0,
+                ]),
+                child: Image.network(
+                  widget.images.first.url,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: const Color(0xFFE0E3E6),
+                  ),
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: const Color(0xFFE0E3E6),
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            )
+          else
+            Container(color: const Color(0xFFE0E3E6)),
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.white,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 16,
+            left: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(9999),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.lightbulb_outline,
+                    size: 18,
+                    color: const Color(0xFF535C89),
+                  ),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'Pista visual',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF535C89),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDefinition() {
+    return Text(
+      widget.word.definition.isNotEmpty
+          ? widget.word.definition
+          : 'No definition available',
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w400,
+        height: 1.6,
+        fontStyle: FontStyle.italic,
+        color: Color(0xFF191C1E),
+      ),
+    );
+  }
+
+  Widget _buildInputSection(BuildContext context, FlashcardLoaded state) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'ESCRIBE LA PALABRA',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.05,
+            color: Color(0xFF454651),
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _controller,
+          textAlign: TextAlign.center,
+          textCapitalization: TextCapitalization.none,
+          decoration: InputDecoration(
+            hintText: '...',
+            hintStyle: const TextStyle(color: Colors.black26),
+            filled: true,
+            fillColor: const Color(0xFFF2F4F7),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFC6C5D3)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFC6C5D3)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFF4352A5), width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+          ),
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF191C1E),
+          ),
+          onSubmitted: (value) {
+            if (value.trim().isNotEmpty) {
+              context.read<FlashcardBloc>().add(ValidateAnswer(value.trim()));
+            }
+          },
+        ),
+        const SizedBox(height: 16),
+        _buildFeedbackArea(context, state),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 56,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              final text = _controller.text.trim();
+              if (text.isNotEmpty) {
+                context.read<FlashcardBloc>().add(ValidateAnswer(text.trim()));
+              }
+            },
+            icon: const Icon(Icons.check_circle, size: 20),
+            label: const Text(
+              'Comprobar',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF4352A5),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 4,
+              shadowColor: const Color(0xFF4352A5).withOpacity(0.3),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Center(
+          child: TextButton(
+            onPressed: () => context.read<FlashcardBloc>().add(const RevealAnswer()),
+            child: const Text(
+              'Mostrar respuesta',
+              style: TextStyle(
+                fontSize: 13,
+                color: Color(0xFF454651),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeedbackArea(BuildContext context, FlashcardLoaded state) {
+    final hasSubmitted = state.isAnswerCorrect != null;
+    final isCorrect = state.isAnswerCorrect ?? false;
+
+    if (hasSubmitted) {
+      if (isCorrect) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFD1FAE5),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.check_circle,
+                size: 20,
+                color: Color(0xFF059669),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                '¡Correcto! Excelente memoria.',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF065F46),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFDAD6),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.error,
+              size: 20,
+              color: Color(0xFF93000A),
+            ),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                'Casi... Inténtalo de nuevo.',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF93000A),
+                ),
+              ),
+            ),
+            Text(
+              state.word.word,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF93000A),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFECEFF1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.info_outline,
+            size: 20,
+            color: Color(0xFF454651),
+          ),
+          const SizedBox(width: 8),
+          const Text(
+            'Toca comprobar para validar',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF454651),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultFeedback(FlashcardLoaded state) {
     final isCorrect = state.isAnswerCorrect!;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isCorrect ? Colors.green.shade50 : Colors.red.shade50,
+        color: isCorrect
+            ? const Color(0xFFD1FAE5)
+            : const Color(0xFFFFDAD6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isCorrect ? Colors.green : Colors.red,
+          color: isCorrect
+              ? const Color(0xFF059669)
+              : const Color(0xFFBA1A1A),
           width: 2,
         ),
       ),
@@ -300,7 +471,9 @@ class _FlashcardFrontState extends State<FlashcardFront> {
         children: [
           Icon(
             isCorrect ? Icons.check_circle : Icons.cancel,
-            color: isCorrect ? Colors.green : Colors.red,
+            color: isCorrect
+                ? const Color(0xFF059669)
+                : const Color(0xFFBA1A1A),
             size: 28,
           ),
           const SizedBox(width: 12),
@@ -313,18 +486,116 @@ class _FlashcardFrontState extends State<FlashcardFront> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isCorrect ? Colors.green[800] : Colors.red[800],
+                    color: isCorrect
+                        ? const Color(0xFF065F46)
+                        : const Color(0xFF93000A),
                   ),
                 ),
                 if (!isCorrect)
                   Text(
                     'Correcto: ${state.word.word}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
-                      color: Colors.red[700],
+                      color: Color(0xFF93000A),
                     ),
                   ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContinueButton(BuildContext context) {
+    final blocState = context.read<FlashcardBloc>().state;
+    final isLastPage = blocState is FlashcardLoaded &&
+        blocState.currentIndex >= blocState.sessions.length - 1;
+
+    return SizedBox(
+      height: 56,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          if (isLastPage) {
+            Navigator.maybePop(context);
+          } else {
+            context.read<FlashcardBloc>().add(NextFlashcard());
+          }
+        },
+        icon: const Icon(Icons.arrow_forward, size: 20),
+        label: const Text(
+          'Continuar',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF059669),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 4,
+          shadowColor: const Color(0xFF059669).withOpacity(0.3),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRevealedAnswer(FlashcardLoaded state) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFDEE0FF).withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF4352A5).withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                color: const Color(0xFF2F3F92),
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Respuesta:',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2F3F92),
+                      ),
+                    ),
+                    Text(
+                      state.word.word,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2F3F92),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Toca la tarjeta para ver la respuesta completa',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              color: const Color(0xFF454651).withOpacity(0.6),
             ),
           ),
         ],
