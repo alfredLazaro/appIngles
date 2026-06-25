@@ -9,6 +9,7 @@ class FlashcardMapper {
     return FlashcardWord(
       id: model.id!,
       word: model.word,
+      phonetic: model.phonetic,
       definition: model.definition,
       sentence: model.sentence,
       learnCount: model.learn,

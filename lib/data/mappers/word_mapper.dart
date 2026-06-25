@@ -94,6 +94,7 @@ class WordMapper {
     return FlashcardWord(
       id: map['id'] as int,
       word: map['word'] as String,
+      phonetic: map['phonetic'] as String? ?? '',
       definition: map['definition'] as String,
       sentence: map['sentence'],
       learnCount: map['learn'],
