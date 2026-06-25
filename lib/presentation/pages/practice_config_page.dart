@@ -89,7 +89,8 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
           _practiceStarted = true;
           Navigator.pop(dialogContext);
           context.read<PracticeBloc>().add(
-                StartPracticeEvent(count, widget.practiceType, maxAudioPlays: maxAudioPlays),
+                StartPracticeEvent(count, widget.practiceType,
+                    maxAudioPlays: maxAudioPlays),
               );
         },
       ),
@@ -132,7 +133,8 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
       case PracticeType.matchingDefinition:
         final defData = state.practiceData as MatchingDefPracticeData;
         return MatchingPracticePage(
-          data: MatchingPracticeData(words: defData.words, rounds: defData.rounds),
+          data: MatchingPracticeData(
+              words: defData.words, rounds: defData.rounds),
           isDefinitionMode: true,
         );
       case PracticeType.spelling:

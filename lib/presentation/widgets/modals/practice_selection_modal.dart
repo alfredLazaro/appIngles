@@ -31,6 +31,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
