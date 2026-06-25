@@ -40,12 +40,11 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     final sessions = <FlashcardSession>[];
 
     for (int i = 0; i < words.length; i += batchSize) {
-      final end =
-          (i + batchSize < words.length) ? i + batchSize : words.length;
+      final end = (i + batchSize < words.length) ? i + batchSize : words.length;
       final batch = words.sublist(i, end);
 
       for (int j = 0; j < batch.length; j++) {
-        if (batch[j].learnCount <= 0) {
+        if (batch[j].learnCount <= 50) {
           sessions.add(FlashcardSession(
             word: batch[j],
             mode: FlashcardMode.learn,
@@ -100,8 +99,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     emit(_buildLoadedState(0));
   }
 
-  void _onNextFlashcard(
-      NextFlashcard event, Emitter<FlashcardState> emit) {
+  void _onNextFlashcard(NextFlashcard event, Emitter<FlashcardState> emit) {
     if (state is! FlashcardLoaded) return;
 
     final nextIndex = _currentIndex + 1;
@@ -137,7 +135,8 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final newCount = currentState.learnCount + increment;
 
       _scores[currentState.word.id] = newCount;
-      emit(currentState.copyWith(learnCount: newCount, scores: Map.from(_scores)));
+      emit(currentState.copyWith(
+          learnCount: newCount, scores: Map.from(_scores)));
     }
   }
 
@@ -146,16 +145,17 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final decrement = event.amount ?? 1;
-      final newCount =
-          (currentState.learnCount - decrement).clamp(0, double.infinity).toInt();
+      final newCount = (currentState.learnCount - decrement)
+          .clamp(0, double.infinity)
+          .toInt();
 
       _scores[currentState.word.id] = newCount;
-      emit(currentState.copyWith(learnCount: newCount, scores: Map.from(_scores)));
+      emit(currentState.copyWith(
+          learnCount: newCount, scores: Map.from(_scores)));
     }
   }
 
-  void _onResetLearnCount(
-      ResetLearnCount event, Emitter<FlashcardState> emit) {
+  void _onResetLearnCount(ResetLearnCount event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
 
@@ -164,8 +164,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     }
   }
 
-  void _onValidateAnswer(
-      ValidateAnswer event, Emitter<FlashcardState> emit) {
+  void _onValidateAnswer(ValidateAnswer event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final isCorrect =
@@ -197,19 +196,18 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     await _speakText(event.text);
   }
 
-  void _onMarkAsKnown(
-      MarkAsKnown event, Emitter<FlashcardState> emit) {
+  void _onMarkAsKnown(MarkAsKnown event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final masteryLevel = event.masteryLevel ?? 5;
 
       _scores[currentState.word.id] = masteryLevel;
-      emit(currentState.copyWith(learnCount: masteryLevel, scores: Map.from(_scores)));
+      emit(currentState.copyWith(
+          learnCount: masteryLevel, scores: Map.from(_scores)));
     }
   }
 
-  void _onMarkAsUnknown(
-      MarkAsUnknown event, Emitter<FlashcardState> emit) {
+  void _onMarkAsUnknown(MarkAsUnknown event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
 
@@ -218,8 +216,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     }
   }
 
-  void _onRevealAnswer(
-      RevealAnswer event, Emitter<FlashcardState> emit) {
+  void _onRevealAnswer(RevealAnswer event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final wordId = currentState.word.id;
