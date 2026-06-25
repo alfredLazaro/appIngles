@@ -26,6 +26,8 @@ class WordInputSection extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: controller,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => onSave(),
                   decoration: InputDecoration(
                     labelText: 'Escribe la palabra',
                     border: const OutlineInputBorder(),
