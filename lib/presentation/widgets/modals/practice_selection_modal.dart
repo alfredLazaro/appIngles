@@ -39,7 +39,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
           maxHeight: MediaQuery.of(context).size.height * 0.85,
         ),
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 5.0),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
