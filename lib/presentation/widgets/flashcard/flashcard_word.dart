@@ -61,48 +61,49 @@ class WordFlashcard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Flexible(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                word.word.isNotEmpty ? word.word : 'Word not found',
-                                style: const TextStyle(
-                                  fontSize: 48,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: -0.02,
-                                  color: Color(0xFF191C1E),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFC0C9FD).withOpacity(0.3),
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.volume_up,
-                                size: 22,
-                                color: Color(0xFF535C89),
-                              ),
-                              onPressed: () {
+                            child: GestureDetector(
+                              onTap: () {
                                 context.read<FlashcardBloc>().add(
                                       SpeakFlashcardText(word.word),
                                     );
                               },
-                              tooltip: 'Escuchar',
-                              constraints: const BoxConstraints(
-                                minWidth: 36,
-                                minHeight: 36,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  word.word.isNotEmpty
+                                      ? word.word
+                                      : 'Word not found',
+                                  style: const TextStyle(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.02,
+                                    color: Color(0xFF191C1E),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                              padding: EdgeInsets.zero,
                             ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.volume_up,
+                              size: 18,
+                              color: Color(0xFF535C89),
+                            ),
+                            onPressed: () {
+                              context.read<FlashcardBloc>().add(
+                                    SpeakFlashcardText(word.word),
+                                  );
+                            },
+                            tooltip: 'Escuchar',
+                            constraints: const BoxConstraints(
+                              minWidth: 14,
+                              minHeight: 14,
+                            ),
+                            padding: EdgeInsets.zero,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
                       _buildPhoneticRow(context),
                       const SizedBox(height: 24),
                       if (word.definition.isNotEmpty)
@@ -115,7 +116,8 @@ class WordFlashcard extends StatelessWidget {
                       Text(
                         'Tap to see definition',
                         style: TextStyle(
-                          fontSize: (constraints.maxHeight * 0.02).clamp(10.0, 13.0),
+                          fontSize:
+                              (constraints.maxHeight * 0.02).clamp(10.0, 13.0),
                           fontStyle: FontStyle.italic,
                           color: const Color(0xFF454651).withOpacity(0.4),
                         ),
