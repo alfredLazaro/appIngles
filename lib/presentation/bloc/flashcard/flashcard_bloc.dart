@@ -103,7 +103,10 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     if (state is! FlashcardLoaded) return;
 
     final nextIndex = _currentIndex + 1;
-    if (nextIndex >= _sessions.length) return;
+    if (nextIndex >= _sessions.length) {
+      emit(FlashcardCompleted(scores: Map.from(_scores)));
+      return;
+    }
 
     _currentIndex = nextIndex;
     emit(_buildLoadedState(nextIndex));

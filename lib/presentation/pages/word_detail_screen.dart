@@ -192,10 +192,19 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                 _buildLearnProgress(state),
                 const SizedBox(height: 16),
                 if (_isEditing) ...[
-                  _buildEditableField('Palabra', _wordController,
-                      onTapSpeak: () => _speak(_wordController.text)),
-                  const SizedBox(height: 12),
-                  _buildEditableField('Fonética', _phoneticController),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildEditableField('Palabra', _wordController,
+                            onTapSpeak: () => _speak(_wordController.text)),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildEditableField('Fonética', _phoneticController),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 12),
                   _buildEditableField('Definición', _definitionController,
                       maxLines: 3),
@@ -203,11 +212,23 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                   _buildEditableField('Oración', _sentenceController,
                       maxLines: 3),
                 ] else ...[
-                  _buildInfoRow(Icons.text_fields, 'Palabra', state.word.word,
-                      onTap: () => _speak(state.word.word)),
-                  if (state.word.phonetic.isNotEmpty)
-                    _buildInfoRow(
-                        Icons.phonelink, 'Fonética', state.word.phonetic),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildInfoRow(Icons.text_fields, 'Palabra',
+                            state.word.word,
+                            onTap: () => _speak(state.word.word)),
+                      ),
+                      if (state.word.phonetic.isNotEmpty) ...[
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildInfoRow(
+                              Icons.phonelink, 'Fonética', state.word.phonetic),
+                        ),
+                      ],
+                    ],
+                  ),
                   _buildInfoRow(
                       Icons.description, 'Definición', state.word.definition),
                   if (state.word.sentence.isNotEmpty)

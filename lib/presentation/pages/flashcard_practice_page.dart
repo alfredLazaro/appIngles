@@ -60,22 +60,19 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     return state.currentIndex >= state.sessions.length - 1;
   }
 
-  void _submitResult() {
-    final state = _bloc.state;
-    if (state is! FlashcardLoaded) return;
-
+  void _submitResult(Map<int, int> scores) {
     final result = PracticeResult(
       type: PracticeType.flashcard,
-      learnCountUpdates: state.scores,
+      learnCountUpdates: scores,
       totalItems: widget.words.length,
-      correctItems: state.scores.values.where((s) => s > 0).length,
+      correctItems: scores.values.where((s) => s > 0).length,
     );
 
     context.read<PracticeBloc>().add(FinishPracticeEvent(result));
   }
 
-  void _showCompletionDialog(FlashcardLoaded state) {
-    final learnedCount = state.scores.values.where((s) => s > 0).length;
+  void _showCompletionDialog(Map<int, int> scores) {
+    final learnedCount = scores.values.where((s) => s > 0).length;
 
     showDialog(
       context: context,
@@ -100,7 +97,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
       ),
     );
 
-    _submitResult();
+    _submitResult(scores);
   }
 
   Color _getModeColor(FlashcardMode mode) {
@@ -131,8 +128,14 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   Widget build(BuildContext context) {
     return BlocProvider<FlashcardBloc>.value(
       value: _bloc,
-      child: BlocBuilder<FlashcardBloc, FlashcardState>(
-          builder: (context, state) {
+      child: BlocListener<FlashcardBloc, FlashcardState>(
+        listener: (context, state) {
+          if (state is FlashcardCompleted) {
+            _showCompletionDialog(state.scores);
+          }
+        },
+        child: BlocBuilder<FlashcardBloc, FlashcardState>(
+            builder: (context, state) {
             if (state is! FlashcardLoaded) {
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
@@ -205,7 +208,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                       totalPages: state.sessions.length,
                       onPrevious: () => _bloc.add(PreviousFlashcard()),
                       onNext: _isLastPage(state)
-                          ? () => _showCompletionDialog(state)
+                          ? () => _showCompletionDialog(state.scores)
                           : () => _bloc.add(NextFlashcard()),
                       centerWidget: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -240,6 +243,8 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             );
           },
         ),
+      ),
     );
   }
 }
+

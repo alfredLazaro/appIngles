@@ -174,7 +174,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
             return Stack(
               children: [
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     WordInputSection(
                       controller: _wordController,
