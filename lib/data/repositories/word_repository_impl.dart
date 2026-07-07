@@ -8,20 +8,28 @@ import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
 import 'package:first_app/domain/entities/word_def.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
-import 'package:first_app/data/datasources/local/word_dao.dart';
+import 'package:first_app/data/datasources/local/word_crud_dao.dart';
+import 'package:first_app/data/datasources/local/word_practice_dao.dart';
+import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
 import 'package:first_app/data/mappers/word_mapper.dart';
 import 'package:first_app/domain/entities/sentence_model.dart';
 
 /// Implementación concreta del repositorio
 class WordRepositoryImpl implements WordRepository {
-  final WordDao _wordDao;
+  final WordCrudDao _wordCrudDao;
+  final WordPracticeDao _wordPracticeDao;
+  final WordBatchDao _wordBatchDao;
   final WordService _wordService;
 
   WordRepositoryImpl({
-    required WordDao wordDao,
+    required WordCrudDao wordCrudDao,
+    required WordPracticeDao wordPracticeDao,
+    required WordBatchDao wordBatchDao,
     required WordService wordService,
-  })  : _wordDao = wordDao,
+  })  : _wordCrudDao = wordCrudDao,
+        _wordPracticeDao = wordPracticeDao,
+        _wordBatchDao = wordBatchDao,
         _wordService = wordService;
 
   // ============ EXISTING METHODS ============
@@ -29,7 +37,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<List<WordSummary>> getRecentWordsSummary({int limit = 9}) async {
     try {
-      final models = await _wordDao.getLastWordBasic(limit: limit);
+      final models = await _wordCrudDao.getLastWordBasic(limit: limit);
       return WordMapper.toSummaryList(models);
     } catch (e) {
       throw Exception('Error al obtener palabras recientes: $e');
@@ -40,7 +48,7 @@ class WordRepositoryImpl implements WordRepository {
   Future<int> saveWord(Word word) async {
     try {
       final model = WordMapper.toModel(word);
-      return await _wordDao.insertWord(model);
+      return await _wordCrudDao.insertWord(model);
     } catch (e) {
       throw Exception('Error al guardar palabra: $e');
     }
@@ -49,7 +57,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<void> updateSentence(int wordId, String newSentence) async {
     try {
-      await _wordDao.updateSentence(wordId, newSentence);
+      await _wordCrudDao.updateSentence(wordId, newSentence);
     } catch (e) {
       throw Exception('Error al actualizar oración: $e');
     }
@@ -58,7 +66,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<void> deleteWord(int wordId) async {
     try {
-      await _wordDao.deleteWord(wordId);
+      await _wordCrudDao.deleteWord(wordId);
     } catch (e) {
       throw Exception('Error al eliminar palabra: $e');
     }
@@ -90,7 +98,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<void> updateLearnCount(int wordId, int newLearn) async {
     try {
-      await _wordDao.updateLearn(wordId, newLearn);
+      await _wordPracticeDao.updateLearn(wordId, newLearn);
     } catch (e) {
       throw Exception('Error al actualizar conteo de aprendizaje: $e');
     }
@@ -101,7 +109,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<Word?> getWordById(int id) async {
     try {
-      final model = await _wordDao.getWordById(id);
+      final model = await _wordCrudDao.getWordById(id);
       return model != null ? WordMapper.toEntity(model) : null;
     } catch (e) {
       throw Exception('Error al obtener palabra por ID: $e');
@@ -111,7 +119,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<bool> wordExists(String wordText) async {
     try {
-      return await _wordDao.wordExists(wordText);
+      return await _wordCrudDao.wordExists(wordText);
     } catch (e) {
       throw Exception('Error al verificar si la palabra existe: $e');
     }
@@ -120,7 +128,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<List<WordWithImage>> getAllWordsWithImages() async {
     try {
-      final maps = await _wordDao.getAllWordsWithImages();
+      final maps = await _wordBatchDao.getAllWordsWithImages();
       return maps.map((map) => WordMapper.toWordWithImage(map)).toList();
     } catch (e) {
       throw Exception('Error al obtener palabras con imágenes: $e');
@@ -134,7 +142,7 @@ class WordRepositoryImpl implements WordRepository {
     String? searchQuery,
   }) async {
     try {
-      final maps = await _wordDao.getWordsWithImagesPaginated(
+      final maps = await _wordBatchDao.getWordsWithImagesPaginated(
         page: page,
         pageSize: pageSize,
         searchQuery: searchQuery,
@@ -159,7 +167,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<List<FlashcardWord>> getWordsForPractice(int limit) async {
     try {
-      final maps = await _wordDao.getWordsForPractice(limit);
+      final maps = await _wordPracticeDao.getWordsForPractice(limit);
       return maps.map((map) => WordMapper.toFlashcardWord(map)).toList();
     } catch (e) {
       throw Exception('Error al obtener palabras para practicar: $e');
@@ -169,7 +177,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<List<SentenceModel>> getSentencesForPractice({int limit = 10}) async {
     try {
-      final maps = await _wordDao.getSentencesForPractice(limit);
+      final maps = await _wordPracticeDao.getSentencesForPractice(limit);
       return maps
           .where((map) => map['sentence'] != null)
           .map((map) => SentenceModel.fromMap(map))
@@ -182,7 +190,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<List<WordDef>> gettWordDefForPractice(int limit) async {
     try {
-      final maps = await _wordDao.gettWordDefForPractice(limit);
+      final maps = await _wordPracticeDao.gettWordDefForPractice(limit);
       return WordMapper.toWordDefList(maps);
     } catch (e) {
       throw Exception('Error al obtener oraciones para practicar: $e');
@@ -192,7 +200,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<List<Word>> searchWords(String query) async {
     try {
-      final models = await _wordDao.searchWords(query);
+      final models = await _wordCrudDao.searchWords(query);
       return WordMapper.toEntityList(models);
     } catch (e) {
       throw Exception('Error al buscar palabras: $e');
@@ -202,7 +210,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<int> getTotalWordCount() async {
     try {
-      return await _wordDao.countWords();
+      return await _wordCrudDao.countWords();
     } catch (e) {
       throw Exception('Error al contar palabras: $e');
     }
@@ -211,7 +219,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<void> batchUpdateLearnCounts(Map<int, int> updates) async {
     try {
-      await _wordDao.batchUpdateLearnCounts(updates);
+      await _wordBatchDao.batchUpdateLearnCounts(updates);
     } catch (e) {
       throw Exception('Error en actualización por lotes: $e');
     }
@@ -220,7 +228,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<List<Word>> getRecentWords({int limit = 9}) async {
     try {
-      final models = await _wordDao.getLastWords(limit: limit);
+      final models = await _wordCrudDao.getLastWords(limit: limit);
       return WordMapper.toEntityList(models);
     } catch (e) {
       throw Exception('Error al obtener palabras recientes: $e');
@@ -230,7 +238,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<List<Word>> getAllWords() async {
     try {
-      final models = await _wordDao.getAllWords();
+      final models = await _wordCrudDao.getAllWords();
       return WordMapper.toEntityList(models);
     } catch (e) {
       throw Exception('Error al obtener todas las palabras: $e');
@@ -241,7 +249,7 @@ class WordRepositoryImpl implements WordRepository {
   Future<void> updateWord(Word word) async {
     try {
       final model = WordMapper.toModel(word);
-      await _wordDao.updateWord(model);
+      await _wordCrudDao.updateWord(model);
     } catch (e) {
       throw Exception('Error al actualizar palabra: $e');
     }
@@ -249,12 +257,12 @@ class WordRepositoryImpl implements WordRepository {
 
   @override
   Future<int> countSentences() async {
-    return await _wordDao.countSentences();
+    return await _wordPracticeDao.countSentences();
   }
 
   @override
   Future<List<int>> getAllLearnCounts() async {
-    return await _wordDao.getAllLearnCounts();
+    return await _wordBatchDao.getAllLearnCounts();
   }
 
   @override
@@ -262,7 +270,7 @@ class WordRepositoryImpl implements WordRepository {
       List<WordInsertion> words) async {
     List<Map<String, String>> ls =
         words.map((word) => WordMapper.toMapInsertion(word)).toList();
-    final list = await _wordDao.insertLotWords(ls);
+    final list = await _wordBatchDao.insertLotWords(ls);
     return list
         .map((map) => InsertionResult(
               id: map['id'] as int,

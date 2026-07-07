@@ -84,24 +84,6 @@ class WordFlashcard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.volume_up,
-                              size: 18,
-                              color: Color(0xFF535C89),
-                            ),
-                            onPressed: () {
-                              context.read<FlashcardBloc>().add(
-                                    SpeakFlashcardText(word.word),
-                                  );
-                            },
-                            tooltip: 'Escuchar',
-                            constraints: const BoxConstraints(
-                              minWidth: 14,
-                              minHeight: 14,
-                            ),
-                            padding: EdgeInsets.zero,
-                          ),
                         ],
                       ),
                       _buildPhoneticRow(context),

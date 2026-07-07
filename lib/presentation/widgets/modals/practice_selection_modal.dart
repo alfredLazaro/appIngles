@@ -158,8 +158,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                   spacing: 8,
                   alignment: WrapAlignment.center,
                   children: [
-                    if (widget.totalWords >= 5) _buildQuickButton(5),
                     if (widget.totalWords >= 10) _buildQuickButton(10),
+                    if (widget.totalWords >= 15) _buildQuickButton(15),
                     if (widget.totalWords >= 30) _buildQuickButton(30),
                     if (widget.totalWords >= 50) _buildQuickButton(50),
                   ],

@@ -179,6 +179,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         emit(currentState.copyWith(
             learnCount: newCount,
             isAnswerCorrect: true,
+            showFront: false,
             userAnswer: event.userAnswer,
             scores: Map.from(_scores)));
       } else {
@@ -188,6 +189,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         emit(currentState.copyWith(
             learnCount: newCount,
             isAnswerCorrect: false,
+            showFront: false,
             userAnswer: event.userAnswer,
             scores: Map.from(_scores)));
       }

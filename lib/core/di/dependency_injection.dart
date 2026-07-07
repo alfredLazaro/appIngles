@@ -1,6 +1,8 @@
 import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/core/services/speech_to_text_service.dart';
-import 'package:first_app/data/datasources/local/word_dao.dart';
+import 'package:first_app/data/datasources/local/word_crud_dao.dart';
+import 'package:first_app/data/datasources/local/word_practice_dao.dart';
+import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/datasources/local/translation_dao.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
@@ -31,7 +33,9 @@ final sl = GetIt.instance;
 
 void setupDependencies() {
   // === Data sources ===
-  sl.registerLazySingleton<WordDao>(() => WordDao());
+  sl.registerLazySingleton<WordCrudDao>(() => WordCrudDao());
+  sl.registerLazySingleton<WordPracticeDao>(() => WordPracticeDao());
+  sl.registerLazySingleton<WordBatchDao>(() => WordBatchDao());
   sl.registerLazySingleton<ImageDao>(() => ImageDao());
   sl.registerLazySingleton<TranslationDao>(() => TranslationDao());
 
@@ -41,7 +45,9 @@ void setupDependencies() {
   // === Repositories ===
   sl.registerLazySingleton<WordRepository>(
     () => WordRepositoryImpl(
-      wordDao: sl<WordDao>(),
+      wordCrudDao: sl<WordCrudDao>(),
+      wordPracticeDao: sl<WordPracticeDao>(),
+      wordBatchDao: sl<WordBatchDao>(),
       wordService: sl<WordService>(),
     ),
   );
