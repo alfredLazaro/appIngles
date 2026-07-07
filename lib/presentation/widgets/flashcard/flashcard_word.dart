@@ -51,8 +51,9 @@ class WordFlashcard extends StatelessWidget {
                 ),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(
-                    (constraints.maxHeight * 0.04).clamp(20.0, 32.0),
+                  padding: EdgeInsets.symmetric(
+                    vertical: (constraints.maxHeight * 0.02).clamp(10.0, 16.0),
+                    horizontal: (constraints.maxHeight * 0.02).clamp(5.0, 8.0),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -87,23 +88,10 @@ class WordFlashcard extends StatelessWidget {
                         ],
                       ),
                       _buildPhoneticRow(context),
-                      const SizedBox(height: 24),
                       if (word.definition.isNotEmpty)
                         Expanded(
                           child: _buildDefinitionSection(),
                         )
-                      else
-                        const Spacer(),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Tap to see definition',
-                        style: TextStyle(
-                          fontSize:
-                              (constraints.maxHeight * 0.02).clamp(10.0, 13.0),
-                          fontStyle: FontStyle.italic,
-                          color: const Color(0xFF454651).withOpacity(0.4),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -143,7 +131,6 @@ class WordFlashcard extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 8),
         const Text(
           'example',
           style: TextStyle(

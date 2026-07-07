@@ -167,7 +167,8 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     }
   }
 
-  void _onValidateAnswer(ValidateAnswer event, Emitter<FlashcardState> emit) {
+  Future<void> _onValidateAnswer(
+      ValidateAnswer event, Emitter<FlashcardState> emit) async {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
       final isCorrect =
@@ -179,6 +180,12 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         emit(currentState.copyWith(
             learnCount: newCount,
             isAnswerCorrect: true,
+            userAnswer: event.userAnswer,
+            scores: Map.from(_scores)));
+        await Future.delayed(const Duration(seconds: 1));
+        emit(currentState.copyWith(
+            learnCount: newCount,
+            isAnswerCorrect: true,
             showFront: false,
             userAnswer: event.userAnswer,
             scores: Map.from(_scores)));
@@ -186,6 +193,12 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         final newCount =
             (currentState.learnCount - 1).clamp(0, double.infinity).toInt();
         _scores[currentState.word.id] = newCount;
+        emit(currentState.copyWith(
+            learnCount: newCount,
+            isAnswerCorrect: false,
+            userAnswer: event.userAnswer,
+            scores: Map.from(_scores)));
+        await Future.delayed(const Duration(seconds: 1));
         emit(currentState.copyWith(
             learnCount: newCount,
             isAnswerCorrect: false,
