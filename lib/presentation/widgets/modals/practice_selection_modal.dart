@@ -25,7 +25,7 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
   @override
   void initState() {
     super.initState();
-    _selectedCount = widget.totalWords < 5 ? widget.totalWords : 5;
+    _selectedCount = widget.totalWords < 10 ? widget.totalWords : 10;
   }
 
   @override

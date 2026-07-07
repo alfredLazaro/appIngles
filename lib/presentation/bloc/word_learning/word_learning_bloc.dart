@@ -95,6 +95,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     SearchWordEvent event,
     Emitter<WordLearningState> emit,
   ) async {
+    emit(WordLearningLoading());
     try {
       final results = await Future.wait([
         _searchWordDefinition(event.word),

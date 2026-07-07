@@ -171,42 +171,28 @@ class _WordLearningPageState extends State<WordLearningPage> {
             final currentPage =
                 state is WordsLoaded ? state.currentPage : _cachedPage;
 
-            return Stack(
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    WordInputSection(
-                      controller: _wordController,
-                      isListening: _speechService.isListening,
-                      onListen: _toggleListening,
-                      onSave: _handleSaveWord,
-                    ),
-                    const SizedBox(height: 10),
-                    if (words.isNotEmpty)
-                      WordListSection(
-                        words: words,
-                        currentPage: currentPage,
-                        pageController: _pageController,
-                        onEdit: (word) => _showEditDialog(word),
-                        onCopy: (sentence) => _copySentence(sentence),
-                        onDelete: (id) => _deleteWord(id),
-                        onPageChanged: (page) => context
-                            .read<WordLearningBloc>()
-                            .add(ChangePageEvent(page)),
-                      ),
-                  ],
+                WordInputSection(
+                  controller: _wordController,
+                  isListening: _speechService.isListening,
+                  isLoading: isLoading,
+                  onListen: _toggleListening,
+                  onSave: _handleSaveWord,
                 ),
-                if (isLoading)
-                  const Positioned.fill(
-                    child: IgnorePointer(
-                      child: ColoredBox(
-                        color: Color(0x55FFFFFF),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ),
+                const SizedBox(height: 10),
+                if (words.isNotEmpty)
+                  WordListSection(
+                    words: words,
+                    currentPage: currentPage,
+                    pageController: _pageController,
+                    onEdit: (word) => _showEditDialog(word),
+                    onCopy: (sentence) => _copySentence(sentence),
+                    onDelete: (id) => _deleteWord(id),
+                    onPageChanged: (page) => context
+                        .read<WordLearningBloc>()
+                        .add(ChangePageEvent(page)),
                   ),
               ],
             );
