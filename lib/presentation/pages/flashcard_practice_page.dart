@@ -14,6 +14,7 @@ import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
 import 'package:first_app/domain/usecases/speak_text.dart';
+import 'package:first_app/domain/services/tts_service_interface.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/presentation/widgets/flashcard/english_flashcard.dart';
 
@@ -48,6 +49,8 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
       imagesMap: widget.imagesMap,
       batchSize: widget.batchSize,
     ));
+
+    sl<ITtsService>().initialize();
   }
 
   @override
