@@ -135,7 +135,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
           }
         },
         child: BlocBuilder<FlashcardBloc, FlashcardState>(
-            builder: (context, state) {
+          builder: (context, state) {
             if (state is! FlashcardLoaded) {
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
@@ -179,22 +179,6 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                     backgroundColor: Colors.grey[300],
                     valueColor: AlwaysStoppedAnimation<Color>(
                         _getModeColor(currentMode)),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    color: _getModeColor(currentMode).withOpacity(0.1),
-                    child: Text(
-                      currentMode == FlashcardMode.learn
-                          ? '📖 Modo Aprendizaje - Lee y memoriza'
-                          : '✍️ Modo Práctica - ¡Demuestra lo que aprendiste!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: _getModeColor(currentMode),
-                      ),
-                    ),
                   ),
                   Expanded(
                     child: Padding(
@@ -247,4 +231,3 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     );
   }
 }
-

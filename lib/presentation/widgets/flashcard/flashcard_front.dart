@@ -125,7 +125,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
             children: [
               _buildHintImage(context),
               Padding(
-                padding: const EdgeInsets.all(32),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -137,9 +137,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
                     if (hasSubmitted) ...[
                       _buildResultFeedback(state),
                       const SizedBox(height: 16),
-                      if (isCorrect)
-                        _buildContinueButton(context)
-                      else
+                      if (!isCorrect)
                         _buildInputSection(context, state),
                     ],
                     if (isRevealed && !hasSubmitted) ...[
@@ -484,42 +482,6 @@ class _FlashcardFrontState extends State<FlashcardFront> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildContinueButton(BuildContext context) {
-    final blocState = context.read<FlashcardBloc>().state;
-    final isLastPage = blocState is FlashcardLoaded &&
-        blocState.currentIndex >= blocState.sessions.length - 1;
-
-    return SizedBox(
-      height: 56,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          if (isLastPage) {
-            Navigator.maybePop(context);
-          } else {
-            context.read<FlashcardBloc>().add(NextFlashcard());
-          }
-        },
-        icon: const Icon(Icons.arrow_forward, size: 20),
-        label: const Text(
-          'Continuar',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF059669),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 4,
-          shadowColor: const Color(0xFF059669).withOpacity(0.3),
-        ),
       ),
     );
   }
