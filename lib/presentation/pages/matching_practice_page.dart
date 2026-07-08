@@ -355,8 +355,13 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
           ),
         ),
         Expanded(
-          child: ListView(
-            children: items,
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: items,
+              ),
+            ),
           ),
         ),
       ],
