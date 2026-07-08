@@ -43,17 +43,6 @@ class PracticeSelectionPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     PracticeCard(
-                      icon: Icons.sort,
-                      title: 'Ordenar Oraciones',
-                      description: 'Construye oraciones ordenando las palabras',
-                      color: Colors.green,
-                      onTap: () => _navigateToConfig(
-                        context,
-                        PracticeType.sentence,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    PracticeCard(
                       icon: Icons.compare_arrows,
                       title: 'Emparejar',
                       description: 'Relaciona palabras con sus traducciones',
@@ -84,6 +73,17 @@ class PracticeSelectionPage extends StatelessWidget {
                       onTap: () => _navigateToConfig(
                         context,
                         PracticeType.spelling,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    PracticeCard(
+                      icon: Icons.sort,
+                      title: 'Ordenar Oraciones',
+                      description: 'Construye oraciones ordenando las palabras',
+                      color: Colors.green,
+                      onTap: () => _navigateToConfig(
+                        context,
+                        PracticeType.sentence,
                       ),
                     ),
                     const SizedBox(height: 16),

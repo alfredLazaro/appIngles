@@ -129,7 +129,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildDefinition(),
+                    _buildSentence(),
                     const SizedBox(height: 24),
                     if (!hasSubmitted && !isRevealed) ...[
                       _buildInputSection(context, state),
@@ -222,11 +222,11 @@ class _FlashcardFrontState extends State<FlashcardFront> {
     );
   }
 
-  Widget _buildDefinition() {
+  Widget _buildSentence() {
     return Text(
-      widget.word.definition.isNotEmpty
-          ? widget.word.definition
-          : 'No definition available',
+      widget.word.sentence.isNotEmpty
+          ? widget.word.sentence
+          : 'No sentence available',
       textAlign: TextAlign.center,
       style: const TextStyle(
         fontSize: 20,

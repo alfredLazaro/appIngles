@@ -150,7 +150,8 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
                     value: (state.currentIndex + 1) / state.words.length,
                     minHeight: 6,
                     backgroundColor: Colors.grey[300],
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.orange),
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -249,12 +250,6 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
         ),
         child: Column(
           children: [
-            Icon(
-              Icons.menu_book,
-              size: 32,
-              color: Colors.orange[700],
-            ),
-            const SizedBox(height: 12),
             Text(
               'Escribe la palabra en inglés',
               style: TextStyle(
@@ -282,20 +277,21 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
   Widget _buildAudioButton(SpellingLoaded state) {
     if (state.maxAudioPlays <= 0) return const SizedBox.shrink();
 
-    final canPlay = state.maxAudioPlays < 0 || state.audioPlayedCount < state.maxAudioPlays;
+    final canPlay =
+        state.maxAudioPlays < 0 || state.audioPlayedCount < state.maxAudioPlays;
 
     return Center(
       child: IconButton.filled(
-        onPressed: canPlay
-            ? () => _bloc.add(const PlayCurrentWordAudio())
-            : null,
+        onPressed:
+            canPlay ? () => _bloc.add(const PlayCurrentWordAudio()) : null,
         icon: const Icon(Icons.volume_up, size: 28),
         style: IconButton.styleFrom(
           backgroundColor: canPlay ? Colors.orange : Colors.grey,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.all(16),
         ),
-        tooltip: canPlay ? 'Escuchar palabra' : 'Límite de reproducciones alcanzado',
+        tooltip:
+            canPlay ? 'Escuchar palabra' : 'Límite de reproducciones alcanzado',
       ),
     );
   }

@@ -174,6 +174,8 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final isCorrect =
           _validateWordAnswer(event.userAnswer, currentState.word.word);
 
+      await _speakText(currentState.word.word);
+
       if (isCorrect) {
         final newCount = currentState.learnCount + 3;
         _scores[currentState.word.id] = newCount;
