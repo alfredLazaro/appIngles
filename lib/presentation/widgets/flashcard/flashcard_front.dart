@@ -137,8 +137,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
                     if (hasSubmitted) ...[
                       _buildResultFeedback(state),
                       const SizedBox(height: 16),
-                      if (!isCorrect)
-                        _buildInputSection(context, state),
+                      if (!isCorrect) _buildInputSection(context, state),
                     ],
                     if (isRevealed && !hasSubmitted) ...[
                       _buildRevealedAnswer(state),
@@ -371,41 +370,6 @@ class _FlashcardFrontState extends State<FlashcardFront> {
           ),
         );
       }
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFDAD6),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.error,
-              size: 20,
-              color: Color(0xFF93000A),
-            ),
-            const SizedBox(width: 8),
-            const Expanded(
-              child: Text(
-                'Casi... Inténtalo de nuevo.',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF93000A),
-                ),
-              ),
-            ),
-            Text(
-              state.word.word,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF93000A),
-              ),
-            ),
-          ],
-        ),
-      );
     }
 
     return Container(

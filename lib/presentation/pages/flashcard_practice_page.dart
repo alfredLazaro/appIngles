@@ -204,21 +204,6 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(
-                            'Palabra ${state.originalIndex + 1}/${widget.words.length}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          if (state.scores.isNotEmpty)
-                            Text(
-                              '${state.scores.values.where((s) => s > 0).length} aprendidas',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
-                            ),
                         ],
                       ),
                     ),
