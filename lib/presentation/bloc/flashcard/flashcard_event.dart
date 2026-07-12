@@ -1,22 +1,45 @@
 import 'package:equatable/equatable.dart';
+import 'package:first_app/domain/entities/flashcard_word.dart';
+import 'package:first_app/domain/entities/flashcard_image.dart';
 
 abstract class FlashcardEvent extends Equatable {
+  const FlashcardEvent();
+
   @override
   List<Object?> get props => [];
 }
 
+class InitializeSession extends FlashcardEvent {
+  final List<FlashcardWord> words;
+  final Map<int, List<FlashcardImage>> imagesMap;
+  final int batchSize;
+
+  const InitializeSession({
+    required this.words,
+    required this.imagesMap,
+    this.batchSize = 3,
+  });
+
+  @override
+  List<Object?> get props => [words, imagesMap, batchSize];
+}
+
+class NextFlashcard extends FlashcardEvent {}
+
+class PreviousFlashcard extends FlashcardEvent {}
+
 class FlipFlashcard extends FlashcardEvent {}
 
 class IncrementLearnCount extends FlashcardEvent {
-  final int? amount; // Optional: allow custom increment amount
-  
-  IncrementLearnCount({this.amount});
+  final int? amount;
+
+  const IncrementLearnCount({this.amount});
 }
 
 class DecrementLearnCount extends FlashcardEvent {
-  final int? amount; // Optional: allow custom decrement amount
-  
-  DecrementLearnCount({this.amount});
+  final int? amount;
+
+  const DecrementLearnCount({this.amount});
 }
 
 class ResetLearnCount extends FlashcardEvent {}
@@ -24,7 +47,7 @@ class ResetLearnCount extends FlashcardEvent {}
 class ValidateAnswer extends FlashcardEvent {
   final String userAnswer;
 
-  ValidateAnswer(this.userAnswer);
+  const ValidateAnswer(this.userAnswer);
 
   @override
   List<Object?> get props => [userAnswer];
@@ -33,15 +56,20 @@ class ValidateAnswer extends FlashcardEvent {
 class SpeakFlashcardText extends FlashcardEvent {
   final String text;
 
-  SpeakFlashcardText(this.text);
+  const SpeakFlashcardText(this.text);
 
   @override
   List<Object?> get props => [text];
 }
+
 class MarkAsKnown extends FlashcardEvent {
-  final int? masteryLevel; // Optional: custom mastery level
-  
-  MarkAsKnown({this.masteryLevel});
+  final int? masteryLevel;
+
+  const MarkAsKnown({this.masteryLevel});
 }
 
 class MarkAsUnknown extends FlashcardEvent {}
+
+class RevealAnswer extends FlashcardEvent {
+  const RevealAnswer();
+}

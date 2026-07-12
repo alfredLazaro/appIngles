@@ -1,8 +1,8 @@
-import 'package:first_app/core/services/tts_service.dart';
+import 'package:first_app/domain/services/tts_service_interface.dart';
 
 /// Caso de uso: Reproducir texto en inglés
 class SpeakText {
-  final TtsService _ttsService;
+  final ITtsService _ttsService;
 
   SpeakText(this._ttsService);
 

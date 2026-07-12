@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class WordInputSection extends StatelessWidget {
   final TextEditingController controller;
   final bool isListening;
+  final bool isLoading;
   final VoidCallback onListen;
   final VoidCallback onSave;
 
@@ -12,6 +13,7 @@ class WordInputSection extends StatelessWidget {
     required this.isListening,
     required this.onListen,
     required this.onSave,
+    this.isLoading = false,
   });
 
   @override
@@ -26,6 +28,8 @@ class WordInputSection extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: controller,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => onSave(),
                   decoration: InputDecoration(
                     labelText: 'Escribe la palabra',
                     border: const OutlineInputBorder(),
@@ -40,17 +44,26 @@ class WordInputSection extends StatelessWidget {
               const SizedBox(width: 10),
               // Botón Guardar
               ElevatedButton(
-                onPressed: onSave,
+                onPressed: isLoading ? null : onSave,
                 style: TextButton.styleFrom(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  backgroundColor: Colors.blue, // Color personalizado
+                  backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text('Guardar'),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Guardar'),
               ),
             ],
           ),

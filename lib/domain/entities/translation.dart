@@ -1,4 +1,7 @@
 // domain/entities/translation.dart
+
+/// @deprecated Use [TranslationEntity] instead.
+/// Kept temporarily for data layer compatibility.
 class Translation {
   final int? id;
   final String wordTranslate;

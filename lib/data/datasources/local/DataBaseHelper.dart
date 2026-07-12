@@ -1,11 +1,12 @@
 import 'package:first_app/data/datasources/local/db_constants.dart';
+//import 'package:logger/logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
   static Database? _database;
-
+  //Logger lo = Logger();
   factory DatabaseService() {
     return _instance;
   }
@@ -14,14 +15,12 @@ class DatabaseService {
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
-    print("base de datos creada correctamente");
     return _database!;
   }
 
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, DbConst.databaseName);
-
     return await openDatabase(
       path,
       version: DbConst.version,
@@ -31,6 +30,7 @@ class DatabaseService {
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    //lo.d("base de datos creada _onCreate");
     const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     const textType = 'TEXT NOT NULL';
     await db.execute('''

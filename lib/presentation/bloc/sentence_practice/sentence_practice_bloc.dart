@@ -29,7 +29,7 @@ class SentencePracticeBloc
     final wordVisibility = List<bool>.filled(shuffledWords.length, true);
 
     emit(SentencePracticeLoaded(
-      sentenceId: event.sentenceId,
+      wordId: event.sentenceId,
       originalSentence: event.originalSentence,
       shuffledWords: shuffledWords,
       wordVisibility: wordVisibility,
@@ -120,7 +120,7 @@ class SentencePracticeBloc
 
     // Re-initialize with the same sentence
     add(InitializeSentenceEvent(
-      sentenceId: currentState.sentenceId,
+      sentenceId: currentState.wordId,
       originalSentence: currentState.originalSentence,
     ));
   }

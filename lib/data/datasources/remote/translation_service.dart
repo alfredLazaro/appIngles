@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 class TranslateService{
-  //constructor privado para patron singleton
   static final TranslateService _instance= TranslateService._internal();
   factory TranslateService() => _instance;
   TranslateService._internal();

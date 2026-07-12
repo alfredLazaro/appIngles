@@ -7,6 +7,8 @@ enum PracticeType {
   sentence,
   spelling,
   listening,
+  matching,
+  matchingDefinition,
 }
 
 class PracticeSelectionPage extends StatelessWidget {
@@ -25,22 +27,6 @@ class PracticeSelectionPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '¿Qué deseas practicar hoy?',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Elige el tipo de práctica que mejor se adapte a tus necesidades',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 24),
               Expanded(
                 child: ListView(
                   children: [
@@ -57,13 +43,24 @@ class PracticeSelectionPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     PracticeCard(
-                      icon: Icons.sort,
-                      title: 'Ordenar Oraciones',
-                      description: 'Construye oraciones ordenando las palabras',
-                      color: Colors.green,
+                      icon: Icons.compare_arrows,
+                      title: 'Emparejar',
+                      description: 'Relaciona palabras con sus traducciones',
+                      color: Colors.teal,
                       onTap: () => _navigateToConfig(
                         context,
-                        PracticeType.sentence,
+                        PracticeType.matching,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    PracticeCard(
+                      icon: Icons.menu_book,
+                      title: 'Emparejar-Definicion',
+                      description: 'Relaciona palabras con sus definiciones',
+                      color: Colors.amber,
+                      onTap: () => _navigateToConfig(
+                        context,
+                        PracticeType.matchingDefinition,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -77,7 +74,17 @@ class PracticeSelectionPage extends StatelessWidget {
                         context,
                         PracticeType.spelling,
                       ),
-                      isComingSoon: true,
+                    ),
+                    const SizedBox(height: 16),
+                    PracticeCard(
+                      icon: Icons.sort,
+                      title: 'Ordenar Oraciones',
+                      description: 'Construye oraciones ordenando las palabras',
+                      color: Colors.green,
+                      onTap: () => _navigateToConfig(
+                        context,
+                        PracticeType.sentence,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     PracticeCard(

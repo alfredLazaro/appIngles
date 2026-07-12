@@ -1,4 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:first_app/domain/entities/image_search_result.dart';
+import 'package:first_app/domain/entities/insertion_result.dart';
+import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 
 abstract class WordLearningState extends Equatable {
@@ -39,33 +42,34 @@ class WordLearningError extends WordLearningState {
   List<Object?> get props => [message];
 }
 
-class DefinitionsLoaded extends WordLearningState {
+class WordDataLoaded extends WordLearningState {
   final List<Map<String, dynamic>> meanings;
+  final List<ImageSearchResult> images;
 
-  DefinitionsLoaded(this.meanings);
+  WordDataLoaded({required this.meanings, required this.images});
 
   @override
-  List<Object?> get props => [meanings];
+  List<Object?> get props => [meanings, images];
 }
 
 class ImagesLoaded extends WordLearningState {
-  final List<Map<String, dynamic>> images;
+  final List<ImageSearchResult> images;
 
-  ImagesLoaded(this.images);
+  ImagesLoaded({required this.images});
 
   @override
   List<Object?> get props => [images];
 }
 
 class LotWordsInserted extends WordLearningState {
-  final List<Map<String, dynamic>> results;
+  final List<InsertionResult> results;
 
   LotWordsInserted({required this.results});
 }
 
 // word_learning_state.dart
 class WordsFetched extends WordLearningState {
-  final List<WordSummary> words;
+  final List<Word> words;
 
   WordsFetched(this.words);
 

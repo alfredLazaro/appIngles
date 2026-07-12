@@ -1,18 +1,14 @@
 import 'package:first_app/data/models/word_model.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/word.dart';
+import 'package:first_app/domain/entities/word_def.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
-import 'package:logger/logger.dart';
 
 /// Convierte entre modelo de datos y entidad de dominio
 class WordMapper {
-  static final _logger = Logger();
   static Word toEntity(WordModel model) {
-    _logger.d('Parseando palabra: ${model.word}');
-    _logger.d('createdAt: "${model.createdAt}"');
-    _logger.d('updatedAt: "${model.updatedAt}"');
     return Word(
       id: model.id,
       word: model.word,
@@ -50,8 +46,20 @@ class WordMapper {
     );
   }
 
+  static WordDef toWordDefEntity(Map<String, dynamic> map) {
+    return WordDef(
+      id: map['id'],
+      word: map['word'] ?? '',
+      definition: map['definition'] ?? '',
+    );
+  }
+
   static List<WordSummary> toSummaryList(List<Map<String, dynamic>> maps) {
     return maps.map((map) => toSummaryEntity(map)).toList();
+  }
+
+  static List<WordDef> toWordDefList(List<Map<String, dynamic>> maps) {
+    return maps.map((map) => toWordDefEntity(map)).toList();
   }
 
   static WordWithImage toWordWithImage(Map<String, dynamic> map) {
@@ -86,6 +94,7 @@ class WordMapper {
     return FlashcardWord(
       id: map['id'] as int,
       word: map['word'] as String,
+      phonetic: map['phonetic'] as String? ?? '',
       definition: map['definition'] as String,
       sentence: map['sentence'],
       learnCount: map['learn'],

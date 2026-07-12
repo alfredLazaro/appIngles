@@ -54,13 +54,13 @@ class WordModel {
   factory WordModel.fromMap(Map<String, dynamic> map) {
     return WordModel(
       id: map['id'],
-      word: map['word'],
-      phonetic: map['phonetic'],
-      definition: map['definition'],
-      sentence: map['sentence'],
-      learn: map['learn'],
-      createdAt: map['created_at'],
-      updatedAt: map['updated_at'],
+      word: map['word'] ?? '',
+      phonetic: map['phonetic'] ?? '',
+      definition: map['definition'] ?? '',
+      sentence: map['sentence'] ?? '',
+      learn: map['learn'] ?? 0,
+      createdAt: map['created_at'] ?? '',
+      updatedAt: map['updated_at'] ?? '',
     );
   }
   factory WordModel.fromPartialMap(Map<String, dynamic> map) {
@@ -85,13 +85,13 @@ class WordModel {
   factory WordModel.fromJson(Map<String, dynamic> json) {
     return WordModel(
       id: json['id'],
-      word: json['word'],
-      phonetic: json['phonetic'],
-      definition: json['definition'],
-      sentence: json['sentence'],
-      learn: json['learn'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
+      word: json['word'] ?? '',
+      phonetic: json['phonetic'] ?? '',
+      definition: json['definition'] ?? '',
+      sentence: json['sentence'] ?? '',
+      learn: json['learn'] ?? 0,
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
     );
   }
 }

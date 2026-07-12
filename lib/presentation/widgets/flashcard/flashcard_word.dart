@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
+import 'package:first_app/presentation/bloc/flashcard/flashcard_bloc.dart';
+import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
 import 'package:first_app/presentation/widgets/flashcard/flashcard_image.dart';
-import 'package:flutter/material.dart';
 
-/// Widget Flashcard simple - muestra toda la info en el frente
 class WordFlashcard extends StatelessWidget {
   final FlashcardWord word;
   final List<FlashcardImage> images;
@@ -14,156 +16,131 @@ class WordFlashcard extends StatelessWidget {
     super.key,
     required this.word,
     required this.images,
-    this.backgroundColor = Colors.blue,
-    this.textColor = Colors.white,
+    this.backgroundColor = Colors.white,
+    this.textColor = const Color(0xFF191C1E),
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: const Color(0xFFC6C5D3).withOpacity(0.1),
+          width: 1,
+        ),
       ),
+      clipBehavior: Clip.antiAlias,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return Container(
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight,
-              maxWidth: constraints.maxWidth,
-            ),
-            padding: EdgeInsets.all(constraints.maxHeight * 0.03),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Imágenes
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (images.isNotEmpty)
                 FlashcardImageWidget(
                   images: images,
-                  height: constraints.maxHeight * 0.35,
+                  height: (constraints.maxHeight * 0.35).clamp(120.0, 220.0),
                 ),
-
-                SizedBox(height: constraints.maxHeight * 0.02),
-
-                // Palabra principal
-                Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      word.word.isNotEmpty ? word.word : 'Word not found',
-                      style: TextStyle(
-                        fontSize: constraints.maxHeight * 0.08,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: constraints.maxHeight * 0.02),
-
-                // Definición
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: (constraints.maxHeight * 0.02).clamp(10.0, 16.0),
+                    horizontal: (constraints.maxHeight * 0.02).clamp(5.0, 8.0),
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.book,
-                            color: textColor.withOpacity(0.9),
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Definición:',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: textColor.withOpacity(0.9),
+                          Flexible(
+                            child: GestureDetector(
+                              onTap: () {
+                                context.read<FlashcardBloc>().add(
+                                      SpeakFlashcardText(word.word),
+                                    );
+                              },
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  word.word.isNotEmpty
+                                      ? word.word
+                                      : 'Word not found',
+                                  style: const TextStyle(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.02,
+                                    color: Color(0xFF191C1E),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        word.definition.isNotEmpty
-                            ? word.definition
-                            : 'No definition available',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: textColor,
-                          height: 1.3,
-                        ),
-                      ),
+                      _buildPhoneticRow(context),
+                      if (word.definition.isNotEmpty)
+                        Expanded(
+                          child: _buildDefinitionSection(),
+                        )
                     ],
                   ),
                 ),
-
-                SizedBox(height: constraints.maxHeight * 0.015),
-
-                // Oración de ejemplo
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.format_quote,
-                            color: textColor.withOpacity(0.9),
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Ejemplo:',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: textColor.withOpacity(0.9),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        word.sentence.isNotEmpty
-                            ? word.sentence
-                            : 'No sentence available',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: textColor,
-                          fontStyle: FontStyle.italic,
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
+    );
+  }
+
+  Widget _buildPhoneticRow(BuildContext context) {
+    return Text(
+      word.phonetic.isNotEmpty ? word.phonetic : '/${word.word}/',
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: Color(0xFF535C89),
+      ),
+    );
+  }
+
+  Widget _buildDefinitionSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Text(
+              word.definition,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                height: 1.6,
+                color: Color(0xFF191C1E),
+              ),
+            ),
+          ),
+        ),
+        const Text(
+          'example',
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.05,
+            color: Color(0xFF454651),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,5 +1,6 @@
-/// Entidad pura de palabra (sin dependencias externas)
-class WordInsertion {
+import 'package:equatable/equatable.dart';
+
+class WordInsertion extends Equatable {
   final String word;
   final String phonetic;
   final String definition;
@@ -11,4 +12,7 @@ class WordInsertion {
     required this.definition,
     required this.sentence,
   });
+
+  @override
+  List<Object?> get props => [word, phonetic, definition, sentence];
 }

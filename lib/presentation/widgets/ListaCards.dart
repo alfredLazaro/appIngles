@@ -1,7 +1,11 @@
-import 'package:first_app/core/services/tts_service.dart';
+import 'package:first_app/core/di/dependency_injection.dart';
+import 'package:first_app/domain/services/tts_service_interface.dart';
+import 'package:first_app/domain/entities/word_with_image.dart';
+import 'package:first_app/presentation/bloc/word_detail/word_detail_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_state.dart';
+import 'package:first_app/presentation/pages/word_detail_screen.dart';
 import 'package:first_app/presentation/widgets/WordCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,33 +19,28 @@ class ListaCards extends StatefulWidget {
 }
 
 class _ListaCardsState extends State<ListaCards> {
-  final TtsService _ttsService = TtsService();
+  final ITtsService _ttsService = sl<ITtsService>();
   final ScrollController _scrollController = ScrollController();
   final log = Logger();
 
   @override
   void initState() {
     super.initState();
-    _initializeTts();
-    _scrollController.addListener(_onScroll);
+    _scrollController.addListener(_onScrollDebounced);
   }
 
-  Future<void> _initializeTts() async {
-    await _ttsService.initialize(
-      language: 'en-US',
-      pitch: 1.0,
-      speechRate: 0.5,
-    );
-  }
-
-  void _onScroll() {
+  void _onScrollDebounced() {
     if (_isBottom) {
-      final state = context.read<WordListBloc>().state;
-      if (state is WordListLoaded &&
-          state.hasMorePages &&
-          !state.isLoadingMore) {
-        context.read<WordListBloc>().add(const LoadMoreWordsEvent());
-      }
+      _loadMoreIfNeeded();
+    }
+  }
+
+  void _loadMoreIfNeeded() {
+    final state = context.read<WordListBloc>().state;
+    if (state is WordListLoaded &&
+        state.hasMorePages &&
+        !state.isLoadingMore) {
+      context.read<WordListBloc>().add(const LoadMoreWordsEvent());
     }
   }
 
@@ -62,63 +61,86 @@ class _ListaCardsState extends State<ListaCards> {
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
+    _scrollController.removeListener(_onScrollDebounced);
     _scrollController.dispose();
     _ttsService.stop();
     super.dispose();
   }
 
-/*   void _navigateToWordDetail(WordWithImage word) {
+  void _navigateToWordDetail(WordWithImage word) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => WordDetailScreen(
-          word: word,
-          ttsService: _ttsService,
-          onWordUpdated: () {
-            // Refresh the word list when a word is updated
-            context.read<WordListBloc>().add(const RefreshWordsEvent());
-          },
+        builder: (context) => BlocProvider(
+          create: (_) => WordDetailBloc(
+            wordRepository: sl(),
+            translationRepository: sl(),
+            imageRepository: sl(),
+            deleteWordUseCase: sl(),
+            saveWordImages: sl(),
+          ),
+          child: WordDetailScreen(
+            wordWithImage: word,
+            onWordUpdated: () {
+              context.read<WordListBloc>().add(const RefreshWordsEvent());
+            },
+          ),
         ),
       ),
     );
-  } */
+  }
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<WordListBloc, WordListState>(
-      builder: (context, state) {
-        if (state is WordListLoaded) {
-          if (state.words.isEmpty) {
-            return const Center(
-              child: Text('No hay palabras en esta sección.'),
+    return BlocListener<WordListBloc, WordListState>(
+      listenWhen: (previous, current) =>
+          current is WordListLoaded &&
+          current.errorMessage != null &&
+          current.errorMessage !=
+              (previous is WordListLoaded ? previous.errorMessage : null),
+      listener: (context, state) {
+        if (state is WordListLoaded && state.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage!)),
+          );
+        }
+      },
+      child: BlocBuilder<WordListBloc, WordListState>(
+        builder: (context, state) {
+          if (state is WordListLoaded) {
+            if (state.words.isEmpty) {
+              return const Center(
+                child: Text('No hay palabras en esta sección.'),
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async {
+                context
+                    .read<WordListBloc>()
+                    .add(const RefreshWordsEvent());
+              },
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount:
+                    state.words.length + (state.hasMorePages ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index >= state.words.length) {
+                    return _buildLoadingIndicator();
+                  }
+
+                  final word = state.words[index];
+                  return WordCard(
+                    word: word,
+                    onSpeak: () => speakf(word.word),
+                    onTapImage: () => _navigateToWordDetail(word),
+                  );
+                },
+              ),
             );
           }
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              context.read<WordListBloc>().add(const RefreshWordsEvent());
-              await Future.delayed(const Duration(milliseconds: 500));
-            },
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: state.words.length + (state.hasMorePages ? 1 : 0),
-              itemBuilder: (context, index) {
-                // Loading indicator at bottom
-                if (index >= state.words.length) {
-                  return _buildLoadingIndicator();
-                }
-
-                final word = state.words[index];
-                return WordCard(
-                  word: word,
-                  onSpeak: () => speakf(word.word),
-                );
-              },
-            ),
-          );
-        }
-
-        return const SizedBox.shrink();
-      },
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 

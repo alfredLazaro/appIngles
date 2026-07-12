@@ -1,7 +1,6 @@
 // presentation/blocs/translation/translation_bloc.dart
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:first_app/data/datasources/local/db_constants.dart';
 import 'package:first_app/domain/entities/translation_entity.dart';
 import 'package:first_app/domain/repositories/translation_repository.dart';
 import 'package:first_app/presentation/bloc/translation/translation_event.dart';
@@ -33,11 +32,8 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
     emit(TranslationLoading());
 
     try {
-      final translations =
-          await translationRepository.getTranslationsByWordId(event.wordId);
-
       final entities =
-          translations.map((map) => TranslationEntity.fromMap(map)).toList();
+          await translationRepository.getTranslationsByWordId(event.wordId);
 
       emit(TranslationLoaded(
         translations: entities,
@@ -58,10 +54,7 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
     emit(TranslationLoading());
 
     try {
-      final translations = await translationRepository.getAllTranslations();
-
-      final entities =
-          translations.map((map) => TranslationEntity.fromMap(map)).toList();
+      final entities = await translationRepository.getAllTranslations();
 
       emit(TranslationLoaded(translations: entities));
     } catch (e) {
@@ -84,11 +77,8 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
     emit(TranslationLoading());
 
     try {
-      final translations =
-          await translationRepository.searchTranslations(event.searchTerm);
-
       final entities =
-          translations.map((map) => TranslationEntity.fromMap(map)).toList();
+          await translationRepository.searchTranslations(event.searchTerm);
 
       emit(TranslationLoaded(translations: entities));
     } catch (e) {
@@ -106,13 +96,11 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
     emit(TranslationLoading());
 
     try {
-      final translationMap = {
-        TranslationFields.wordId: event.wordId,
-        TranslationFields.wordTranslate: event.wordTranslate,
-        TranslationFields.alternatives: event.alternatives.join('|'),
-      };
-
-      final id = await translationRepository.insertTranslation(translationMap);
+      final id = await translationRepository.insertTranslation(
+        event.wordId,
+        event.wordTranslate,
+        event.alternatives,
+      );
 
       final newTranslation = TranslationEntity(
         id: id,
@@ -124,7 +112,6 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
 
       emit(TranslationAdded(newTranslation));
 
-      // Reload translations for this word
       add(LoadTranslationsByWordIdEvent(event.wordId));
     } catch (e) {
       emit(TranslationError(
@@ -141,41 +128,37 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
     emit(TranslationLoading());
 
     try {
-      // Prepare translations with wordId
-      final preparedTranslations = event.translations.map((translation) {
-        return {
-          ...translation,
-          TranslationFields.wordId: event.wordId,
-        };
+      final entities = event.translations.map((t) {
+        final alternatives = (t['alternatives'] as String? ?? '')
+            .split('|')
+            .where((item) => item.isNotEmpty)
+            .toList();
+        return TranslationEntity(
+          wordId: event.wordId,
+          wordTranslate: t['wordTranslate'] as String,
+          alternatives: alternatives,
+        );
       }).toList();
 
       final ids = await translationRepository.insertTranslations(
         event.wordId,
-        preparedTranslations,
+        entities,
       );
 
-      // Create translation entities from the inserted data
       final newTranslations =
           List<TranslationEntity>.generate(ids.length, (index) {
-        final originalTranslation = preparedTranslations[index];
+        final original = entities[index];
         return TranslationEntity(
           id: ids[index],
-          wordId: event.wordId,
-          wordTranslate:
-              originalTranslation[TranslationFields.wordTranslate] as String,
-          alternatives:
-              (originalTranslation[TranslationFields.alternatives] as String? ??
-                      '')
-                  .split('|')
-                  .where((item) => item.isNotEmpty)
-                  .toList(),
+          wordId: original.wordId,
+          wordTranslate: original.wordTranslate,
+          alternatives: original.alternatives,
           createdAt: DateTime.now(),
         );
       });
 
       emit(TranslationsBulkAdded(newTranslations));
 
-      // Reload translations for this word
       add(LoadTranslationsByWordIdEvent(event.wordId));
     } catch (e) {
       emit(TranslationError(
@@ -192,18 +175,7 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
     emit(TranslationLoading());
 
     try {
-      final translationMap = <String, dynamic>{};
-
-      if (event.wordTranslate != null) {
-        translationMap[TranslationFields.wordTranslate] = event.wordTranslate;
-      }
-
-      if (event.alternatives != null) {
-        translationMap[TranslationFields.alternatives] =
-            event.alternatives!.join('|');
-      }
-
-      if (translationMap.isEmpty) {
+      if (event.wordTranslate == null && event.alternatives == null) {
         emit(TranslationError(
           'No fields to update',
           failedEvent: event,
@@ -213,20 +185,18 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
 
       final affectedRows = await translationRepository.updateTranslation(
         event.id,
-        translationMap,
+        event.wordTranslate,
+        event.alternatives,
       );
 
       if (affectedRows > 0) {
-        // Get the updated translation
-        final updatedTranslation =
+        final updatedEntity =
             await translationRepository.getTranslationById(event.id);
 
-        if (updatedTranslation != null) {
-          final entity = TranslationEntity.fromMap(updatedTranslation);
-          emit(TranslationUpdated(entity));
+        if (updatedEntity != null) {
+          emit(TranslationUpdated(updatedEntity));
 
-          // Reload translations for this word
-          add(LoadTranslationsByWordIdEvent(entity.wordId));
+          add(LoadTranslationsByWordIdEvent(updatedEntity.wordId));
         }
       } else {
         emit(TranslationError(
@@ -249,7 +219,6 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
     emit(TranslationLoading());
 
     try {
-      // Get translation to know wordId before deleting
       final translation =
           await translationRepository.getTranslationById(event.id);
 
@@ -265,11 +234,9 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
           await translationRepository.deleteTranslation(event.id);
 
       if (affectedRows > 0) {
-        final wordId = translation[TranslationFields.wordId] as int;
         emit(TranslationDeleted(event.id));
 
-        // Reload translations for this word
-        add(LoadTranslationsByWordIdEvent(wordId));
+        add(LoadTranslationsByWordIdEvent(translation.wordId));
       } else {
         emit(TranslationError(
           'Failed to delete translation',
@@ -339,11 +306,10 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
     emit(TranslationLoading());
 
     try {
-      final translation =
+      final entity =
           await translationRepository.getTranslationById(event.id);
 
-      if (translation != null) {
-        final entity = TranslationEntity.fromMap(translation);
+      if (entity != null) {
         emit(TranslationDetailLoaded(translation: entity));
       } else {
         emit(TranslationError(
@@ -369,10 +335,6 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
       final translations = await translationRepository
           .getTranslationsWithWordDetails(event.wordId);
 
-      final entities =
-          translations.map((map) => TranslationEntity.fromMap(map)).toList();
-
-      // Extract word details from first translation (assuming they all have the same word)
       final wordDetails = translations.isNotEmpty
           ? {
               'word': translations.first['word'],
@@ -382,12 +344,11 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
           : null;
 
       emit(TranslationDetailLoaded(
-        translation: entities.firstOrNull ??
-            TranslationEntity(
-              id: -1,
-              wordId: event.wordId,
-              wordTranslate: '',
-            ),
+        translation: TranslationEntity(
+          id: -1,
+          wordId: event.wordId,
+          wordTranslate: '',
+        ),
         wordDetails: wordDetails,
       ));
     } catch (e) {
@@ -398,7 +359,6 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
     }
   }
 
-  // Helper method to get current state (for testing)
   @visibleForTesting
   TranslationState get currentState => state;
 }

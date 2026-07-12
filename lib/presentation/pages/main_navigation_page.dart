@@ -1,5 +1,3 @@
-import 'package:first_app/main.dart';
-import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
@@ -18,49 +16,10 @@ class MainNavigationPage extends StatefulWidget {
 class _MainNavigationPageState extends State<MainNavigationPage> {
   int _currentIndex = 0;
 
-  // Create blocs once
-  late final WordLearningBloc wordLearningBloc;
-  late final WordListBloc wordListBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    final deps = Dependencies.instance;
-
-    wordLearningBloc = WordLearningBloc(
-      getRecentWords: deps.getRecentWords,
-      saveWord: deps.saveWord,
-      deleteWord: deps.deleteWord,
-      updateSentence: deps.updateSentence,
-      searchWordDefinition: deps.searchWordDefinition,
-      searchImages: deps.searchImages,
-      saveWordImages: deps.saveWordImages,
-      saveLotWords: deps.saveLotWords,
-    );
-
-    wordListBloc = WordListBloc(
-        wordRepository: deps.wordRepository,
-        imageRepository: deps.imageRepository)
-      ..add(const LoadWordsEvent());
-  }
-
-  @override
-  void dispose() {
-    wordLearningBloc.close();
-    wordListBloc.close();
-    super.dispose();
-  }
-
   List<Widget> get _pages => [
-        BlocProvider.value(
-          value: wordLearningBloc,
-          child: const WordLearningPage(),
-        ),
+        const WordLearningPage(),
         const PracticeSelectionPage(),
-        BlocProvider.value(
-          value: wordListBloc,
-          child: const WordListPage(),
-        ),
+        const WordListPage(),
       ];
 
   @override
@@ -73,7 +32,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           setState(() {
             _currentIndex = index;
             if (index == 2) {
-              wordListBloc.add(const LoadWordsEvent());
+              context.read<WordListBloc>().add(const LoadWordsEvent());
             }
           });
         },
@@ -82,7 +41,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             icon: Icon(Icons.school),
             label: 'Aprender',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.alarm), label: "d"),
+          BottomNavigationBarItem(icon: Icon(Icons.alarm), label: "Practica"),
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
             label: 'Mis Palabras',

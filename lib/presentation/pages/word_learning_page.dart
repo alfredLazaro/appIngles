@@ -1,10 +1,14 @@
+import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/presentation/widgets/bulk_insert_dialog.dart';
+import 'package:first_app/presentation/widgets/dialogs/delete_confirmation_dialog.dart';
 import 'package:first_app/presentation/widgets/modals/combine_word_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:first_app/core/services/speech_to_text_service.dart';
+import 'package:first_app/domain/entities/image_search_result.dart';
+import 'package:first_app/domain/services/speech_to_text_interface.dart';
 import 'package:first_app/core/utils/clipboard_helper.dart';
+import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_event.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_state.dart';
@@ -21,12 +25,12 @@ class WordLearningPage extends StatefulWidget {
 class _WordLearningPageState extends State<WordLearningPage> {
   final TextEditingController _wordController = TextEditingController();
   final PageController _pageController = PageController();
-  final SpeechToTextService _speechService = SpeechToTextService();
+  final ISpeechToTextService _speechService = sl<ISpeechToTextService>();
   List<Map<String, dynamic>>? _tempDefinitions;
-  List<Map<String, dynamic>>? _tempImages;
+  List<ImageSearchResult>? _tempImages;
   // Cache to keep the last loaded list so it doesn't disappear while searching
   List<WordSummary> _cachedWords = [];
-  List<WordSummary> _selecteWords = [];
+  List<Word> _selecteWords = [];
   int _cachedPage = 0;
   @override
   void initState() {
@@ -64,9 +68,8 @@ class _WordLearningPageState extends State<WordLearningPage> {
       _showError('Por favor escribe una palabra');
       return;
     }
-    // 1. Buscar definiciones
-    context.read<WordLearningBloc>().add(SearchWordDefinitionEvent(word));
-    context.read<WordLearningBloc>().add(SearchWordImagesEvent(word));
+    // 1. Buscar definiciones e imágenes
+    context.read<WordLearningBloc>().add(SearchWordEvent(word));
   }
 
   void _showError(String message) {
@@ -85,22 +88,24 @@ class _WordLearningPageState extends State<WordLearningPage> {
   }
 
   Future<void> _copySearchResults() async {
-    List<WordSummary> wordsToCopy = _selecteWords;
+    final wordsToCopy = _selecteWords;
 
     if (wordsToCopy.isEmpty) {
       _showError('No hay palabras para copiar');
       return;
     }
 
-    print('Copying ${wordsToCopy.length} words');
-
     // Format the words for copying
     String result = '';
     for (int i = 0; i < wordsToCopy.length; i++) {
       final word = wordsToCopy[i];
       result += 'id ${word.id}. ${word.word}\n';
-      if (word.sentence != null && word.sentence!.isNotEmpty) {
-        result += ' Ejemplo: ${word.sentence}\n';
+      result += 'phonetic: ${word.phonetic}';
+      result += '\n';
+      result += 'definition: ${word.definition}';
+      result += '\n';
+      if (word.sentence.isNotEmpty) {
+        result += ' sentence: ${word.sentence}\n';
       }
       result += '\n';
     }
@@ -140,13 +145,10 @@ class _WordLearningPageState extends State<WordLearningPage> {
         listener: (context, state) {
           if (state is WordLearningError) {
             _showError(state.message);
-          } else if (state is DefinitionsLoaded) {
-            //_handleDefinitionsLoaded(state.meanings);
+          } else if (state is WordDataLoaded) {
             _tempDefinitions = state.meanings;
-            _checkAndShowCombinedDialog();
-          } else if (state is ImagesLoaded) {
             _tempImages = state.images;
-            _checkAndShowCombinedDialog();
+            _showCombinedDialog();
           } else if (state is WordsLoaded) {
             // Update cache whenever words are (re)loaded
             _cachedWords = state.words;
@@ -156,7 +158,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
               'Palabra guardada con ${state.imagesCount} imagen(es)',
             );
             _wordController.clear();
-          }else if (state is WordsFetched) {
+          } else if (state is WordsFetched) {
             // Handle the fetched words
             _selecteWords = state.words;
           }
@@ -169,42 +171,28 @@ class _WordLearningPageState extends State<WordLearningPage> {
             final currentPage =
                 state is WordsLoaded ? state.currentPage : _cachedPage;
 
-            return Stack(
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    WordInputSection(
-                      controller: _wordController,
-                      isListening: _speechService.isListening,
-                      onListen: _toggleListening,
-                      onSave: _handleSaveWord,
-                    ),
-                    const SizedBox(height: 10),
-                    if (words.isNotEmpty)
-                      WordListSection(
-                        words: words,
-                        currentPage: currentPage,
-                        pageController: _pageController,
-                        onEdit: (word) => _showEditDialog(word),
-                        onCopy: (sentence) => _copySentence(sentence),
-                        onDelete: (id) => _deleteWord(id),
-                        onPageChanged: (page) => context
-                            .read<WordLearningBloc>()
-                            .add(ChangePageEvent(page)),
-                      ),
-                  ],
+                WordInputSection(
+                  controller: _wordController,
+                  isListening: _speechService.isListening,
+                  isLoading: isLoading,
+                  onListen: _toggleListening,
+                  onSave: _handleSaveWord,
                 ),
-                if (isLoading)
-                  const Positioned.fill(
-                    child: IgnorePointer(
-                      child: ColoredBox(
-                        color: Color(0x55FFFFFF),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ),
+                const SizedBox(height: 10),
+                if (words.isNotEmpty)
+                  WordListSection(
+                    words: words,
+                    currentPage: currentPage,
+                    pageController: _pageController,
+                    onEdit: (word) => _showEditDialog(word),
+                    onCopy: (sentence) => _copySentence(sentence),
+                    onDelete: (id) => _deleteWord(id),
+                    onPageChanged: (page) => context
+                        .read<WordLearningBloc>()
+                        .add(ChangePageEvent(page)),
                   ),
               ],
             );
@@ -212,13 +200,6 @@ class _WordLearningPageState extends State<WordLearningPage> {
         ),
       ),
     );
-  }
-
-  void _checkAndShowCombinedDialog() {
-    // Solo mostrar cuando AMBOS resultados estén listos
-    if (_tempDefinitions != null && _tempImages != null) {
-      _showCombinedDialog();
-    }
   }
 
   Future<void> _showCombinedDialog() async {
@@ -232,8 +213,8 @@ class _WordLearningPageState extends State<WordLearningPage> {
     );
 
     if (result != null && mounted) {
-      // Preparar las imágenes en el formato esperado
-      final selectedImages = result['images'] ?? <Map<String, dynamic>>[];
+      final selectedImages =
+          (result['images'] as List<ImageSearchResult>?) ?? [];
 
       context.read<WordLearningBloc>().add(
             SaveNewWordEvent(
@@ -268,27 +249,11 @@ class _WordLearningPageState extends State<WordLearningPage> {
     _showSuccess('Texto copiado al portapapeles');
   }
 
-  void _deleteWord(int id) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Confirmar eliminación'),
-        content: const Text('¿Estás seguro de eliminar esta palabra?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<WordLearningBloc>().add(DeleteWordEvent(id));
-              Navigator.pop(dialogContext);
-            },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
+  Future<void> _deleteWord(int id) async {
+    final confirm = await showDeleteConfirmationDialog(context);
+    if (confirm != true) return;
+    if (!mounted) return;
+    context.read<WordLearningBloc>().add(DeleteWordEvent(id));
   }
 
   void _resetTempData() {
@@ -298,7 +263,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
 
   Future<void> _showWordsLimitDialog() async {
     // Create a TextEditingController for the input field
-    final TextEditingController _limitController = TextEditingController();
+    final TextEditingController limitController = TextEditingController();
 
     await showDialog(
       context: context,
@@ -310,7 +275,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
             const Text('Ingresa el número de palabras a cargar:'),
             const SizedBox(height: 16),
             TextField(
-              controller: _limitController,
+              controller: limitController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 labelText: 'Límite',
@@ -329,20 +294,21 @@ class _WordLearningPageState extends State<WordLearningPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
+            onPressed: () {
+              limitController.dispose();
+              Navigator.pop(dialogContext);
+            },
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () {
-              final input = _limitController.text.trim();
+              final input = limitController.text.trim();
 
-              // Parse the input
               int limit = 9;
               if (input.isNotEmpty) {
                 limit = int.tryParse(input) ?? 9;
 
-                // Validate the input
-                if (limit == null || limit <= 0) {
+                if (limit <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content:
@@ -350,14 +316,13 @@ class _WordLearningPageState extends State<WordLearningPage> {
                       backgroundColor: Colors.red,
                     ),
                   );
-                  return; // Don't close dialog on invalid input
+                  return;
                 }
               }
 
-              // Close the dialog first
+              limitController.dispose();
               Navigator.pop(dialogContext);
 
-              // Dispatch the event with the limit (or null for default)
               context.read<WordLearningBloc>().add(
                     FetchWordsEvent(limit),
                   );
@@ -368,8 +333,6 @@ class _WordLearningPageState extends State<WordLearningPage> {
         ],
       ),
     );
-
-    // Dispose the controller
   }
 
   void _showSuccessMessage(int? limit) {

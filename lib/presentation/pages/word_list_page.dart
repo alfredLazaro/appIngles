@@ -12,31 +12,35 @@ class WordListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<WordListBloc, WordListState>(
-      builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text("My Words"),
-            actions: [
-              if (state is WordListLoaded && state.stats != null)
-                Padding(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("My Words"),
+        actions: [
+          BlocBuilder<WordListBloc, WordListState>(
+            builder: (context, state) {
+              if (state is WordListLoaded && state.stats != null) {
+                return Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                   child: WordStatsWidget(
                     stats: state.stats!,
                     compact: true,
                   ),
-                ),
-              IconButton(
-                icon: const Icon(Icons.school),
-                onPressed: () => _navigateToPracticeHub(context),
-                tooltip: 'Prácticas',
-              ),
-            ],
+                );
+              }
+              return const SizedBox.shrink();
+            },
           ),
-          body: _buildBody(context, state),
-        );
-      },
+          IconButton(
+            icon: const Icon(Icons.school),
+            onPressed: () => _navigateToPracticeHub(context),
+            tooltip: 'Prácticas',
+          ),
+        ],
+      ),
+      body: BlocBuilder<WordListBloc, WordListState>(
+        builder: (context, state) => _buildBody(context, state),
+      ),
     );
   }
 
@@ -54,7 +58,7 @@ class WordListPage extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, WordListState state) {
-    if (state is WordListLoading) {
+    if (state is WordListInitial || state is WordListLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 

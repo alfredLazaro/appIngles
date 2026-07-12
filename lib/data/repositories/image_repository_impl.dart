@@ -1,8 +1,11 @@
+import 'package:first_app/domain/entities/flashcard_image.dart';
+import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/entities/word_image.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
-import 'package:first_app/core/services/apiImage.dart';
+import 'package:first_app/data/datasources/remote/unsplash_service.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/models/image_model.dart';
+import 'package:first_app/data/mappers/image_mapper.dart';
 import 'package:logger/logger.dart';
 
 class ImageRepositoryImpl implements ImageRepository {
@@ -17,9 +20,18 @@ class ImageRepositoryImpl implements ImageRepository {
         _imageDao = imageDao;
 
   @override
-  Future<List<Map<String, dynamic>>> searchImages(String query) async {
+  Future<List<ImageSearchResult>> searchImages(String query) async {
     try {
-      return await _imageService.getMinImg(query);
+      final rawImages = await _imageService.getMinImg(query);
+      return rawImages.map((map) => ImageSearchResult(
+            id: map['id'] as String,
+            regularUrl: (map['url'] as Map)['regular'] as String,
+            thumbUrl: (map['url'] as Map)['thumb'] as String,
+            author: (map['user'] is Map)
+                ? (map['user'] as Map)['name'] as String
+                : (map['user'] as String?) ?? 'Desconocido',
+            description: (map['alt_description'] as String?) ?? 'Unsplash',
+          )).toList();
     } catch (e) {
       _logger.e('Error buscando imágenes: $e');
       return [];
@@ -28,24 +40,20 @@ class ImageRepositoryImpl implements ImageRepository {
 
   @override
   Future<List<int>> saveImages(
-    List<Map<String, dynamic>> images,
+    List<ImageSearchResult> images,
     int wordId,
   ) async {
     List<int> savedIds = [];
 
-    for (var imageData in images) {
+    for (final image in images) {
       try {
         final imageModel = Image_Model(
           wordId: wordId,
-          name: imageData['description'] ??
-              imageData['alt_description'] ??
-              'Sin nombre',
-          author: (imageData['user'] is Map)
-              ? imageData['user']['name']
-              : imageData['user'] ?? 'Desconocido',
-          url: imageData['url']['regular'],
-          tinyurl: imageData['url']['thumb'],
-          source: imageData['alt_description'] ?? 'Desconocida',
+          name: image.description,
+          author: image.author,
+          url: image.regularUrl,
+          tinyurl: image.thumbUrl,
+          source: image.description,
         );
 
         final id = await _imageDao.insertImage(imageModel);
@@ -60,20 +68,24 @@ class ImageRepositoryImpl implements ImageRepository {
 
   @override
   Future<List<WordImage>> getImagesByWordId(int wordId) async {
-    // Implementar si necesitas obtener imágenes de una palabra
-    throw UnimplementedError();
+    try {
+      final imageModels = await _imageDao.getByWordId(wordId);
+      return imageModels.map((m) => ImageMapper.toWordImage(m)).toList();
+    } catch (e) {
+      _logger.e('Error obteniendo imágenes para wordId $wordId: $e');
+      return [];
+    }
   }
 
   @override
-  Future<Map<int, List<Image_Model>>> getImagesByWordIds(
+  Future<Map<int, List<FlashcardImage>>> getImagesByWordIds(
       List<int> wordIds) async {
     try {
-      final Map<int, List<Image_Model>> imags =
-          await _imageDao.getImagesByWordIds(wordIds);
-      return imags;
+      final imagesMap = await _imageDao.getImagesByWordIds(wordIds);
+      return ImageMapper.mapToFlashcardImages(imagesMap);
     } catch (e) {
       _logger.e('Error guardando imagen: $e');
-      return {}; //map vacio
+      return {};
     }
   }
 }

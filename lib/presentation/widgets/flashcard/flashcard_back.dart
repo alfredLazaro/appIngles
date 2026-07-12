@@ -4,7 +4,9 @@ import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_bloc.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
-import 'word_test_input.dart';
+import 'package:first_app/presentation/bloc/flashcard/flashcard_state.dart';
+import 'flashcard_image.dart';
+import 'flashcard_controls.dart';
 
 class FlashcardBack extends StatelessWidget {
   final FlashcardWord word;
@@ -18,118 +20,152 @@ class FlashcardBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<FlashcardBloc>().state;
+    if (state is! FlashcardLoaded) return const SizedBox.shrink();
+
+    final images = state.images;
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Container(
-          padding: EdgeInsets.all(constraints.maxHeight * 0.02),
-          constraints: BoxConstraints(
-            minHeight: constraints.minHeight,
-            maxWidth: constraints.maxWidth,
-          ),
-            child: Padding(
-              padding: EdgeInsets.all(constraints.maxHeight * 0.02),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  WordTestInput(
-                    onSubmit: (answer) => context
-                        .read<FlashcardBloc>()
-                        .add(ValidateAnswer(answer)),
-                    constraints: constraints,
-                  ),
-                  SizedBox(height: constraints.maxHeight * 0.02),
-                  _buildDefinitionSection(context, constraints),
-                  SizedBox(height: constraints.maxHeight * 0.02),
-                  _buildExampleSection(context, constraints),
-                  SizedBox(height: constraints.maxHeight * 0.04),
-                  Text(
-                    FlashcardConstants.tapToSeeWord,
-                    style: TextStyle(
-                      fontSize: constraints.maxHeight * 0.022,
-                      fontStyle: FontStyle.italic,
-                      color: textColor.withOpacity(0.6),
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (images.isNotEmpty)
+                SizedBox(
+                  height: (constraints.maxHeight * 0.35).clamp(100.0, 200.0),
+                  width: double.infinity,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                    ),
+                    child: FlashcardImageWidget(
+                      images: images,
+                      height: (constraints.maxHeight * 0.35).clamp(100.0, 200.0),
                     ),
                   ),
-                ],
+                ),
+              Padding(
+                padding: EdgeInsets.all(
+                  (constraints.maxHeight * 0.03).clamp(16.0, 32.0),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      word.word.isNotEmpty ? word.word : 'Word not found',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: (constraints.maxHeight * 0.08).clamp(28.0, 48.0),
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    SizedBox(height: constraints.maxHeight * 0.02),
+                    if (word.definition.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: constraints.maxWidth * 0.05,
+                        ),
+                        child: Text(
+                          word.definition,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: (constraints.maxHeight * 0.025).clamp(14.0, 18.0),
+                            color: textColor.withOpacity(0.8),
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    SizedBox(height: constraints.maxHeight * 0.02),
+                    if (word.sentence.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: constraints.maxWidth * 0.05,
+                        ),
+                        child: Text(
+                          '"${word.sentence}"',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: (constraints.maxHeight * 0.025).clamp(12.0, 16.0),
+                            fontStyle: FontStyle.italic,
+                            color: textColor.withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+                    SizedBox(height: constraints.maxHeight * 0.02),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildAudioButton(
+                          context,
+                          Icons.volume_up,
+                          () => context
+                              .read<FlashcardBloc>()
+                              .add(SpeakFlashcardText(word.word)),
+                          constraints,
+                        ),
+                        const SizedBox(width: 12),
+                        if (word.sentence.isNotEmpty)
+                          _buildAudioButton(
+                            context,
+                            Icons.format_quote,
+                            () => context
+                                .read<FlashcardBloc>()
+                                .add(SpeakFlashcardText(word.sentence)),
+                            constraints,
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: constraints.maxHeight * 0.02),
+                    FlashcardControls(
+                      height: (constraints.maxHeight * 0.18).clamp(40.0, 90.0),
+                      fontSize: (constraints.maxHeight * 0.03).clamp(11.0, 16.0),
+                      iconSize: (constraints.maxHeight * 0.04).clamp(16.0, 24.0),
+                      onLearned: () {
+                          context.read<FlashcardBloc>().add(IncrementLearnCount());
+                          context.read<FlashcardBloc>().add(NextFlashcard());
+                        },
+                    ),
+                    SizedBox(height: constraints.maxHeight * 0.01),
+                    Text(
+                      FlashcardConstants.tapToSeeWord,
+                      style: TextStyle(
+                        fontSize: (constraints.maxHeight * 0.02).clamp(10.0, 13.0),
+                        fontStyle: FontStyle.italic,
+                        color: textColor.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildDefinitionSection(
-      BuildContext context, BoxConstraints constraints) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              FlashcardConstants.definitionLabel,
-              style: TextStyle(
-                fontSize: constraints.maxHeight * 0.03,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            const Spacer(),
-            IconButton(
-              icon: Icon(Icons.volume_up, size: constraints.maxHeight * 0.05),
-              onPressed: () => context
-                  .read<FlashcardBloc>()
-                  .add(SpeakFlashcardText(word.definition)),
-            ),
-          ],
+  Widget _buildAudioButton(
+    BuildContext context,
+    IconData icon,
+    VoidCallback onPressed,
+    BoxConstraints constraints,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFC0C9FD).withOpacity(0.3),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: Icon(
+          icon,
+          size: (constraints.maxHeight * 0.045).clamp(20.0, 28.0),
+          color: const Color(0xFF535C89),
         ),
-        SizedBox(height: constraints.maxHeight * 0.003),
-        Text(
-          word.definition,
-          style: TextStyle(
-            fontSize: constraints.maxHeight * 0.03,
-            color: textColor,
-          ),
-          textAlign: TextAlign.start,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildExampleSection(
-      BuildContext context, BoxConstraints constraints) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              FlashcardConstants.exampleLabel,
-              style: TextStyle(
-                fontSize: constraints.maxHeight * 0.03,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            const Spacer(),
-            IconButton(
-              icon: Icon(Icons.volume_up, size: constraints.maxHeight * 0.05),
-              onPressed: () => context
-                  .read<FlashcardBloc>()
-                  .add(SpeakFlashcardText(word.sentence)),
-            ),
-          ],
-        ),
-        SizedBox(height: constraints.maxHeight * 0.003),
-        Text(
-          '"${word.sentence}"',
-          style: TextStyle(
-            fontSize: constraints.maxHeight * 0.03,
-            fontStyle: FontStyle.italic,
-            color: textColor,
-          ),
-          textAlign: TextAlign.left,
-        ),
-      ],
+        onPressed: onPressed,
+        tooltip: 'Escuchar',
+      ),
     );
   }
 }

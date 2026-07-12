@@ -1,9 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
-
+import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
+import 'package:first_app/domain/usecases/word/get_recent_words.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/entities/word.dart';
+import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/usecases/word/save_word.dart';
 import 'package:first_app/domain/usecases/word/delete_word.dart';
 import 'package:first_app/domain/usecases/word/update_sentence.dart';
@@ -17,6 +17,7 @@ import 'word_learning_state.dart';
 class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
   // Variables con sufijo "UseCase"
   final GetRecentWordsSummaryUseCase _getRecentWords;
+  final GetRecentWordsUseCase _getRecentWordsFull;
   final SaveWordUseCase _saveWord;
   final DeleteWordUseCase _deleteWord;
   final UpdateSentenceUseCase _updateSentence;
@@ -27,6 +28,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
 
   WordLearningBloc({
     required GetRecentWordsSummaryUseCase getRecentWords,
+    required GetRecentWordsUseCase getRecentWordsFull,
     required SaveWordUseCase saveWord,
     required DeleteWordUseCase deleteWord,
     required UpdateSentenceUseCase updateSentence,
@@ -35,6 +37,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     required SaveWordImagesUseCase saveWordImages,
     required InsertLotWordsUseCase saveLotWords,
   })  : _getRecentWords = getRecentWords,
+        _getRecentWordsFull = getRecentWordsFull,
         _saveWord = saveWord,
         _deleteWord = deleteWord,
         _updateSentence = updateSentence,
@@ -46,7 +49,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     // Eventos con sufijo "Event"
     on<LoadRecentWordsEvent>(_onLoadRecentWords);
     on<FetchWordsEvent>(_onFetchWords);
-    on<SearchWordDefinitionEvent>(_onSearchWordDefinition);
+    on<SearchWordEvent>(_onSearchWord);
     on<SearchWordImagesEvent>(_onSearchWordImages);
     on<SaveNewWordEvent>(_onSaveNewWord);
     on<UpdateWordSentenceEvent>(_onUpdateSentence);
@@ -81,35 +84,42 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
   ) async {
     emit(WordLearningLoading());
     try {
-      final words = await _getRecentWords(limit: event.limit);
+      final words = await _getRecentWordsFull(limit: event.limit);
       emit(WordsFetched(words));
     } catch (e) {
       emit(WordLearningError('Error fetching words: $e'));
     }
   }
 
-  Future<void> _onSearchWordDefinition(
-    SearchWordDefinitionEvent event,
+  Future<void> _onSearchWord(
+    SearchWordEvent event,
     Emitter<WordLearningState> emit,
   ) async {
+    emit(WordLearningLoading());
     try {
-      final meanings = await _searchWordDefinition(event.word);
+      final results = await Future.wait([
+        _searchWordDefinition(event.word),
+        _searchImages(event.word),
+      ]);
 
-      final meaningsMap = meanings.map((meaning) {
+      final meanings = (results[0] as List<WordMeaning>).map((m) {
         return {
-          'partOfSpeech': meaning.partOfSpeech,
-          'definitions': meaning.definitions.map((def) {
+          'partOfSpeech': m.partOfSpeech,
+          'definitions': m.definitions.map((d) {
             return {
-              'definition': def.definition,
-              'example': def.example,
+              'definition': d.definition,
+              'example': d.example,
+              'phonetic': d.phonetic,
             };
           }).toList(),
         };
       }).toList();
 
-      emit(DefinitionsLoaded(meaningsMap));
+      final images = results[1] as List<ImageSearchResult>;
+
+      emit(WordDataLoaded(meanings: meanings, images: images));
     } catch (e) {
-      emit(WordLearningError('Error buscando definiciones: $e'));
+      emit(WordLearningError('Error al buscar datos: $e'));
     }
   }
 
@@ -119,7 +129,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
   ) async {
     try {
       final images = await _searchImages(event.query);
-      emit(ImagesLoaded(images));
+      emit(ImagesLoaded(images: images));
     } catch (e) {
       emit(WordLearningError('Error buscando imágenes: $e'));
     }
@@ -197,6 +207,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     try {
       final results = await _saveLotWords(event.words);
       emit(LotWordsInserted(results: results));
+      if (event.onCompleted != null) event.onCompleted!();
 
       // Optionally reload recent words
       add(LoadRecentWordsEvent());

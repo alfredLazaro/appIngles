@@ -7,20 +7,16 @@ import 'package:first_app/presentation/bloc/flashcard/flashcard_state.dart';
 import 'flashcard_front.dart';
 import 'flashcard_back.dart';
 
-/// Widget principal de la flashcard (ahora solo maneja UI)
 class EnglishFlashCard extends StatelessWidget {
-  final Color cardColor;
   final Color textColor;
   final double borderRadius;
-  final double? minHeight;
   final double? maxWidth;
+
   const EnglishFlashCard({
     super.key,
-    this.cardColor = Colors.white,
-    this.textColor = Colors.black,
-    this.borderRadius = FlashcardConstants.defaultBorderRadius,
-    this.minHeight = 550.0, //valor por defecto: 550px
-    this.maxWidth = 450.0, // Valor por defecto: 450px
+    this.textColor = const Color(0xFF191C1E),
+    this.borderRadius = 12.0,
+    this.maxWidth = 450.0,
   });
 
   @override
@@ -37,20 +33,30 @@ class EnglishFlashCard extends StatelessWidget {
         return Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: minHeight ?? 0,
               maxWidth: maxWidth ?? double.infinity,
             ),
             child: GestureDetector(
               onTap: () {
                 context.read<FlashcardBloc>().add(FlipFlashcard());
               },
-              child: Card(
-                elevation: 5.0,
+              child: Container(
                 margin: EdgeInsets.all(isPortrait ? 8.0 : 4.0),
-                shape: RoundedRectangleBorder(
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(borderRadius),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: const Color(0xFFC6C5D3).withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
-                color: cardColor,
+                clipBehavior: Clip.antiAlias,
                 child: AnimatedSwitcher(
                   duration: const Duration(
                     milliseconds: FlashcardConstants.flipAnimationDuration,
@@ -61,7 +67,7 @@ class EnglishFlashCard extends StatelessWidget {
                   },
                   child: state.showFront
                       ? FlashcardFront(
-                          key: const ValueKey('front'),
+                          key: ValueKey(state.word.id),
                           word: state.word,
                           images: state.images,
                           textColor: textColor,

@@ -3,13 +3,13 @@ import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_
 import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:first_app/core/services/tts_service.dart';
+import 'package:first_app/domain/services/tts_service_interface.dart';
 import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_bloc.dart';
 
 class SentenceBuilderWidget extends StatelessWidget {
   final int sentenceId;
   final String originalSentence;
-  final TtsService ttsService;
+  final ITtsService ttsService;
 
   const SentenceBuilderWidget({
     super.key,

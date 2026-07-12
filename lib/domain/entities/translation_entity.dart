@@ -1,7 +1,3 @@
-// domain/entities/translation_entity.dart
-import 'package:first_app/data/datasources/local/db_constants.dart';
-import 'package:flutter/foundation.dart';
-
 class TranslationEntity {
   final int? id;
   final int wordId;
@@ -9,37 +5,13 @@ class TranslationEntity {
   final List<String> alternatives;
   final DateTime? createdAt;
 
-  TranslationEntity({
+  const TranslationEntity({
     this.id,
     required this.wordId,
     required this.wordTranslate,
     this.alternatives = const [],
     this.createdAt,
   });
-
-  Map<String, dynamic> toMap() {
-    return {
-      if (id != null) TranslationFields.id: id,
-      TranslationFields.wordId: wordId,
-      TranslationFields.wordTranslate: wordTranslate,
-      TranslationFields.alternatives: alternatives.join('|'),
-    };
-  }
-
-  factory TranslationEntity.fromMap(Map<String, dynamic> map) {
-    return TranslationEntity(
-      id: map[TranslationFields.id] as int?,
-      wordId: map[TranslationFields.wordId] as int,
-      wordTranslate: map[TranslationFields.wordTranslate] as String,
-      alternatives: (map[TranslationFields.alternatives] as String? ?? '')
-          .split('|')
-          .where((item) => item.isNotEmpty)
-          .toList(),
-      createdAt: map['created_at'] != null
-          ? DateTime.parse(map['created_at'] as String)
-          : null,
-    );
-  }
 
   TranslationEntity copyWith({
     int? id,
@@ -70,7 +42,7 @@ class TranslationEntity {
         other.id == id &&
         other.wordId == wordId &&
         other.wordTranslate == wordTranslate &&
-        listEquals(other.alternatives, alternatives);
+        _listEquals(other.alternatives, alternatives);
   }
 
   @override
@@ -79,5 +51,13 @@ class TranslationEntity {
         wordId.hashCode ^
         wordTranslate.hashCode ^
         alternatives.hashCode;
+  }
+
+  static bool _listEquals(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 }

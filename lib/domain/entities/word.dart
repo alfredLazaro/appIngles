@@ -1,5 +1,6 @@
-/// Entidad pura de palabra (sin dependencias externas)
-class Word {
+import 'package:equatable/equatable.dart';
+
+class Word extends Equatable {
   final int? id;
   final String word;
   final String phonetic;
@@ -19,6 +20,18 @@ class Word {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  @override
+  List<Object?> get props => [
+        id,
+        word,
+        phonetic,
+        definition,
+        sentence,
+        learnCount,
+        createdAt,
+        updatedAt,
+      ];
 
   Word copyWith({
     int? id,

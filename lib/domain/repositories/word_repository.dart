@@ -1,16 +1,18 @@
 import 'package:first_app/domain/entities/flashcard_word.dart';
+import 'package:first_app/domain/entities/insertion_result.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
 import 'package:first_app/domain/entities/word.dart';
+import 'package:first_app/domain/entities/word_def.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
-import 'package:first_app/domain/entities/word_stats.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
-import 'package:first_app/presentation/bloc/practice/practice_data.dart';
+import 'package:first_app/domain/entities/sentence_model.dart';
 
 /// Contrato del repositorio de palabras
 abstract class WordRepository {
   Future<List<WordSummary>> getRecentWordsSummary({int limit = 9});
+  Future<List<Word>> getRecentWords({int limit = 9});
   Future<int> saveWord(Word word);
   Future<void> updateSentence(int wordId, String newSentence);
   Future<void> deleteWord(int wordId);
@@ -27,12 +29,13 @@ abstract class WordRepository {
   });
   Future<List<FlashcardWord>> getWordsForPractice(int limit);
   Future<List<SentenceModel>> getSentencesForPractice({int limit});
+  Future<List<WordDef>> gettWordDefForPractice(int limit);
   Future<List<Word>> searchWords(String query);
   Future<int> getTotalWordCount();
   Future<void> batchUpdateLearnCounts(Map<int, int> updates);
   Future<List<Word>> getAllWords();
   Future<void> updateWord(Word word);
   Future<int> countSentences();
-  Future<WordStats> getWordStatistics();
-  Future<List<Map<String, dynamic>>> insertLotWords(List<WordInsertion> words);
+  Future<List<int>> getAllLearnCounts();
+  Future<List<InsertionResult>> insertLotWords(List<WordInsertion> words);
 }

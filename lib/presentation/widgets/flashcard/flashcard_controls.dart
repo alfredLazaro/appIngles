@@ -6,7 +6,6 @@ class FlashcardControls extends StatelessWidget {
   final double fontSize;
   final double iconSize;
   final VoidCallback onLearned;
-  final VoidCallback onReset;
 
   const FlashcardControls({
     super.key,
@@ -14,7 +13,6 @@ class FlashcardControls extends StatelessWidget {
     required this.fontSize,
     required this.iconSize,
     required this.onLearned,
-    required this.onReset,
   });
 
   @override
@@ -22,33 +20,49 @@ class FlashcardControls extends StatelessWidget {
     return SizedBox(
       height: height,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ElevatedButton.icon(
+          _buildPrimaryButton(
+            label: FlashcardConstants.learnedButtonLabel,
             onPressed: onLearned,
-            icon: Icon(Icons.check, size: iconSize),
-            label: Text(
-              FlashcardConstants.learnedButtonLabel,
-              style: TextStyle(fontSize: fontSize),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-          ),
-          ElevatedButton.icon(
-            onPressed: onReset,
-            icon: Icon(Icons.restart_alt, size: iconSize),
-            label: Text(
-              FlashcardConstants.againButtonLabel,
-              style: TextStyle(fontSize: fontSize),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPrimaryButton({
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF5C6BC0),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.05,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
