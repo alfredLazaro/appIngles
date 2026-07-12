@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class MatchingTile extends StatelessWidget {
@@ -8,6 +9,7 @@ class MatchingTile extends StatelessWidget {
   final Color color;
   final VoidCallback? onTap;
   final bool shrinkWrap;
+  final bool showShake;
 
   const MatchingTile({
     super.key,
@@ -18,91 +20,161 @@ class MatchingTile extends StatelessWidget {
     this.color = Colors.teal,
     this.onTap,
     this.shrinkWrap = false,
+    this.showShake = false,
   });
+
+  static const Color _primary = Color(0xFF413FE6);
+  static const Color _tertiary = Color(0xFF006934);
+  static const Color _tertiaryContainer = Color(0xFF6BFE9C);
+  static const Color _error = Color(0xFFBA1A1A);
+  static const Color _errorContainer = Color(0xFFFFDAD6);
+  static const Color _surfaceContainerLowest = Color(0xFFFFFFFF);
+  static const Color _onSurface = Color(0xFF1B1C1C);
+  static const Color _outlineVariant = Color(0xFFC6C4D8);
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor;
+    Color bgColor;
     Color textColor;
+    Border border;
+    List<BoxShadow> shadows;
 
-    if (isMatched) {
-      if (isCorrect == true) {
-        backgroundColor = Colors.green.shade100;
-        textColor = Colors.green.shade800;
-      } else if (isCorrect == false) {
-        backgroundColor = Colors.red.shade100;
-        textColor = Colors.red.shade800;
-      } else {
-        backgroundColor = Colors.grey.shade200;
-        textColor = Colors.grey.shade600;
-      }
+    if (isMatched && isCorrect == true) {
+      bgColor = _tertiaryContainer;
+      textColor = _tertiary;
+      border = Border.all(color: _tertiary, width: 2);
+      shadows = [];
+    } else if (isMatched && isCorrect == false) {
+      bgColor = _errorContainer;
+      textColor = _error;
+      border = Border.all(color: _error, width: 2);
+      shadows = [];
+    } else if (isMatched) {
+      bgColor = Colors.grey.shade200;
+      textColor = Colors.grey.shade600;
+      border = Border.all(color: Colors.grey.shade300, width: 1);
+      shadows = [];
     } else if (isSelected) {
-      backgroundColor = color.withValues(alpha: 0.2);
-      textColor = color;
+      bgColor = _surfaceContainerLowest;
+      textColor = _primary;
+      border = Border.all(color: _primary, width: 2);
+      shadows = [
+        BoxShadow(
+          color: _primary.withValues(alpha: 0.1),
+          blurRadius: 20,
+          offset: const Offset(0, 8),
+        ),
+      ];
     } else {
-      backgroundColor = Colors.white;
-      textColor = Colors.black87;
+      bgColor = _surfaceContainerLowest;
+      textColor = _onSurface;
+      border = Border.all(color: _outlineVariant, width: 1);
+      shadows = [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.05),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ];
     }
 
-    return GestureDetector(
-      onTap: isMatched && isCorrect != false ? null : onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? color
-                : isMatched
-                    ? (isCorrect == true
-                        ? Colors.green
-                        : isCorrect == false
-                            ? Colors.red
-                            : Colors.grey.shade300)
-                    : Colors.grey.shade300,
-            width: isSelected || isMatched ? 2 : 1,
-          ),
-          boxShadow: [
-            if (isSelected || (isMatched && isCorrect == true))
-              BoxShadow(
-                color: (isMatched ? Colors.green : color).withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+    final tile = AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: border,
+        boxShadow: shadows,
+      ),
+      child: Row(
+        mainAxisSize: shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
+        children: [
+          if (shrinkWrap)
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight:
+                    isSelected || isMatched ? FontWeight.bold : FontWeight.w400,
+                color: textColor,
               ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
-          children: [
-            if (shrinkWrap)
-              Text(
+            )
+          else
+            Expanded(
+              child: Text(
                 text,
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight:
-                      isSelected || isMatched ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 18,
+                  fontWeight: isSelected || isMatched
+                      ? FontWeight.bold
+                      : FontWeight.w400,
                   color: textColor,
                 ),
-              )
-            else
-              Expanded(
-                child: Text(
-                  text,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: isSelected || isMatched
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    color: textColor,
-                  ),
-                ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
+    );
+
+    final gestureTile = GestureDetector(
+      onTap: isMatched && isCorrect != false ? null : onTap,
+      child: tile,
+    );
+
+    if (showShake) {
+      return _ShakeWidget(child: gestureTile);
+    }
+
+    return gestureTile;
+  }
+}
+
+class _ShakeWidget extends StatefulWidget {
+  final Widget child;
+  const _ShakeWidget({required this.child});
+
+  @override
+  State<_ShakeWidget> createState() => _ShakeWidgetState();
+}
+
+class _ShakeWidgetState extends State<_ShakeWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.elasticIn),
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        final shake = sin(_animation.value * 4 * pi) * 4;
+        return Transform.translate(
+          offset: Offset(shake, 0),
+          child: child,
+        );
+      },
+      child: widget.child,
     );
   }
 }

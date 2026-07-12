@@ -20,7 +20,7 @@ class MatchRound extends Equatable {
   static List<MatchRound> generateRounds({
     required List<FlashcardWord> allWords,
     required List<TranslationEntity> allTranslations,
-    int batchSize = 8,
+    int batchSize = 6
   }) {
     final random = Random();
 

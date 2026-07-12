@@ -138,7 +138,7 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     final rounds = MatchRound.generateRounds(
       allWords: words,
       allTranslations: translations,
-      batchSize: 8,
+      batchSize: 6
     );
     return MatchingPracticeData(
       words: words,

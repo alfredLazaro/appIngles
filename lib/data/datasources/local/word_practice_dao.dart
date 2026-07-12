@@ -36,6 +36,7 @@ class WordPracticeDao {
         w.id,
         w.word,
         w.definition,
+        w.phonetic,
         w.sentence,
         w.learn
       FROM Word w

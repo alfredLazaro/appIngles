@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
@@ -27,10 +28,42 @@ class MatchingPracticePage extends StatefulWidget {
 class _MatchingPracticePageState extends State<MatchingPracticePage> {
   bool _resultSubmitted = false;
   Logger l = Logger();
+
+  int? _pendingLeftIndex;
+  int? _pendingRightIndex;
+  ({int left, int right})? _shakingPair;
+  Timer? _shakingTimer;
+
+  final Set<int> _fadingOut = {};
+  final Map<int, Timer> _fadeTimers = {};
+  MatchingRoundReady? _lastRoundState;
+
   int get _totalPairs => widget.data.rounds.fold<int>(
         0,
         (sum, r) => sum + r.words.length,
       );
+
+  @override
+  void dispose() {
+    _shakingTimer?.cancel();
+    for (final t in _fadeTimers.values) {
+      t.cancel();
+    }
+    super.dispose();
+  }
+
+  void _clearRoundState() {
+    for (final t in _fadeTimers.values) {
+      t.cancel();
+    }
+    _fadingOut.clear();
+    _fadeTimers.clear();
+    _shakingPair = null;
+    _shakingTimer?.cancel();
+    _pendingLeftIndex = null;
+    _pendingRightIndex = null;
+  }
+
   void _submitResult(MatchingCompleted state) {
     if (_resultSubmitted) return;
     _resultSubmitted = true;
@@ -139,12 +172,53 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
   }
 
   Widget _buildRound(BuildContext context, MatchingRoundReady state) {
+    if (state.roundIndex != _lastRoundState?.roundIndex) {
+      _clearRoundState();
+    }
+
+    if (state.lastAttemptCorrect == false && _shakingPair == null) {
+      if (_pendingLeftIndex != null && _pendingRightIndex != null) {
+        _shakingPair =
+            (left: _pendingLeftIndex!, right: _pendingRightIndex!);
+        _shakingTimer?.cancel();
+        _shakingTimer = Timer(const Duration(milliseconds: 800), () {
+          if (mounted) {
+            setState(() => _shakingPair = null);
+          }
+        });
+      }
+    }
+
+    _fadeTimers.removeWhere((key, timer) {
+      if (!state.matchedWordIndices.contains(key)) {
+        timer.cancel();
+        _fadingOut.remove(key);
+        return true;
+      }
+      return false;
+    });
+
+    for (final idx in state.matchedWordIndices) {
+      if (!_fadeTimers.containsKey(idx) && !_fadingOut.contains(idx)) {
+        _fadeTimers[idx] = Timer(const Duration(milliseconds: 800), () {
+          if (mounted) {
+            setState(() => _fadingOut.add(idx));
+          }
+        });
+      }
+    }
+
+    _lastRoundState = state;
+
     final isRoundComplete =
         state.matchedWordIndices.length == state.round.words.length;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFBF9F8),
       appBar: AppBar(
-        title: Text('Ronda ${state.roundIndex + 1} de ${state.totalRounds}'),
+        title: Text(
+          'Ronda ${state.roundIndex + 1} de ${state.totalRounds}',
+        ),
         centerTitle: true,
         actions: [
           Center(
@@ -155,7 +229,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green,
+                  color: Color(0xFF22c55e),
                 ),
               ),
             ),
@@ -164,13 +238,14 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
       ),
       body: Column(
         children: [
+          _buildProgressBar(state),
           if (state.lastAttemptCorrect != null)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 12),
               color: state.lastAttemptCorrect!
-                  ? Colors.green.shade50
-                  : Colors.red.shade50,
+                  ? const Color(0xFF6BFE9C).withValues(alpha: 0.3)
+                  : const Color(0xFFFFDAD6),
               child: Center(
                 child: Text(
                   state.lastAttemptCorrect!
@@ -180,135 +255,16 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: state.lastAttemptCorrect!
-                        ? Colors.green.shade800
-                        : Colors.red.shade800,
+                        ? const Color(0xFF006934)
+                        : const Color(0xFFBA1A1A),
                   ),
                 ),
               ),
             ),
           Expanded(
             child: widget.isDefinitionMode
-                ? Column(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Column(
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 16),
-                              child: Text(
-                                'Palabras',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Center(
-                                child: SingleChildScrollView(
-                                  child: Wrap(
-                                    spacing: 4,
-                                    runSpacing: 2,
-                                    alignment: WrapAlignment.center,
-                                    children: List.generate(
-                                      state.round.words.length,
-                                      (i) => MatchingTile(
-                                        text: state.round.words[i].word,
-                                        shrinkWrap: true,
-                                        isSelected:
-                                            state.selectedLeftIndex == i,
-                                        isMatched: state.matchedWordIndices
-                                            .contains(i),
-                                        isCorrect:
-                                            state.matchedWordIndices.contains(i)
-                                                ? true
-                                                : null,
-                                        color: Colors.teal,
-                                        onTap: () => context
-                                            .read<MatchingBloc>()
-                                            .add(SelectLeftTile(wordIndex: i)),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: _buildColumn(
-                          title: 'Definiciones',
-                          items: List.generate(
-                            state.round.definitions!.length,
-                            (i) => MatchingTile(
-                              text: state.round.definitions![i],
-                              isSelected: state.selectedRightIndex == i,
-                              isMatched:
-                                  state.matchedTranslationIndices.contains(i),
-                              isCorrect:
-                                  state.matchedTranslationIndices.contains(i)
-                                      ? true
-                                      : null,
-                              color: Colors.indigo,
-                              onTap: () => context
-                                  .read<MatchingBloc>()
-                                  .add(SelectRightTile(translationIndex: i)),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Row(
-                    children: [
-                      Expanded(
-                        child: _buildColumn(
-                          title: 'Palabras',
-                          items: List.generate(
-                            state.round.words.length,
-                            (i) => MatchingTile(
-                              text: state.round.words[i].word,
-                              isSelected: state.selectedLeftIndex == i,
-                              isMatched: state.matchedWordIndices.contains(i),
-                              isCorrect: state.matchedWordIndices.contains(i)
-                                  ? true
-                                  : null,
-                              color: Colors.teal,
-                              onTap: () => context
-                                  .read<MatchingBloc>()
-                                  .add(SelectLeftTile(wordIndex: i)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: _buildColumn(
-                          title: 'Traducciones',
-                          items: List.generate(
-                            state.round.translations.length,
-                            (i) => MatchingTile(
-                              text: state.round.translations[i].wordTranslate,
-                              isSelected: state.selectedRightIndex == i,
-                              isMatched:
-                                  state.matchedTranslationIndices.contains(i),
-                              isCorrect:
-                                  state.matchedTranslationIndices.contains(i)
-                                      ? true
-                                      : null,
-                              color: Colors.indigo,
-                              onTap: () => context
-                                  .read<MatchingBloc>()
-                                  .add(SelectRightTile(translationIndex: i)),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                ? _buildDefinitionMode(context, state)
+                : _buildTranslationMode(context, state),
           ),
           if (isRoundComplete)
             Padding(
@@ -318,10 +274,14 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: Colors.teal,
+                    backgroundColor: const Color(0xFF413FE6),
                     foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   onPressed: () {
+                    _clearRoundState();
                     context.read<MatchingBloc>().add(NextMatchingRound());
                   },
                   child: Text(
@@ -338,6 +298,238 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
     );
   }
 
+  Widget _buildProgressBar(MatchingRoundReady state) {
+    final total = state.round.words.length;
+    final matched = state.matchedWordIndices.length;
+    final progress = total == 0 ? 0.0 : matched / total;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Set Progress',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: const Color(0xFF767587),
+                      fontFamily: 'Nunito Sans',
+                    ),
+                  ),
+                  Text(
+                    'Round ${state.roundIndex + 1} of ${state.totalRounds}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: const Color(0xFF767587),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                '$matched/$total',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF22c55e),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(9999),
+            child: Container(
+              height: 12,
+              width: double.infinity,
+              color: const Color(0xFFE0E0FF),
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: progress,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF22c55e),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(9999),
+                      bottomLeft: Radius.circular(9999),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTranslationMode(BuildContext context, MatchingRoundReady state) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildColumn(
+            title: 'Palabras',
+            items: List.generate(
+              state.round.words.length,
+              (i) => AnimatedOpacity(
+                opacity: _fadingOut.contains(i) ? 0.0 : 1.0,
+                duration: const Duration(milliseconds: 500),
+                child: MatchingTile(
+                  text: state.round.words[i].word,
+                  isSelected: state.selectedLeftIndex == i,
+                  isMatched: state.matchedWordIndices.contains(i),
+                  isCorrect: state.matchedWordIndices.contains(i)
+                      ? true
+                      : null,
+                  showShake:
+                      _shakingPair != null && _shakingPair!.left == i,
+                  onTap: () {
+                    _pendingLeftIndex = i;
+                    context
+                        .read<MatchingBloc>()
+                        .add(SelectLeftTile(wordIndex: i));
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: _buildColumn(
+            title: 'Traducciones',
+            items: List.generate(
+              state.round.translations.length,
+              (i) => AnimatedOpacity(
+                opacity: _fadingOut.contains(i) ? 0.0 : 1.0,
+                duration: const Duration(milliseconds: 500),
+                child: MatchingTile(
+                  text: state.round.translations[i].wordTranslate,
+                  isSelected: state.selectedRightIndex == i,
+                  isMatched:
+                      state.matchedTranslationIndices.contains(i),
+                  isCorrect:
+                      state.matchedTranslationIndices.contains(i)
+                          ? true
+                          : null,
+                  showShake:
+                      _shakingPair != null && _shakingPair!.right == i,
+                  onTap: () {
+                    _pendingRightIndex = i;
+                    context
+                        .read<MatchingBloc>()
+                        .add(SelectRightTile(translationIndex: i));
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDefinitionMode(BuildContext context, MatchingRoundReady state) {
+    return Column(
+      children: [
+        Expanded(
+          flex: 1,
+          child: Column(
+            children: [
+              const Padding(
+                padding:
+                    EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                child: Text(
+                  'Palabras',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Wrap(
+                      spacing: 4,
+                      runSpacing: 2,
+                      alignment: WrapAlignment.center,
+                      children: List.generate(
+                        state.round.words.length,
+                        (i) => AnimatedOpacity(
+                          opacity: _fadingOut.contains(i) ? 0.0 : 1.0,
+                          duration: const Duration(milliseconds: 500),
+                          child: MatchingTile(
+                            text: state.round.words[i].word,
+                            shrinkWrap: true,
+                            isSelected:
+                                state.selectedLeftIndex == i,
+                            isMatched:
+                                state.matchedWordIndices.contains(i),
+                            isCorrect: state
+                                    .matchedWordIndices.contains(i)
+                                ? true
+                                : null,
+                            showShake: _shakingPair != null &&
+                                _shakingPair!.left == i,
+                            onTap: () {
+                              _pendingLeftIndex = i;
+                              context
+                                  .read<MatchingBloc>()
+                                  .add(SelectLeftTile(
+                                      wordIndex: i));
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: _buildColumn(
+            title: 'Definiciones',
+            items: List.generate(
+              state.round.definitions!.length,
+              (i) => AnimatedOpacity(
+                opacity: _fadingOut.contains(i) ? 0.0 : 1.0,
+                duration: const Duration(milliseconds: 500),
+                child: MatchingTile(
+                  text: state.round.definitions![i],
+                  isSelected: state.selectedRightIndex == i,
+                  isMatched:
+                      state.matchedTranslationIndices.contains(i),
+                  isCorrect:
+                      state.matchedTranslationIndices.contains(i)
+                          ? true
+                          : null,
+                  showShake: _shakingPair != null &&
+                      _shakingPair!.right == i,
+                  onTap: () {
+                    _pendingRightIndex = i;
+                    context
+                        .read<MatchingBloc>()
+                        .add(SelectRightTile(
+                            translationIndex: i));
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildColumn({
     required String title,
     required List<Widget> items,
@@ -351,6 +543,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
+              color: Color(0xFF464556),
             ),
           ),
         ),
