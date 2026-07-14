@@ -65,14 +65,14 @@ class PracticeSelectionPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     PracticeCard(
-                      icon: Icons.keyboard,
-                      title: 'Spelling',
+                      icon: Icons.headphones,
+                      title: 'Listening',
                       description:
-                          'Escribe correctamente las palabras que escuchas',
-                      color: Colors.orange,
+                          'Escucha y escribe correctamente las palabras',
+                      color: Colors.purple,
                       onTap: () => _navigateToConfig(
                         context,
-                        PracticeType.spelling,
+                        PracticeType.listening,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -88,13 +88,14 @@ class PracticeSelectionPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     PracticeCard(
-                      icon: Icons.headphones,
-                      title: 'Listening',
-                      description: 'Mejora tu comprensión auditiva',
-                      color: Colors.purple,
+                      icon: Icons.keyboard,
+                      title: 'Spelling',
+                      description:
+                          'Escribe palabras con letras desordenadas',
+                      color: Colors.orange,
                       onTap: () => _navigateToConfig(
                         context,
-                        PracticeType.listening,
+                        PracticeType.spelling,
                       ),
                       isComingSoon: true,
                     ),

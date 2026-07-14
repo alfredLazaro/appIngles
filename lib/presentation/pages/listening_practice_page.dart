@@ -1,6 +1,6 @@
-import 'package:first_app/presentation/bloc/spelling/spelling_bloc.dart';
-import 'package:first_app/presentation/bloc/spelling/spelling_event.dart';
-import 'package:first_app/presentation/bloc/spelling/spelling_state.dart';
+import 'package:first_app/presentation/bloc/listening/listening_bloc.dart';
+import 'package:first_app/presentation/bloc/listening/listening_event.dart';
+import 'package:first_app/presentation/bloc/listening/listening_state.dart';
 import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/bloc/practice/practice_event.dart';
@@ -14,33 +14,33 @@ import 'package:first_app/domain/usecases/validate_word_answer.dart';
 import 'package:first_app/domain/usecases/speak_text.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
 
-class SpellingPracticePage extends StatefulWidget {
+class ListeningPracticePage extends StatefulWidget {
   final List<FlashcardWord> words;
   final int maxAudioPlays;
 
-  const SpellingPracticePage({
+  const ListeningPracticePage({
     super.key,
     required this.words,
     this.maxAudioPlays = 0,
   });
 
   @override
-  State<SpellingPracticePage> createState() => _SpellingPracticePageState();
+  State<ListeningPracticePage> createState() => _ListeningPracticePageState();
 }
 
-class _SpellingPracticePageState extends State<SpellingPracticePage> {
-  late final SpellingBloc _bloc;
+class _ListeningPracticePageState extends State<ListeningPracticePage> {
+  late final ListeningBloc _bloc;
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _bloc = SpellingBloc(
+    _bloc = ListeningBloc(
       validateWordAnswer: sl<ValidateWordAnswer>(),
       speakText: sl<SpeakText>(),
     );
-    _bloc.add(InitializeSpelling(
+    _bloc.add(InitializeListening(
       words: widget.words,
       maxAudioPlays: widget.maxAudioPlays,
     ));
@@ -54,9 +54,9 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
     super.dispose();
   }
 
-  void _submitResult(SpellingCompleted state) {
+  void _submitResult(ListeningCompleted state) {
     final result = PracticeResult(
-      type: PracticeType.spelling,
+      type: PracticeType.listening,
       learnCountUpdates: state.learnCountUpdates,
       totalItems: state.totalItems,
       correctItems: state.correctItems,
@@ -64,7 +64,7 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
     context.read<PracticeBloc>().add(FinishPracticeEvent(result));
   }
 
-  void _showCompletionDialog(SpellingCompleted state) {
+  void _showCompletionDialog(ListeningCompleted state) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -79,46 +79,46 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
         onRepeat: () {
           Navigator.pop(dialogContext);
           _textController.clear();
-          _bloc.add(InitializeSpelling(
+          _bloc.add(InitializeListening(
             words: widget.words,
             maxAudioPlays: widget.maxAudioPlays,
           ));
         },
-        primaryColor: Colors.orange,
+        primaryColor: Colors.purple,
       ),
     );
 
     _submitResult(state);
   }
 
-  void _onNextOrFinish(SpellingLoaded state) {
+  void _onNextOrFinish(ListeningLoaded state) {
     final isLast = state.currentIndex >= state.words.length - 1;
 
     if (state.hasSubmitted) {
       _textController.clear();
       _focusNode.requestFocus();
       if (isLast) {
-        _bloc.add(const FinishSpelling());
+        _bloc.add(const FinishListening());
       } else {
-        _bloc.add(const NextSpellingWord());
+        _bloc.add(const NextListeningWord());
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<SpellingBloc>.value(
+    return BlocProvider<ListeningBloc>.value(
       value: _bloc,
-      child: BlocListener<SpellingBloc, SpellingState>(
-        listenWhen: (previous, current) => current is SpellingCompleted,
+      child: BlocListener<ListeningBloc, ListeningState>(
+        listenWhen: (previous, current) => current is ListeningCompleted,
         listener: (context, state) {
-          if (state is SpellingCompleted) {
+          if (state is ListeningCompleted) {
             _showCompletionDialog(state);
           }
         },
-        child: BlocBuilder<SpellingBloc, SpellingState>(
+        child: BlocBuilder<ListeningBloc, ListeningState>(
           builder: (context, state) {
-            if (state is! SpellingLoaded) {
+            if (state is! ListeningLoaded) {
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
@@ -127,8 +127,8 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
             return Scaffold(
               resizeToAvoidBottomInset: true,
               appBar: AppBar(
-                title: const Text('Spelling'),
-                backgroundColor: Colors.orange,
+                title: const Text('Listening'),
+                backgroundColor: Colors.purple,
                 actions: [
                   Center(
                     child: Padding(
@@ -151,7 +151,7 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
                     minHeight: 6,
                     backgroundColor: Colors.grey[300],
                     valueColor:
-                        const AlwaysStoppedAnimation<Color>(Colors.orange),
+                        const AlwaysStoppedAnimation<Color>(Colors.purple),
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -194,12 +194,12 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
                     onPrevious: () {
                       _textController.clear();
                       _focusNode.requestFocus();
-                      _bloc.add(const PreviousSpellingWord());
+                      _bloc.add(const PreviousListeningWord());
                     },
                     onNext: state.hasSubmitted
                         ? () => _onNextOrFinish(state)
                         : null,
-                    nextButtonColor: Colors.orange,
+                    nextButtonColor: Colors.purple,
                     nextLabel: 'Siguiente',
                     finalLabel: 'Finalizar',
                     centerWidget: Column(
@@ -231,7 +231,7 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
     );
   }
 
-  Widget _buildDefinitionCard(SpellingLoaded state) {
+  Widget _buildDefinitionCard(ListeningLoaded state) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -243,7 +243,7 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [Colors.orange.shade50, Colors.orange.shade100],
+            colors: [Colors.purple.shade50, Colors.purple.shade100],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -251,7 +251,7 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
         child: Column(
           children: [
             Text(
-              'Escribe la palabra en inglés',
+              'Escucha y escribe la palabra en inglés',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[600],
@@ -274,7 +274,7 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
     );
   }
 
-  Widget _buildAudioButton(SpellingLoaded state) {
+  Widget _buildAudioButton(ListeningLoaded state) {
     if (state.maxAudioPlays <= 0) return const SizedBox.shrink();
 
     final canPlay =
@@ -283,10 +283,10 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
     return Center(
       child: IconButton.filled(
         onPressed:
-            canPlay ? () => _bloc.add(const PlayCurrentWordAudio()) : null,
+            canPlay ? () => _bloc.add(const PlayCurrentWordAudioListening()) : null,
         icon: const Icon(Icons.volume_up, size: 28),
         style: IconButton.styleFrom(
-          backgroundColor: canPlay ? Colors.orange : Colors.grey,
+          backgroundColor: canPlay ? Colors.purple : Colors.grey,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.all(16),
         ),
@@ -296,7 +296,7 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
     );
   }
 
-  Widget _buildInputSection(SpellingLoaded state) {
+  Widget _buildInputSection(ListeningLoaded state) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -320,7 +320,7 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.orange, width: 2),
+              borderSide: const BorderSide(color: Colors.purple, width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 20,
@@ -336,7 +336,7 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
               ? null
               : (value) {
                   if (value.trim().isNotEmpty) {
-                    _bloc.add(SubmitSpellingAnswer(value.trim()));
+                    _bloc.add(SubmitListeningAnswer(value.trim()));
                   }
                 },
         ),
@@ -346,11 +346,11 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
             onPressed: () {
               final text = _textController.text.trim();
               if (text.isNotEmpty) {
-                _bloc.add(SubmitSpellingAnswer(text));
+                _bloc.add(SubmitListeningAnswer(text));
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
+              backgroundColor: Colors.purple,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -366,7 +366,7 @@ class _SpellingPracticePageState extends State<SpellingPracticePage> {
     );
   }
 
-  Widget _buildFeedback(SpellingLoaded state) {
+  Widget _buildFeedback(ListeningLoaded state) {
     final isCorrect = state.isCorrect!;
 
     return AnimatedContainer(

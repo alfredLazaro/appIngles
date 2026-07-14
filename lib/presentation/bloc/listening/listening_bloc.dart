@@ -2,10 +2,10 @@ import 'package:bloc/bloc.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/usecases/speak_text.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
-import 'package:first_app/presentation/bloc/spelling/spelling_event.dart';
-import 'package:first_app/presentation/bloc/spelling/spelling_state.dart';
+import 'package:first_app/presentation/bloc/listening/listening_event.dart';
+import 'package:first_app/presentation/bloc/listening/listening_state.dart';
 
-class SpellingBloc extends Bloc<SpellingEvent, SpellingState> {
+class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
   final ValidateWordAnswer _validateWordAnswer;
   final SpeakText _speakText;
 
@@ -13,24 +13,24 @@ class SpellingBloc extends Bloc<SpellingEvent, SpellingState> {
   final Map<int, int> _scores = {};
   int _currentIndex = 0;
 
-  SpellingBloc({
+  ListeningBloc({
     required ValidateWordAnswer validateWordAnswer,
     required SpeakText speakText,
   })  : _validateWordAnswer = validateWordAnswer,
         _speakText = speakText,
-        super(const SpellingInitial()) {
-    on<InitializeSpelling>(_onInitialize);
-    on<PlayCurrentWordAudio>(_onPlayAudio);
-    on<SubmitSpellingAnswer>(_onSubmitAnswer);
-    on<NextSpellingWord>(_onNext);
-    on<PreviousSpellingWord>(_onPrevious);
-    on<SkipSpellingWord>(_onSkip);
-    on<FinishSpelling>(_onFinish);
+        super(const ListeningInitial()) {
+    on<InitializeListening>(_onInitialize);
+    on<PlayCurrentWordAudioListening>(_onPlayAudio);
+    on<SubmitListeningAnswer>(_onSubmitAnswer);
+    on<NextListeningWord>(_onNext);
+    on<PreviousListeningWord>(_onPrevious);
+    on<SkipListeningWord>(_onSkip);
+    on<FinishListening>(_onFinish);
   }
 
-  SpellingLoaded _buildLoaded(int index, {String userAnswer = '', bool? isCorrect, bool hasSubmitted = false}) {
+  ListeningLoaded _buildLoaded(int index, {String userAnswer = '', bool? isCorrect, bool hasSubmitted = false}) {
     final word = _words[index];
-    return SpellingLoaded(
+    return ListeningLoaded(
       words: _words,
       currentIndex: index,
       currentWord: word,
@@ -46,7 +46,7 @@ class SpellingBloc extends Bloc<SpellingEvent, SpellingState> {
 
   int _maxAudioPlays = 0;
 
-  void _onInitialize(InitializeSpelling event, Emitter<SpellingState> emit) {
+  void _onInitialize(InitializeListening event, Emitter<ListeningState> emit) {
     _words = event.words;
     _currentIndex = 0;
     _scores.clear();
@@ -57,7 +57,7 @@ class SpellingBloc extends Bloc<SpellingEvent, SpellingState> {
     }
 
     if (_words.isEmpty) {
-      emit(const SpellingCompleted(
+      emit(const ListeningCompleted(
         learnCountUpdates: {},
         totalItems: 0,
         correctItems: 0,
@@ -69,21 +69,21 @@ class SpellingBloc extends Bloc<SpellingEvent, SpellingState> {
   }
 
   Future<void> _onPlayAudio(
-    PlayCurrentWordAudio event,
-    Emitter<SpellingState> emit,
+    PlayCurrentWordAudioListening event,
+    Emitter<ListeningState> emit,
   ) async {
     final state = this.state;
-    if (state is! SpellingLoaded) return;
+    if (state is! ListeningLoaded) return;
 
     await _speakText(state.currentWord.word);
   }
 
   void _onSubmitAnswer(
-    SubmitSpellingAnswer event,
-    Emitter<SpellingState> emit,
+    SubmitListeningAnswer event,
+    Emitter<ListeningState> emit,
   ) {
     final state = this.state;
-    if (state is! SpellingLoaded || state.hasSubmitted) return;
+    if (state is! ListeningLoaded || state.hasSubmitted) return;
 
     final isCorrect = _validateWordAnswer(event.answer, state.currentWord.word);
     final wordId = state.currentWord.id;
@@ -103,9 +103,9 @@ class SpellingBloc extends Bloc<SpellingEvent, SpellingState> {
     ));
   }
 
-  void _onNext(NextSpellingWord event, Emitter<SpellingState> emit) {
+  void _onNext(NextListeningWord event, Emitter<ListeningState> emit) {
     final state = this.state;
-    if (state is! SpellingLoaded) return;
+    if (state is! ListeningLoaded) return;
 
     final nextIndex = _currentIndex + 1;
     if (nextIndex >= _words.length) return;
@@ -114,9 +114,9 @@ class SpellingBloc extends Bloc<SpellingEvent, SpellingState> {
     emit(_buildLoaded(nextIndex));
   }
 
-  void _onPrevious(PreviousSpellingWord event, Emitter<SpellingState> emit) {
+  void _onPrevious(PreviousListeningWord event, Emitter<ListeningState> emit) {
     final state = this.state;
-    if (state is! SpellingLoaded) return;
+    if (state is! ListeningLoaded) return;
 
     final prevIndex = _currentIndex - 1;
     if (prevIndex < 0) return;
@@ -125,9 +125,9 @@ class SpellingBloc extends Bloc<SpellingEvent, SpellingState> {
     emit(_buildLoaded(prevIndex));
   }
 
-  void _onSkip(SkipSpellingWord event, Emitter<SpellingState> emit) {
+  void _onSkip(SkipListeningWord event, Emitter<ListeningState> emit) {
     final state = this.state;
-    if (state is! SpellingLoaded) return;
+    if (state is! ListeningLoaded) return;
 
     if (!state.hasSubmitted) {
       final wordId = state.currentWord.id;
@@ -144,13 +144,13 @@ class SpellingBloc extends Bloc<SpellingEvent, SpellingState> {
     emit(_buildLoaded(nextIndex));
   }
 
-  void _onFinish(FinishSpelling event, Emitter<SpellingState> emit) {
+  void _onFinish(FinishListening event, Emitter<ListeningState> emit) {
     _emitCompleted(emit);
   }
 
-  void _emitCompleted(Emitter<SpellingState> emit) {
+  void _emitCompleted(Emitter<ListeningState> emit) {
     final correctCount = _scores.values.where((s) => s > 0).length;
-    emit(SpellingCompleted(
+    emit(ListeningCompleted(
       learnCountUpdates: Map.from(_scores),
       totalItems: _words.length,
       correctItems: correctCount,

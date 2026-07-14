@@ -46,11 +46,11 @@ class MatchingDefPracticeData extends PracticeData {
   });
 }
 
-class SpellingPracticeData extends PracticeData {
+class ListeningPracticeData extends PracticeData {
   final List<FlashcardWord> words;
   final int maxAudioPlays;
 
-  const SpellingPracticeData({
+  const ListeningPracticeData({
     required this.words,
     this.maxAudioPlays = 0,
   });

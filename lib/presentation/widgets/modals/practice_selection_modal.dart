@@ -166,8 +166,8 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                 ),
                 const SizedBox(height: 24),
 
-                // Audio config (only for spelling)
-                if (widget.practiceType == PracticeType.spelling) ...[
+                // Audio config (only for listening)
+                if (widget.practiceType == PracticeType.listening) ...[
                   _buildAudioConfig(),
                   const SizedBox(height: 16),
                 ],
@@ -398,10 +398,10 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return 'Flashcards';
       case PracticeType.sentence:
         return 'Ordenar Oraciones';
-      case PracticeType.spelling:
-        return 'Spelling';
       case PracticeType.listening:
         return 'Listening';
+      case PracticeType.spelling:
+        return 'Spelling';
       case PracticeType.matching:
         return 'Emparejar';
       case PracticeType.matchingDefinition:
@@ -415,10 +415,10 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return '¿Cuántas palabras practicar?';
       case PracticeType.sentence:
         return '¿Cuántas oraciones ordenar?';
-      case PracticeType.spelling:
-        return '¿Cuántas palabras escribir?';
       case PracticeType.listening:
-        return '¿Cuántas palabras escuchar?';
+        return '¿Cuántas palabras escribir?';
+      case PracticeType.spelling:
+        return '¿Cuántas palabras ordenar?';
       case PracticeType.matching:
         return '¿Cuántas palabras emparejar?';
       case PracticeType.matchingDefinition:
@@ -432,10 +432,10 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return Icons.style;
       case PracticeType.sentence:
         return Icons.sort;
-      case PracticeType.spelling:
-        return Icons.keyboard;
       case PracticeType.listening:
         return Icons.headphones;
+      case PracticeType.spelling:
+        return Icons.keyboard;
       case PracticeType.matching:
         return Icons.compare_arrows;
       case PracticeType.matchingDefinition:
@@ -449,10 +449,10 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
         return Colors.blue;
       case PracticeType.sentence:
         return Colors.green;
-      case PracticeType.spelling:
-        return Colors.orange;
       case PracticeType.listening:
         return Colors.purple;
+      case PracticeType.spelling:
+        return Colors.orange;
       case PracticeType.matching:
         return Colors.teal;
       case PracticeType.matchingDefinition:
@@ -474,17 +474,16 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
           'Forma oraciones correctas',
           'Arrastra al orden correcto',
         ];
-      case PracticeType.spelling:
-        return [
-          'Ve la definición de cada palabra',
-          'Escribe la palabra correcta en inglés',
-          'Activa el audio si lo necesitas',
-        ];
       case PracticeType.listening:
         return [
-          'Escucha con atención',
-          'Identifica las palabras',
-          'Mejora tu comprensión',
+          'Ve la definición de cada palabra',
+          'Escucha la pronunciación',
+          'Escribe la palabra correcta en inglés',
+        ];
+      case PracticeType.spelling:
+        return [
+          'Próximamente disponible',
+          'Nueva forma de practicar',
         ];
       case PracticeType.matching:
         return [

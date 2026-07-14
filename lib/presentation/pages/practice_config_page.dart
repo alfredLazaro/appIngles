@@ -6,7 +6,7 @@ import 'package:first_app/presentation/bloc/practice/practice_state.dart';
 import 'package:first_app/presentation/pages/flashcard_practice_page.dart';
 import 'package:first_app/presentation/pages/sentence_practice_page.dart';
 import 'package:first_app/presentation/pages/matching_practice_page.dart';
-import 'package:first_app/presentation/pages/spelling_practice_page.dart';
+import 'package:first_app/presentation/pages/listening_practice_page.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/modals/practice_selection_modal.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
@@ -137,15 +137,15 @@ class _PracticeConfigPageState extends State<PracticeConfigPage> {
               words: defData.words, rounds: defData.rounds),
           isDefinitionMode: true,
         );
-      case PracticeType.spelling:
-        final spellData = state.practiceData as SpellingPracticeData;
-        return SpellingPracticePage(
-          words: spellData.words,
-          maxAudioPlays: spellData.maxAudioPlays,
+      case PracticeType.listening:
+        final listenData = state.practiceData as ListeningPracticeData;
+        return ListeningPracticePage(
+          words: listenData.words,
+          maxAudioPlays: listenData.maxAudioPlays,
         );
-      default:
+      case PracticeType.spelling:
         return const Scaffold(
-          body: Center(child: Text('Práctica no disponible')),
+          body: Center(child: Text('Práctica de Spelling próximamente')),
         );
     }
   }

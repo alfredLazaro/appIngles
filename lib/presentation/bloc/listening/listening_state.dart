@@ -1,18 +1,18 @@
 import 'package:equatable/equatable.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 
-abstract class SpellingState extends Equatable {
-  const SpellingState();
+abstract class ListeningState extends Equatable {
+  const ListeningState();
 
   @override
   List<Object?> get props => [];
 }
 
-class SpellingInitial extends SpellingState {
-  const SpellingInitial();
+class ListeningInitial extends ListeningState {
+  const ListeningInitial();
 }
 
-class SpellingLoaded extends SpellingState {
+class ListeningLoaded extends ListeningState {
   final List<FlashcardWord> words;
   final int currentIndex;
   final FlashcardWord currentWord;
@@ -24,7 +24,7 @@ class SpellingLoaded extends SpellingState {
   final int audioPlayedCount;
   final bool hasSubmitted;
 
-  const SpellingLoaded({
+  const ListeningLoaded({
     required this.words,
     required this.currentIndex,
     required this.currentWord,
@@ -37,7 +37,7 @@ class SpellingLoaded extends SpellingState {
     this.hasSubmitted = false,
   });
 
-  SpellingLoaded copyWith({
+  ListeningLoaded copyWith({
     List<FlashcardWord>? words,
     int? currentIndex,
     FlashcardWord? currentWord,
@@ -50,7 +50,7 @@ class SpellingLoaded extends SpellingState {
     bool? hasSubmitted,
     bool clearIsCorrect = false,
   }) {
-    return SpellingLoaded(
+    return ListeningLoaded(
       words: words ?? this.words,
       currentIndex: currentIndex ?? this.currentIndex,
       currentWord: currentWord ?? this.currentWord,
@@ -79,12 +79,12 @@ class SpellingLoaded extends SpellingState {
       ];
 }
 
-class SpellingCompleted extends SpellingState {
+class ListeningCompleted extends ListeningState {
   final Map<int, int> learnCountUpdates;
   final int totalItems;
   final int correctItems;
 
-  const SpellingCompleted({
+  const ListeningCompleted({
     required this.learnCountUpdates,
     required this.totalItems,
     required this.correctItems,
