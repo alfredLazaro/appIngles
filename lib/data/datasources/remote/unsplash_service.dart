@@ -51,7 +51,7 @@ class ImageService {
           queryParameters: {
             'query': nImg,
             'page': '1',
-            'per_page': '10',
+            'per_page': '12',
           },
           options: Options(headers: {'Authorization': 'Client-ID $_apiKey'}));
       if (response.data['results'] == null ||

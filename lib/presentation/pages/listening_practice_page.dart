@@ -6,7 +6,7 @@ import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/bloc/practice/practice_event.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
-import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
+import 'package:first_app/presentation/widgets/practice_results_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
@@ -64,30 +64,7 @@ class _ListeningPracticePageState extends State<ListeningPracticePage> {
     context.read<PracticeBloc>().add(FinishPracticeEvent(result));
   }
 
-  void _showCompletionDialog(ListeningCompleted state) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => CompletionDialog(
-        totalItems: state.totalItems,
-        learnedCount: state.correctItems,
-        itemName: 'palabras',
-        onFinish: () {
-          Navigator.pop(dialogContext);
-          Navigator.pop(context);
-        },
-        onRepeat: () {
-          Navigator.pop(dialogContext);
-          _textController.clear();
-          _bloc.add(InitializeListening(
-            words: widget.words,
-            maxAudioPlays: widget.maxAudioPlays,
-          ));
-        },
-        primaryColor: Colors.purple,
-      ),
-    );
-
+  void _goToResults(ListeningCompleted state) {
     _submitResult(state);
   }
 
@@ -109,20 +86,30 @@ class _ListeningPracticePageState extends State<ListeningPracticePage> {
   Widget build(BuildContext context) {
     return BlocProvider<ListeningBloc>.value(
       value: _bloc,
-      child: BlocListener<ListeningBloc, ListeningState>(
-        listenWhen: (previous, current) => current is ListeningCompleted,
+      child: BlocConsumer<ListeningBloc, ListeningState>(
         listener: (context, state) {
           if (state is ListeningCompleted) {
-            _showCompletionDialog(state);
+            _goToResults(state);
           }
         },
-        child: BlocBuilder<ListeningBloc, ListeningState>(
-          builder: (context, state) {
-            if (state is! ListeningLoaded) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
+        builder: (context, state) {
+          if (state is ListeningCompleted) {
+            return PracticeResultsWidget(
+              practiceType: PracticeType.listening,
+              totalItems: state.totalItems,
+              correctItems: state.correctItems,
+              words: widget.words,
+              learnCountUpdates: state.learnCountUpdates,
+              onFinish: () => Navigator.pop(context),
+              accentColor: Colors.purple,
+            );
+          }
+
+          if (state is! ListeningLoaded) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
 
             return Scaffold(
               resizeToAvoidBottomInset: true,
@@ -227,8 +214,7 @@ class _ListeningPracticePageState extends State<ListeningPracticePage> {
             );
           },
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildDefinitionCard(ListeningLoaded state) {

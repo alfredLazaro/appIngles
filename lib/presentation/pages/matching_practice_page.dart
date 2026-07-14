@@ -6,7 +6,7 @@ import 'package:first_app/presentation/bloc/practice/practice_event.dart';
 import 'package:first_app/presentation/bloc/matching/matching_bloc.dart';
 import 'package:first_app/presentation/bloc/matching/matching_event.dart';
 import 'package:first_app/presentation/bloc/matching/matching_state.dart';
-import 'package:first_app/presentation/widgets/matching_results_widget.dart';
+import 'package:first_app/presentation/widgets/practice_results_widget.dart';
 import 'package:first_app/presentation/widgets/matching_progress_bar.dart';
 import 'package:first_app/presentation/widgets/matching_translation_layout.dart';
 import 'package:first_app/presentation/widgets/matching_definition_layout.dart';
@@ -98,9 +98,16 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
         },
         builder: (context, state) {
           if (state is MatchingCompleted) {
-            return MatchingResultsWidget(
-              state: state,
-              totalPairs: _totalPairs,
+            return PracticeResultsWidget(
+              practiceType: widget.isDefinitionMode
+                  ? PracticeType.matchingDefinition
+                  : PracticeType.matching,
+              totalItems: _totalPairs,
+              correctItems: state.totalCorrect,
+              words: widget.data.words,
+              learnCountUpdates: state.learnCountUpdates,
+              onFinish: () => Navigator.pop(context),
+              accentColor: const Color(0xFF413FE6),
             );
           }
           if (state is MatchingRoundReady) {

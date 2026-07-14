@@ -5,7 +5,8 @@ import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/bloc/practice/practice_event.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
-import 'package:first_app/presentation/widgets/dialogs/completion_dialog.dart';
+import 'package:first_app/domain/entities/flashcard_word.dart';
+import 'package:first_app/presentation/widgets/practice_results_widget.dart';
 import 'package:first_app/presentation/widgets/sentence/sentence_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,6 +28,7 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
   final PageController _pageController = PageController();
   int get totalSentences => widget.sentences.length;
   int _currentIndex = 0;
+  bool _isCompleted = false;
 
   @override
   void initState() {
@@ -43,6 +45,20 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isCompleted) {
+      return PracticeResultsWidget(
+        practiceType: PracticeType.sentence,
+        totalItems: widget.sentences.length,
+        correctItems: widget.sentences.length,
+        words: _sentencesAsWords(),
+        learnCountUpdates: {
+          for (final s in widget.sentences) s.id: s.learnCount + 1,
+        },
+        onFinish: () => Navigator.pop(context),
+        showDetailList: false,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Ordenar Oraciones (${_currentIndex + 1}/$totalSentences)'),
@@ -104,44 +120,40 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
                             curve: Curves.easeInOut,
                           );
                         }
-                      : () => _showCompletionDialog(),
+                      : () => _finishPractice(),
                 ),
               ],
             ),
     );
   }
 
-  void _showCompletionDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => CompletionDialog(
-          totalItems: widget.sentences.length,
-          learnedCount: widget.sentences.length,
-          itemName: 'sentence',
-          onFinish: () {
-            final learnCountUpdates = <int, int>{
-              for (final s in widget.sentences)
-                s.id: s.learnCount + 1,
-            };
-            context.read<PracticeBloc>().add(
-                  FinishPracticeEvent(PracticeResult(
-                    type: PracticeType.sentence,
-                    learnCountUpdates: learnCountUpdates,
-                    totalItems: widget.sentences.length,
-                    correctItems: widget.sentences.length,
-                  )),
-                );
-            Navigator.pop(dialogContext);
-            Navigator.pop(context);
-          },
-          onRepeat: () {
-            Navigator.pop(dialogContext);
-            setState(() {
-              _currentIndex = 0;
-              _pageController.jumpToPage(0);
-            });
-          }),
-    );
+  void _finishPractice() {
+    final learnCountUpdates = <int, int>{
+      for (final s in widget.sentences)
+        s.id: s.learnCount + 1,
+    };
+    context.read<PracticeBloc>().add(
+          FinishPracticeEvent(PracticeResult(
+            type: PracticeType.sentence,
+            learnCountUpdates: learnCountUpdates,
+            totalItems: widget.sentences.length,
+            correctItems: widget.sentences.length,
+          )),
+        );
+    setState(() {
+      _isCompleted = true;
+    });
+  }
+
+  List<FlashcardWord> _sentencesAsWords() {
+    return widget.sentences
+        .map((s) => FlashcardWord(
+              id: s.id,
+              word: s.sentence,
+              sentence: '',
+              definition: '',
+              learnCount: s.learnCount,
+            ))
+        .toList();
   }
 }
