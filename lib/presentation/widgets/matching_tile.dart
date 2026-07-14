@@ -23,7 +23,7 @@ class MatchingTile extends StatelessWidget {
     this.showShake = false,
   });
 
-  static const Color _primary = Color(0xFF413FE6);
+  static const Color _primary = Color.fromARGB(255, 39, 38, 63);
   static const Color _tertiary = Color(0xFF006934);
   static const Color _tertiaryContainer = Color(0xFF6BFE9C);
   static const Color _error = Color(0xFFBA1A1A);
@@ -42,22 +42,22 @@ class MatchingTile extends StatelessWidget {
     if (isMatched && isCorrect == true) {
       bgColor = _tertiaryContainer;
       textColor = _tertiary;
-      border = Border.all(color: _tertiary, width: 2);
+      border = Border.all(color: _tertiary, width: 0.5);
       shadows = [];
     } else if (isMatched && isCorrect == false) {
       bgColor = _errorContainer;
       textColor = _error;
-      border = Border.all(color: _error, width: 2);
+      border = Border.all(color: _error, width: 0.5);
       shadows = [];
     } else if (isMatched) {
       bgColor = Colors.grey.shade200;
       textColor = Colors.grey.shade600;
-      border = Border.all(color: Colors.grey.shade300, width: 1);
+      border = Border.all(color: Colors.grey.shade300, width: 0.5);
       shadows = [];
     } else if (isSelected) {
-      bgColor = _surfaceContainerLowest;
+      bgColor = const Color.fromARGB(255, 185, 213, 240);
       textColor = _primary;
-      border = Border.all(color: _primary, width: 2);
+      border = Border.all(color: _primary, width: 0.5);
       shadows = [
         BoxShadow(
           color: _primary.withValues(alpha: 0.1),
@@ -68,19 +68,19 @@ class MatchingTile extends StatelessWidget {
     } else {
       bgColor = _surfaceContainerLowest;
       textColor = _onSurface;
-      border = Border.all(color: _outlineVariant, width: 1);
+      border = Border.all(color: _outlineVariant, width: 0.5);
       shadows = [
         BoxShadow(
           color: Colors.black.withValues(alpha: 0.05),
           blurRadius: 12,
-          offset: const Offset(0, 4),
+          offset: const Offset(0, 8),
         ),
       ];
     }
 
     final tile = AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       decoration: BoxDecoration(
         color: bgColor,
