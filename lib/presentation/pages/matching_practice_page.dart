@@ -7,6 +7,7 @@ import 'package:first_app/presentation/bloc/practice/practice_event.dart';
 import 'package:first_app/presentation/bloc/matching/matching_bloc.dart';
 import 'package:first_app/presentation/bloc/matching/matching_event.dart';
 import 'package:first_app/presentation/bloc/matching/matching_state.dart';
+import 'package:first_app/presentation/widgets/feedback_overlay.dart';
 import 'package:first_app/presentation/widgets/practice_results_widget.dart';
 import 'package:first_app/presentation/widgets/matching_progress_bar.dart';
 import 'package:first_app/presentation/widgets/matching_translation_layout.dart';
@@ -34,6 +35,8 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
   late final MatchingAnimationController _animationController;
   int? _pendingLeftIndex;
   int? _pendingRightIndex;
+  bool? _lastAttemptCorrect;
+  bool _feedbackDismissed = false;
 
   int get _totalPairs => widget.data.rounds.fold<int>(
         0,
@@ -126,6 +129,13 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
     final isRoundComplete =
         state.matchedWordIndices.length == state.round.words.length;
 
+    if (state.lastAttemptCorrect != _lastAttemptCorrect) {
+      _lastAttemptCorrect = state.lastAttemptCorrect;
+      if (state.lastAttemptCorrect != null) {
+        _feedbackDismissed = false;
+      }
+    }
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppBar(
@@ -149,80 +159,75 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          MatchingProgressBar(
-            matched: state.matchedWordIndices.length,
-            total: state.round.words.length,
-            roundIndex: state.roundIndex,
-            totalRounds: state.totalRounds,
-          ),
-          if (state.lastAttemptCorrect != null)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              color: state.lastAttemptCorrect!
-                  ? AppColors.successLight.withValues(alpha: 0.3)
-                  : AppColors.errorLight,
-              child: Center(
-                child: Text(
-                  state.lastAttemptCorrect!
-                      ? '¡Correcto!'
-                      : 'Incorrecto, intenta de nuevo',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: state.lastAttemptCorrect!
-                        ? AppColors.success
-                        : AppColors.error,
-                  ),
+          Column(
+            children: [
+              MatchingProgressBar(
+                matched: state.matchedWordIndices.length,
+                total: state.round.words.length,
+                roundIndex: state.roundIndex,
+                totalRounds: state.totalRounds,
+              ),
+              Expanded(
+                child: ListenableBuilder(
+                  listenable: _animationController,
+                  builder: (context, _) {
+                    return widget.isDefinitionMode
+                        ? MatchingDefinitionLayout(
+                            state: state,
+                            controller: _animationController,
+                            onLeftTap: _onLeftTap,
+                            onRightTap: _onRightTap,
+                          )
+                        : MatchingTranslationLayout(
+                            state: state,
+                            controller: _animationController,
+                            onLeftTap: _onLeftTap,
+                            onRightTap: _onRightTap,
+                          );
+                  },
                 ),
               ),
-            ),
-          Expanded(
-            child: ListenableBuilder(
-              listenable: _animationController,
-              builder: (context, _) {
-                return widget.isDefinitionMode
-                    ? MatchingDefinitionLayout(
-                        state: state,
-                        controller: _animationController,
-                        onLeftTap: _onLeftTap,
-                        onRightTap: _onRightTap,
-                      )
-                    : MatchingTranslationLayout(
-                        state: state,
-                        controller: _animationController,
-                        onLeftTap: _onLeftTap,
-                        onRightTap: _onRightTap,
-                      );
-              },
-            ),
-          ),
-          if (isRoundComplete)
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: FlashcardConstants.primaryBlue,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              if (isRoundComplete)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: FlashcardConstants.primaryBlue,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        _matchingBloc.add(const NextMatchingRound());
+                      },
+                      child: Text(
+                        state.roundIndex + 1 < state.totalRounds
+                            ? 'Siguiente ronda'
+                            : 'Ver resultados',
+                        style: const TextStyle(fontSize: 18),
+                      ),
                     ),
                   ),
-                  onPressed: () {
-                    _matchingBloc.add(const NextMatchingRound());
-                  },
-                  child: Text(
-                    state.roundIndex + 1 < state.totalRounds
-                        ? 'Siguiente ronda'
-                        : 'Ver resultados',
-                    style: const TextStyle(fontSize: 18),
-                  ),
                 ),
+            ],
+          ),
+          if (state.lastAttemptCorrect != null && !_feedbackDismissed)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: FeedbackOverlay(
+                text: state.lastAttemptCorrect!
+                    ? '¡Correcto!'
+                    : 'Incorrecto, intenta de nuevo',
+                isCorrect: state.lastAttemptCorrect!,
+                onDismiss: () => setState(() => _feedbackDismissed = true),
               ),
             ),
         ],
