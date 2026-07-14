@@ -20,16 +20,8 @@ class FlashcardConstants {
   static const double checkButtonHeight = 56.0;
 
   // Colors
-  static const Color textColor = Color(0xFF191C1E);
-  static const Color secondaryTextColor = Color(0xFF454651);
-  static const Color primaryBlue = Color(0xFF4352A5);
-  static const Color accentColor = Color(0xFF535C89);
-  static const Color borderColor = Color(0xFFC6C5D3);
-  static const Color successGreen = Color(0xFF059669);
   static const Color successContainer = Color(0xFFD1FAE5);
   static const Color successDark = Color(0xFF065F46);
-  static const Color errorRed = Color(0xFFBA1A1A);
-  static const Color errorContainer = Color(0xFFFFDAD6);
   static const Color errorDark = Color(0xFF93000A);
   static const Color hintBg = Color(0xFFE0E3E6);
   static const Color inputBg = Color(0xFFF2F4F7);

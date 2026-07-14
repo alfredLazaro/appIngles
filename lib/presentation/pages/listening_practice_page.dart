@@ -360,7 +360,7 @@ class _ListeningPracticePageState extends State<ListeningPracticePage> {
       duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-              color: isCorrect ? FlashcardConstants.successContainer : FlashcardConstants.errorContainer,
+              color: isCorrect ? FlashcardConstants.successContainer : AppColors.errorLight ,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isCorrect ? Colors.green : Colors.red,
@@ -371,7 +371,7 @@ class _ListeningPracticePageState extends State<ListeningPracticePage> {
         children: [
           Icon(
             isCorrect ? Icons.check_circle : Icons.cancel,
-          color: isCorrect ? FlashcardConstants.successGreen : FlashcardConstants.errorRed,
+          color: isCorrect ? AppColors.success : AppColors.error,
             size: 28,
           ),
           const SizedBox(width: 12),
