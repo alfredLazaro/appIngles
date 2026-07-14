@@ -151,7 +151,7 @@ class PracticeResultsWidget extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: onFinish,
-              child: const Text('Volver'),
+              child: const Text('Finalizar'),
             ),
           ],
         ),
