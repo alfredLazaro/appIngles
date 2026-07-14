@@ -6,7 +6,6 @@ import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_bloc.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_state.dart';
-import 'flashcard_image.dart';
 
 class FlashcardFront extends StatefulWidget {
   final FlashcardWord word;
@@ -42,74 +41,10 @@ class _FlashcardFrontState extends State<FlashcardFront> {
   @override
   Widget build(BuildContext context) {
     final blocState = context.watch<FlashcardBloc>().state;
-    if (blocState is FlashcardLoaded && blocState.mode == FlashcardMode.test) {
-      return _buildTestFront(context, blocState);
+    if (blocState is! FlashcardLoaded) {
+      return const Center(child: CircularProgressIndicator());
     }
-    return _buildLearnFront(context);
-  }
-
-  Widget _buildLearnFront(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
-          children: [
-            if (widget.images.isNotEmpty)
-              SizedBox(
-                height: (constraints.maxHeight * 0.5).clamp(120.0, 300.0),
-                width: double.infinity,
-                child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(AppLayout.radiusLarge),
-                      topRight: Radius.circular(AppLayout.radiusLarge),
-                    ),
-                  child: FlashcardImageWidget(
-                    images: widget.images,
-                    height: (constraints.maxHeight * 0.5).clamp(120.0, 300.0),
-                  ),
-                ),
-              ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(
-                    (constraints.maxHeight * 0.02).clamp(6.0, 14.0)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          widget.word.word.isNotEmpty
-                          ? widget.word.word
-                          : FlashcardConstants.wordNotFound,
-                          style: TextStyle(
-                            fontSize:
-                                (constraints.maxHeight * 0.1).clamp(26.0, 48.0),
-                            fontWeight: FontWeight.bold,
-                            color: widget.textColor,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      FlashcardConstants.tapToSeeDefinition,
-                      style: TextStyle(
-                        fontSize:
-                            (constraints.maxHeight * 0.02).clamp(10.0, 14.0),
-                        fontStyle: FontStyle.italic,
-                        color: widget.textColor.withOpacity(0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+    return _buildTestFront(context, blocState);
   }
 
   Widget _buildTestFront(BuildContext context, FlashcardLoaded state) {
@@ -348,15 +283,15 @@ class _FlashcardFrontState extends State<FlashcardFront> {
             color: FlashcardConstants.successContainer,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
+          child: const Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.check_circle,
                 size: 20,
                 color: AppColors.success,
               ),
-              const SizedBox(width: 8),
-              const Text(
+              SizedBox(width: 8),
+              Text(
                 '¡Correcto! Excelente memoria.',
                 style: TextStyle(
                   fontSize: 12,
