@@ -6,6 +6,7 @@ import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_bloc.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_event.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_state.dart';
+import 'feedback_area.dart';
 
 class FlashcardFront extends StatefulWidget {
   final FlashcardWord word;
@@ -223,7 +224,10 @@ class _FlashcardFrontState extends State<FlashcardFront> {
           },
         ),
         const SizedBox(height: 16),
-        _buildFeedbackArea(context, state),
+        FeedbackArea(
+                          isCorrect: state.isAnswerCorrect,
+                          correctAnswer: widget.word.word,
+                        ),
         const SizedBox(height: 16),
         SizedBox(
           height: FlashcardConstants.checkButtonHeight,
@@ -270,95 +274,6 @@ class _FlashcardFrontState extends State<FlashcardFront> {
       ],
     );
   }
-
-  Widget _buildFeedbackArea(BuildContext context, FlashcardLoaded state) {
-    final hasSubmitted = state.isAnswerCorrect != null;
-    final isCorrect = state.isAnswerCorrect ?? false;
-
-    if (hasSubmitted) {
-      if (isCorrect) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: FlashcardConstants.successContainer,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Row(
-            children: [
-              Icon(
-                Icons.check_circle,
-                size: 20,
-                color: AppColors.success,
-              ),
-              SizedBox(width: 8),
-              Text(
-                '¡Correcto! Excelente memoria.',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: FlashcardConstants.successDark,
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.errorLight,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.info_outline,
-              size: 20,
-              color: AppColors.error,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Correcto: ${widget.word.word}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.error,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFECEFF1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.info_outline,
-            size: 20,
-            color: AppColors.textSecondary,
-          ),
-          const SizedBox(width: 8),
-          const Text(
-            'Toca comprobar para validar',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
 
 
   Widget _buildRevealedAnswer(FlashcardLoaded state) {
