@@ -12,6 +12,7 @@ class DBTables {
 class WordFields {
   static const String id = 'id';
   static const String word = 'word';
+  static const String partOfSpeech = 'partOfSpeech';
   static const String phonetic = 'phonetic';
   static const String definition = 'definition';
   static const String sentence = 'sentence';
