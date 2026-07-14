@@ -135,8 +135,6 @@ class _FlashcardFrontState extends State<FlashcardFront> {
                       _buildInputSection(context, state),
                     ],
                     if (hasSubmitted) ...[
-                      _buildResultFeedback(state),
-                      const SizedBox(height: 16),
                       if (!isCorrect) _buildInputSection(context, state),
                     ],
                     if (isRevealed && !hasSubmitted) ...[
@@ -233,7 +231,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
         fontWeight: FontWeight.w400,
         height: 1.6,
         fontStyle: FontStyle.italic,
-        color: FlashcardConstants.textColor,
+        color: AppColors.textPrimary ,
       ),
     );
   }
@@ -248,7 +246,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.05,
-            color: FlashcardConstants.secondaryTextColor,
+            color: AppColors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -263,11 +261,11 @@ class _FlashcardFrontState extends State<FlashcardFront> {
             fillColor: const Color(0xFFF2F4F7),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppLayout.radiusMedium),
-              borderSide: BorderSide(color: FlashcardConstants.borderColor),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppLayout.radiusMedium),
-              borderSide: BorderSide(color: FlashcardConstants.borderColor),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppLayout.radiusMedium),
@@ -281,7 +279,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
           style: const TextStyle(
             fontSize: FlashcardConstants.inputFontSize,
             fontWeight: FontWeight.w500,
-            color: FlashcardConstants.textColor,
+            color: AppColors.textPrimary ,
           ),
           onSubmitted: (value) {
             if (value.trim().isNotEmpty) {
@@ -310,7 +308,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor:         FlashcardConstants.primaryBlue,
+              backgroundColor:         AppColors.primaryBlue,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppLayout.radiusLarge),
@@ -329,7 +327,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
               'Mostrar respuesta',
               style: TextStyle(
                 fontSize: 13,
-                color: FlashcardConstants.secondaryTextColor,
+                color: AppColors.textSecondary,
               ),
             ),
           ),
@@ -355,7 +353,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
               const Icon(
                 Icons.check_circle,
                 size: 20,
-                color: FlashcardConstants.successGreen,
+                color: AppColors.success,
               ),
               const SizedBox(width: 8),
               const Text(
@@ -370,6 +368,33 @@ class _FlashcardFrontState extends State<FlashcardFront> {
           ),
         );
       }
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.errorLight,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.info_outline,
+              size: 20,
+              color: AppColors.error,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Correcto: ${widget.word.word}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.error,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     return Container(
@@ -383,7 +408,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
           const Icon(
             Icons.info_outline,
             size: 20,
-            color: FlashcardConstants.secondaryTextColor,
+            color: AppColors.textSecondary,
           ),
           const SizedBox(width: 8),
           const Text(
@@ -391,7 +416,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: FlashcardConstants.secondaryTextColor,
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -399,56 +424,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
     );
   }
 
-  Widget _buildResultFeedback(FlashcardLoaded state) {
-    final isCorrect = state.isAnswerCorrect!;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isCorrect ? FlashcardConstants.successContainer : FlashcardConstants.errorContainer,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-                  color: isCorrect ? FlashcardConstants.successGreen : FlashcardConstants.errorRed,
-          width: 2,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            isCorrect ? Icons.check_circle : Icons.cancel,
-            color:
-                isCorrect ? FlashcardConstants.successGreen : FlashcardConstants.errorRed,
-            size: 28,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isCorrect ? '¡Correcto! (+3)' : 'Incorrecto (-1)',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isCorrect
-                        ? FlashcardConstants.successDark
-                        : FlashcardConstants.errorDark,
-                  ),
-                ),
-                if (!isCorrect)
-                  Text(
-                    'Correcto: ${state.word.word}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: FlashcardConstants.errorDark,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildRevealedAnswer(FlashcardLoaded state) {
     return Container(
@@ -502,7 +478,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
             style: TextStyle(
               fontSize: 12,
               fontStyle: FontStyle.italic,
-              color: FlashcardConstants.secondaryTextColor.withOpacity(0.6),
+              color: AppColors.textSecondary.withOpacity(0.6),
             ),
           ),
         ],

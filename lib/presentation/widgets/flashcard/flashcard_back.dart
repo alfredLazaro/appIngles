@@ -161,7 +161,7 @@ class FlashcardBack extends StatelessWidget {
         icon: Icon(
           icon,
           size: (constraints.maxHeight * 0.045).clamp(20.0, 28.0),
-                          color: FlashcardConstants.accentColor,
+                          color: AppColors.textAccent,
         ),
         onPressed: onPressed,
         tooltip: 'Escuchar',

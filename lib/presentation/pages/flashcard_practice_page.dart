@@ -6,6 +6,7 @@ import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/bloc/practice/practice_event.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
+import 'package:first_app/presentation/widgets/feedback_overlay.dart';
 import 'package:first_app/presentation/widgets/practice_results_widget.dart';
 import 'package:first_app/presentation/widgets/flashcard/flashcard_word.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,8 @@ class FlashcardPracticePage extends StatefulWidget {
 
 class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   late final FlashcardBloc _bloc;
+  bool? _lastIsAnswerCorrect;
+  bool _feedbackDismissed = false;
 
   @override
   void initState() {
@@ -126,6 +129,14 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
 
           final currentMode = state.mode;
           final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+
+          if (state.isAnswerCorrect != _lastIsAnswerCorrect) {
+            _lastIsAnswerCorrect = state.isAnswerCorrect;
+            if (state.isAnswerCorrect != null) {
+              _feedbackDismissed = false;
+            }
+          }
+
           return Scaffold(
             resizeToAvoidBottomInset: true,
             appBar: AppBar(
@@ -153,38 +164,56 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                 ),
               ],
             ),
-            body: Column(
+            body: Stack(
               children: [
-                LinearProgressIndicator(
-                  value: (state.currentIndex + 1) / state.sessions.length,
-                  minHeight: 6,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                      _getModeColor(currentMode)),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: _buildFlashcard(state),
-                  ),
-                ),
-                if (!keyboardOpen && state.mode == FlashcardMode.learn)
-                  PageNavigationControls(
-                    currentIndex: state.currentIndex,
-                    totalPages: state.sessions.length,
-                    onPrevious: () => _bloc.add(PreviousFlashcard()),
-                    onNext: () => _bloc.add(NextFlashcard()),
-                    centerWidget: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${state.currentIndex + 1} / ${state.sessions.length}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                Column(
+                  children: [
+                    LinearProgressIndicator(
+                      value: (state.currentIndex + 1) / state.sessions.length,
+                      minHeight: 6,
+                      backgroundColor: Colors.grey[300],
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          _getModeColor(currentMode)),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: _buildFlashcard(state),
+                      ),
+                    ),
+                    if (!keyboardOpen && state.mode == FlashcardMode.learn)
+                      PageNavigationControls(
+                        currentIndex: state.currentIndex,
+                        totalPages: state.sessions.length,
+                        onPrevious: () => _bloc.add(PreviousFlashcard()),
+                        onNext: () => _bloc.add(NextFlashcard()),
+                        centerWidget: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${state.currentIndex + 1} / ${state.sessions.length}',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
+                  ],
+                ),
+                if (state.isAnswerCorrect != null && !_feedbackDismissed)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: FeedbackOverlay(
+                      text: state.isAnswerCorrect!
+                          ? '¡Correcto!'
+                          : 'Incorrecto',
+                      isCorrect: state.isAnswerCorrect!,
+                      displayDuration: const Duration(milliseconds: 800),
+                      onDismiss: () => setState(() => _feedbackDismissed = true),
                     ),
                   ),
               ],

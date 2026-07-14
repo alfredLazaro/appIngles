@@ -18,7 +18,7 @@ class WordFlashcard extends StatelessWidget {
     required this.word,
     required this.images,
     this.backgroundColor = Colors.white,
-    this.textColor = FlashcardConstants.textColor,
+    this.textColor = AppColors.textPrimary ,
   });
 
   @override
@@ -35,7 +35,7 @@ class WordFlashcard extends StatelessWidget {
           ),
         ],
         border: Border.all(
-                    color: FlashcardConstants.borderColor.withOpacity(0.1),
+                    color: AppColors.border.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -79,7 +79,7 @@ class WordFlashcard extends StatelessWidget {
                                     fontSize: FlashcardConstants.wordFontSize,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: -0.02,
-                                    color: FlashcardConstants.textColor,
+                                    color: AppColors.textPrimary ,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -110,7 +110,7 @@ class WordFlashcard extends StatelessWidget {
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: FlashcardConstants.accentColor,
+        color: AppColors.textAccent,
       ),
     );
   }
@@ -127,7 +127,7 @@ class WordFlashcard extends StatelessWidget {
                 fontSize: 20,
                 fontWeight: FontWeight.w400,
                 height: 1.6,
-                color: FlashcardConstants.textColor,
+                color: AppColors.textPrimary ,
               ),
             ),
           ),
@@ -138,7 +138,7 @@ class WordFlashcard extends StatelessWidget {
             fontSize: 10,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.05,
-            color: FlashcardConstants.secondaryTextColor,
+            color: AppColors.textSecondary,
           ),
         ),
       ],
