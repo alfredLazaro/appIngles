@@ -35,6 +35,8 @@ class MatchingRoundReady extends MatchingState {
     this.totalCorrect = 0,
   });
 
+  static const _sentinel = Object();
+
   MatchingRoundReady copyWith({
     MatchRound? round,
     int? roundIndex,
@@ -43,7 +45,7 @@ class MatchingRoundReady extends MatchingState {
     int? selectedRightIndex,
     Set<int>? matchedWordIndices,
     Set<int>? matchedTranslationIndices,
-    bool? lastAttemptCorrect,
+    Object? lastAttemptCorrect = _sentinel,
     int? totalCorrect,
     bool clearSelection = false,
   }) {
@@ -60,7 +62,9 @@ class MatchingRoundReady extends MatchingState {
       matchedWordIndices: matchedWordIndices ?? this.matchedWordIndices,
       matchedTranslationIndices:
           matchedTranslationIndices ?? this.matchedTranslationIndices,
-      lastAttemptCorrect: lastAttemptCorrect ?? this.lastAttemptCorrect,
+      lastAttemptCorrect: identical(lastAttemptCorrect, _sentinel)
+          ? this.lastAttemptCorrect
+          : lastAttemptCorrect as bool?,
       totalCorrect: totalCorrect ?? this.totalCorrect,
     );
   }
