@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/presentation/widgets/learn_progress_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 
 class WordCard extends StatelessWidget {
   final WordWithImage word;
@@ -31,8 +32,8 @@ class WordCard extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: SizedBox(
-                  width: 75,
-                  height: 75,
+                  width: AppLayout.wordCardThumbSize,
+                  height: AppLayout.wordCardThumbSize,
                   child: word.tinyImageUrl != null &&
                           word.tinyImageUrl!.isNotEmpty
                       ? CachedNetworkImage(

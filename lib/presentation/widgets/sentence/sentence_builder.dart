@@ -3,6 +3,7 @@ import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_
 import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/services/tts_service_interface.dart';
 import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_bloc.dart';
 
@@ -35,7 +36,7 @@ class SentenceBuilderWidget extends StatelessWidget {
                   state.isCorrect ? '¡Correcto! ✅' : 'Incorrecto ❌',
                 ),
                 backgroundColor: state.isCorrect ? Colors.green : Colors.red,
-                duration: const Duration(seconds: 2),
+                duration: AppDurations.snackbar,
               ),
             );
           }
@@ -114,7 +115,7 @@ class SentenceBuilderWidget extends StatelessWidget {
   ) {
     return Container(
       width: double.infinity,
-      height: 190,
+      height: AppLayout.sentenceAreaHeight,
       constraints: const BoxConstraints(minHeight: 120),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -163,7 +164,7 @@ class SentenceBuilderWidget extends StatelessWidget {
     SentencePracticeLoaded state,
   ) {
     return Container(
-      height: 260,
+      height: AppLayout.availableWordsHeight,
       decoration: BoxDecoration(
         color: Colors.grey[50],
         borderRadius: BorderRadius.circular(12),

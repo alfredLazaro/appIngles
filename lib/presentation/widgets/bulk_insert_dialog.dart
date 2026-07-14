@@ -1,6 +1,7 @@
 // presentation/widgets/modals/bulk_insert_dialog.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_event.dart';
@@ -100,7 +101,7 @@ class _BulkInsertDialogState extends State<BulkInsertDialog> {
             SnackBar(
               content: Text('✅ Insertadas ${state.results.length} palabras'),
               backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
+              duration: AppDurations.snackbar,
             ),
           );
         } else if (state is WordLearningError) {
@@ -138,8 +139,8 @@ class _BulkInsertDialogState extends State<BulkInsertDialog> {
               const SizedBox(height: 16),
               TextField(
                 controller: _textController,
-                maxLines: 10,
-                minLines: 6,
+                maxLines: AppLayout.bulkInsertMaxLines,
+                minLines: AppLayout.bulkInsertMinLines,
                 onChanged: (_) => _calculateWordCount(),
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),

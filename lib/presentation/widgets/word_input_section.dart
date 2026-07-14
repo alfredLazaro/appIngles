@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 
 class WordInputSection extends StatelessWidget {
   final TextEditingController controller;
@@ -49,7 +50,7 @@ class WordInputSection extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppLayout.radiusSmall),
                   ),
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,

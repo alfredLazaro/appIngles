@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/presentation/bloc/flashcard/flashcard_bloc.dart';
@@ -17,7 +18,7 @@ class WordFlashcard extends StatelessWidget {
     required this.word,
     required this.images,
     this.backgroundColor = Colors.white,
-    this.textColor = const Color(0xFF191C1E),
+    this.textColor = FlashcardConstants.textColor,
   });
 
   @override
@@ -25,7 +26,7 @@ class WordFlashcard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppLayout.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -34,7 +35,7 @@ class WordFlashcard extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: const Color(0xFFC6C5D3).withOpacity(0.1),
+                    color: FlashcardConstants.borderColor.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -70,15 +71,15 @@ class WordFlashcard extends StatelessWidget {
                               },
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
-                                child: Text(
+                              child: Text(
                                   word.word.isNotEmpty
                                       ? word.word
-                                      : 'Word not found',
+                                      : FlashcardConstants.wordNotFound,
                                   style: const TextStyle(
-                                    fontSize: 48,
+                                    fontSize: FlashcardConstants.wordFontSize,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: -0.02,
-                                    color: Color(0xFF191C1E),
+                                    color: FlashcardConstants.textColor,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -109,7 +110,7 @@ class WordFlashcard extends StatelessWidget {
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: Color(0xFF535C89),
+        color: FlashcardConstants.accentColor,
       ),
     );
   }
@@ -126,7 +127,7 @@ class WordFlashcard extends StatelessWidget {
                 fontSize: 20,
                 fontWeight: FontWeight.w400,
                 height: 1.6,
-                color: Color(0xFF191C1E),
+                color: FlashcardConstants.textColor,
               ),
             ),
           ),
@@ -137,7 +138,7 @@ class WordFlashcard extends StatelessWidget {
             fontSize: 10,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.05,
-            color: Color(0xFF454651),
+            color: FlashcardConstants.secondaryTextColor,
           ),
         ),
       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 
 class PaginationControls extends StatelessWidget {
   final int currentPage;
@@ -21,7 +22,7 @@ class PaginationControls extends StatelessWidget {
           icon: const Icon(Icons.chevron_left),
           onPressed: currentPage > 0
               ? () => pageController.previousPage(
-                    duration: const Duration(milliseconds: 300),
+                    duration: AppDurations.pageTransition,
                     curve: Curves.easeInOut,
                   )
               : null,
@@ -31,7 +32,7 @@ class PaginationControls extends StatelessWidget {
           icon: const Icon(Icons.chevron_right),
           onPressed: currentPage < pageCount - 1
               ? () => pageController.nextPage(
-                    duration: const Duration(milliseconds: 300),
+                    duration: AppDurations.pageTransition,
                     curve: Curves.easeInOut,
                   )
               : null,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 
 class DefinitionSelector extends StatefulWidget {
   final List<Map<String, dynamic>> meanings;
@@ -23,11 +24,11 @@ class _DefinitionSelectorState extends State<DefinitionSelector> {
     final definitions = selectedMeaning['definitions'] as List<dynamic>;
     final partOfSpeech = selectedMeaning['partOfSpeech'] as String;
     return Dialog(
-      insetPadding: const EdgeInsets.all(20),
+      insetPadding: const EdgeInsets.all(AppLayout.dialogInset),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-          minWidth: MediaQuery.of(context).size.width * 0.8,
+            maxHeight: MediaQuery.of(context).size.height * AppLayout.dialogMaxHeightRatio,
+            minWidth: MediaQuery.of(context).size.width * AppLayout.dialogMinWidthRatio,
         ),
         child: Padding(
           padding: const EdgeInsets.all(10.0),

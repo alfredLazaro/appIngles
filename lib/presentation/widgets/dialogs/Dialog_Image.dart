@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:logger/logger.dart';
 
 class ImageSelectorDialog extends StatefulWidget {
@@ -20,11 +21,11 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: const EdgeInsets.all(20),
+      insetPadding: const EdgeInsets.all(AppLayout.dialogInset),
       child: ConstrainedBox(
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.8,
-            minWidth: MediaQuery.of(context).size.width * 0.9,
+            minWidth: MediaQuery.of(context).size.width * AppLayout.dialogMinWidthRatio,
           ),
           child: Padding(
               padding: const EdgeInsets.all(16.0),

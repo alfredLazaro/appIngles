@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/bloc/practice/practice_event.dart';
@@ -126,7 +127,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
         state.matchedWordIndices.length == state.round.words.length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBF9F8),
+      backgroundColor: AppColors.surface,
       appBar: AppBar(
         title: Text(
           'Ronda ${state.roundIndex + 1} de ${state.totalRounds}',
@@ -141,7 +142,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF22c55e),
+                  color: AppColors.progressGreen,
                 ),
               ),
             ),
@@ -161,8 +162,8 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 12),
               color: state.lastAttemptCorrect!
-                  ? const Color(0xFF6BFE9C).withValues(alpha: 0.3)
-                  : const Color(0xFFFFDAD6),
+                  ? AppColors.successLight.withValues(alpha: 0.3)
+                  : AppColors.errorLight,
               child: Center(
                 child: Text(
                   state.lastAttemptCorrect!
@@ -172,8 +173,8 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: state.lastAttemptCorrect!
-                        ? const Color(0xFF006934)
-                        : const Color(0xFFBA1A1A),
+                        ? AppColors.success
+                        : AppColors.error,
                   ),
                 ),
               ),
@@ -206,7 +207,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: const Color(0xFF413FE6),
+                    backgroundColor: FlashcardConstants.primaryBlue,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

@@ -37,8 +37,8 @@ class FlashcardBack extends StatelessWidget {
                   width: double.infinity,
                   child: ClipRRect(
                     borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
+                      topLeft: Radius.circular(AppLayout.radiusLarge),
+                      topRight: Radius.circular(AppLayout.radiusLarge),
                     ),
                     child: FlashcardImageWidget(
                       images: images,
@@ -53,7 +53,7 @@ class FlashcardBack extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      word.word.isNotEmpty ? word.word : 'Word not found',
+                        word.word.isNotEmpty ? word.word : FlashcardConstants.wordNotFound,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: (constraints.maxHeight * 0.08).clamp(28.0, 48.0),
@@ -154,14 +154,14 @@ class FlashcardBack extends StatelessWidget {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFC0C9FD).withOpacity(0.3),
+                      color: FlashcardConstants.audioBtnBg.withOpacity(0.3),
         shape: BoxShape.circle,
       ),
       child: IconButton(
         icon: Icon(
           icon,
           size: (constraints.maxHeight * 0.045).clamp(20.0, 28.0),
-          color: const Color(0xFF535C89),
+                          color: FlashcardConstants.accentColor,
         ),
         onPressed: onPressed,
         tooltip: 'Escuchar',

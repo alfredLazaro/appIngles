@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 
 class MatchingProgressBar extends StatelessWidget {
   final int matched;
@@ -33,7 +34,7 @@ class MatchingProgressBar extends StatelessWidget {
                 'Set Progress',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Color(0xFF767587),
+                  color: AppColors.subtitleGrey,
                   fontFamily: 'Nunito Sans',
                 ),
               ),
@@ -41,7 +42,7 @@ class MatchingProgressBar extends StatelessWidget {
                 'Round ${roundIndex + 1} of $totalRounds',
                 style: const TextStyle(
                   fontSize: 10,
-                  color: Color(0xFF767587),
+                  color: AppColors.subtitleGrey,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -52,27 +53,27 @@ class MatchingProgressBar extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF22c55e),
+                  color: AppColors.progressGreen,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 6),
           ClipRRect(
-            borderRadius: BorderRadius.circular(9999),
+            borderRadius: BorderRadius.circular(AppLayout.radiusPill),
             child: Container(
               height: 12,
               width: double.infinity,
-              color: const Color(0xFFE0E0FF),
+              color: AppColors.progressTrack,
               child: FractionallySizedBox(
                 alignment: Alignment.centerLeft,
                 widthFactor: progress,
                 child: Container(
                   decoration: const BoxDecoration(
-                    color: Color(0xFF22c55e),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(9999),
-                      bottomLeft: Radius.circular(9999),
+                    color: AppColors.progressGreen,
+                      borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(AppLayout.radiusPill),
+                      bottomLeft: Radius.circular(AppLayout.radiusPill),
                     ),
                   ),
                 ),

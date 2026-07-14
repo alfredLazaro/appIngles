@@ -1,3 +1,4 @@
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:flutter/material.dart';
 import 'word_list_item.dart';
@@ -23,7 +24,7 @@ class WordListSection extends StatelessWidget {
     required this.onPageChanged,
   });
 
-  int get _pageCount => (words.length / 3).ceil();
+  int get _pageCount => (words.length / AppLayout.defaultPageSize).ceil();
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +37,8 @@ class WordListSection extends StatelessWidget {
               itemCount: _pageCount,
               onPageChanged: onPageChanged,
               itemBuilder: (context, pageIndex) {
-                final startIndex = pageIndex * 3;
-                final endIndex = (startIndex + 3).clamp(0, words.length);
+                final startIndex = pageIndex * AppLayout.defaultPageSize;
+                final endIndex = (startIndex + AppLayout.defaultPageSize).clamp(0, words.length);
                 final displayedWords = words.sublist(startIndex, endIndex);
 
                 return ListView.builder(

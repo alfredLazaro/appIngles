@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 
 class MatchingTile extends StatelessWidget {
   final String text;
@@ -23,14 +24,14 @@ class MatchingTile extends StatelessWidget {
     this.showShake = false,
   });
 
-  static const Color _primary = Color.fromARGB(255, 39, 38, 63);
-  static const Color _tertiary = Color(0xFF006934);
-  static const Color _tertiaryContainer = Color(0xFF6BFE9C);
-  static const Color _error = Color(0xFFBA1A1A);
-  static const Color _errorContainer = Color(0xFFFFDAD6);
-  static const Color _surfaceContainerLowest = Color(0xFFFFFFFF);
-  static const Color _onSurface = Color(0xFF1B1C1C);
-  static const Color _outlineVariant = Color(0xFFC6C4D8);
+  static const Color _primary = AppColors.matchingPrimary;
+  static const Color _tertiary = AppColors.success;
+  static const Color _tertiaryContainer = AppColors.successLight;
+  static const Color _error = AppColors.error;
+  static const Color _errorContainer = AppColors.errorLight;
+  static const Color _surfaceContainerLowest = AppColors.white;
+  static const Color _onSurface = AppColors.textPrimary;
+  static const Color _outlineVariant = AppColors.border;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,7 @@ class MatchingTile extends StatelessWidget {
       border = Border.all(color: Colors.grey.shade300, width: 0.5);
       shadows = [];
     } else if (isSelected) {
-      bgColor = const Color.fromARGB(255, 185, 213, 240);
+      bgColor = AppColors.selectedBg;
       textColor = _primary;
       border = Border.all(color: _primary, width: 0.5);
       shadows = [
@@ -79,12 +80,12 @@ class MatchingTile extends StatelessWidget {
     }
 
     final tile = AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+      duration: AppDurations.matchingTileAnimation,
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppLayout.radiusLarge),
         border: border,
         boxShadow: shadows,
       ),
@@ -148,7 +149,7 @@ class _ShakeWidgetState extends State<_ShakeWidget>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: AppDurations.matchingFade,
       vsync: this,
     );
     _animation = Tween<double>(begin: 0, end: 1).animate(

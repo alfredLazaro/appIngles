@@ -5,6 +5,7 @@ import 'package:first_app/presentation/widgets/dialogs/delete_confirmation_dialo
 import 'package:first_app/presentation/widgets/modals/combine_word_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/services/speech_to_text_interface.dart';
 import 'package:first_app/core/utils/clipboard_helper.dart';
@@ -304,9 +305,9 @@ class _WordLearningPageState extends State<WordLearningPage> {
             onPressed: () {
               final input = limitController.text.trim();
 
-              int limit = 9;
+              int limit = AppLayout.defaultWordLoadLimit;
               if (input.isNotEmpty) {
-                limit = int.tryParse(input) ?? 9;
+                limit = int.tryParse(input) ?? AppLayout.defaultWordLoadLimit;
 
                 if (limit <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(

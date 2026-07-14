@@ -9,6 +9,7 @@ import 'package:first_app/presentation/widgets/controlers/page_navegation_contro
 import 'package:first_app/presentation/widgets/practice_results_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
 import 'package:first_app/domain/usecases/speak_text.dart';
@@ -359,7 +360,7 @@ class _ListeningPracticePageState extends State<ListeningPracticePage> {
       duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isCorrect ? Colors.green.shade50 : Colors.red.shade50,
+              color: isCorrect ? FlashcardConstants.successContainer : FlashcardConstants.errorContainer,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isCorrect ? Colors.green : Colors.red,
@@ -370,7 +371,7 @@ class _ListeningPracticePageState extends State<ListeningPracticePage> {
         children: [
           Icon(
             isCorrect ? Icons.check_circle : Icons.cancel,
-            color: isCorrect ? Colors.green : Colors.red,
+          color: isCorrect ? FlashcardConstants.successGreen : FlashcardConstants.errorRed,
             size: 28,
           ),
           const SizedBox(width: 12),
@@ -383,7 +384,7 @@ class _ListeningPracticePageState extends State<ListeningPracticePage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isCorrect ? Colors.green[800] : Colors.red[800],
+                    color: isCorrect ? FlashcardConstants.successDark : FlashcardConstants.errorDark,
                   ),
                 ),
                 if (!isCorrect)
@@ -391,7 +392,7 @@ class _ListeningPracticePageState extends State<ListeningPracticePage> {
                     'Respuesta correcta: ${state.currentWord.word}',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.red[700],
+                      color: FlashcardConstants.errorDark,
                     ),
                   ),
               ],

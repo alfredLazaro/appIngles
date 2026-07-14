@@ -1,6 +1,7 @@
 // presentation/widgets/modals/translation_bulk_insert_dialog.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/data/datasources/local/db_constants.dart';
 import 'package:first_app/presentation/bloc/translation/translation_bloc.dart';
 import 'package:first_app/presentation/bloc/translation/translation_event.dart';
@@ -164,8 +165,8 @@ class _TranslationBulkInsertDialogState
             const SizedBox(height: 16),
             TextField(
               controller: _textController,
-              maxLines: 10,
-              minLines: 6,
+              maxLines: AppLayout.bulkInsertMaxLines,
+              minLines: AppLayout.bulkInsertMinLines,
               onChanged: (_) => _calculateTranslationCount(),
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
@@ -223,7 +224,7 @@ class _TranslationBulkInsertDialogState
                 '✅ Insertadas ${state.translations.length} traducciones',
               ),
               backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
+              duration: AppDurations.snackbar,
             ),
           );
         } else if (state is TranslationError) {

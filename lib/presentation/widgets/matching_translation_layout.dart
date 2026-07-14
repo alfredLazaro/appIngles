@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/presentation/bloc/matching/matching_state.dart';
 import 'package:first_app/presentation/widgets/matching_tile.dart';
 import 'package:first_app/presentation/widgets/matching_animation_controller.dart';
@@ -28,7 +29,7 @@ class MatchingTranslationLayout extends StatelessWidget {
               state.round.words.length,
               (i) => AnimatedOpacity(
                 opacity: controller.fadingOutWords.contains(i) ? 0.0 : 1.0,
-                duration: const Duration(milliseconds: 500),
+                duration: AppDurations.matchingFade,
                 child: MatchingTile(
                   text: state.round.words[i].word,
                   isSelected: state.selectedLeftIndex == i,
@@ -51,7 +52,7 @@ class MatchingTranslationLayout extends StatelessWidget {
               (i) => AnimatedOpacity(
                 opacity:
                     controller.fadingOutTranslations.contains(i) ? 0.0 : 1.0,
-                duration: const Duration(milliseconds: 500),
+                duration: AppDurations.matchingFade,
                 child: MatchingTile(
                   text: state.round.translations[i].wordTranslate,
                   isSelected: state.selectedRightIndex == i,
@@ -84,7 +85,7 @@ class MatchingTranslationLayout extends StatelessWidget {
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF464556),
+              color: AppColors.matchingTitle,
             ),
           ),
         ),

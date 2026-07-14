@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 
 class AuthorInfoButton extends StatelessWidget {
   final String? author;
@@ -19,7 +20,7 @@ class AuthorInfoButton extends StatelessWidget {
             content: Text(
               'Autor: ${author ?? "Desconocido"}\nFuente: ${source ?? "Desconocida"}',
             ),
-            duration: const Duration(seconds: 2),
+            duration: AppDurations.snackbar,
           ),
         );
       },

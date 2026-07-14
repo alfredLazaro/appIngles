@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 
 class PracticeSelectionModal extends StatefulWidget {
@@ -19,25 +20,29 @@ class PracticeSelectionModal extends StatefulWidget {
 
 class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
   late int _selectedCount;
-  int _maxAudioPlays = 1;
+  int _maxAudioPlays = AppLayout.defaultAudioPlays;
   double get _totalMax =>
-      (widget.totalWords > 30 ? 30.0 : widget.totalWords.toDouble());
+      (widget.totalWords > AppLayout.maxPracticeSelection
+          ? AppLayout.maxPracticeSelection.toDouble()
+          : widget.totalWords.toDouble());
   @override
   void initState() {
     super.initState();
-    _selectedCount = widget.totalWords < 10 ? widget.totalWords : 10;
+    _selectedCount = widget.totalWords < AppLayout.defaultPracticeCount
+        ? widget.totalWords
+        : AppLayout.defaultPracticeCount;
   }
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      insetPadding: const EdgeInsets.all(AppLayout.dialogInset),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxHeight: MediaQuery.of(context).size.height * AppLayout.dialogMaxHeightRatio,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 5.0),
@@ -158,10 +163,10 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                   spacing: 8,
                   alignment: WrapAlignment.center,
                   children: [
-                    if (widget.totalWords >= 10) _buildQuickButton(10),
-                    if (widget.totalWords >= 15) _buildQuickButton(15),
-                    if (widget.totalWords >= 30) _buildQuickButton(30),
-                    if (widget.totalWords >= 50) _buildQuickButton(50),
+                    if (widget.totalWords >= AppLayout.practiceQuickSelect[0]) _buildQuickButton(AppLayout.practiceQuickSelect[0]),
+                    if (widget.totalWords >= AppLayout.practiceQuickSelect[1]) _buildQuickButton(AppLayout.practiceQuickSelect[1]),
+                    if (widget.totalWords >= AppLayout.practiceQuickSelect[2]) _buildQuickButton(AppLayout.practiceQuickSelect[2]),
+                    if (widget.totalWords >= AppLayout.practiceQuickSelect[3]) _buildQuickButton(AppLayout.practiceQuickSelect[3]),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -337,10 +342,10 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            _buildAudioChip(0, 'Sin audio'),
-            _buildAudioChip(1, '1 vez'),
-            _buildAudioChip(3, '3 veces'),
-            _buildAudioChip(-1, 'Ilimitado'),
+            _buildAudioChip(AppLayout.audioPlayOptions[0], 'Sin audio'),
+            _buildAudioChip(AppLayout.audioPlayOptions[1], '1 vez'),
+            _buildAudioChip(AppLayout.audioPlayOptions[2], '3 veces'),
+            _buildAudioChip(AppLayout.audioPlayOptions[3], 'Ilimitado'),
           ],
         ),
       ],

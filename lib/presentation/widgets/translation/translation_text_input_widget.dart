@@ -3,6 +3,7 @@ import 'package:first_app/presentation/bloc/translation/translation_event.dart';
 import 'package:first_app/presentation/bloc/translation/translation_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 
 class TranslationTextInputWidget extends StatefulWidget {
   final int wordId;
@@ -98,8 +99,8 @@ class _TranslationTextInputWidgetState
                     child: TextField(
                       controller: _textController,
                       focusNode: _focusNode,
-                      maxLines: 6,
-                      minLines: 3,
+                      maxLines: AppLayout.translationInputMaxLines,
+                      minLines: AppLayout.translationInputMinLines,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.all(12),

@@ -1,3 +1,4 @@
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/translation_entity.dart';
 import 'package:flutter/material.dart';
 
@@ -50,7 +51,7 @@ class _TranslationSectionState extends State<TranslationSection> {
           children: [
             const Icon(Icons.translate, size: 20, color: Colors.grey),
             const SizedBox(width: 12),
-            const Text('Traducciones',
+            const Text(AppStrings.translations,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             if (widget.translations.isNotEmpty) ...[
               const SizedBox(width: 8),
@@ -63,7 +64,7 @@ class _TranslationSectionState extends State<TranslationSection> {
         if (widget.translations.isEmpty && !widget.isEditing)
           const Padding(
             padding: EdgeInsets.only(left: 32, top: 4, bottom: 4),
-            child: Text('Sin traducciones',
+            child: Text(AppStrings.noTranslations,
                 style: TextStyle(color: Colors.grey, fontSize: 14)),
           ),
         ...List.generate(widget.translations.length, (i) {

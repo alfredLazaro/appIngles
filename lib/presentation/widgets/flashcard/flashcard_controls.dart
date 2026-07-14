@@ -37,7 +37,7 @@ class FlashcardControls extends StatelessWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF5C6BC0),
+        color: FlashcardConstants.controlBg,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(

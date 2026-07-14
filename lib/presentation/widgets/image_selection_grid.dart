@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/image_search_result.dart';
 
 class ImageSelectionGrid extends StatefulWidget {
@@ -114,8 +115,8 @@ class _ImageSelectionGridState extends State<ImageSelectionGrid> {
                   child: GridView.builder(
                     padding: const EdgeInsets.all(8),
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
+                        SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: AppLayout.imageGridColumns,
                       crossAxisSpacing: 8,
                       mainAxisSpacing: 8,
                     ),

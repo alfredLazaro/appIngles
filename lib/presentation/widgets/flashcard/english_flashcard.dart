@@ -14,8 +14,8 @@ class EnglishFlashCard extends StatelessWidget {
 
   const EnglishFlashCard({
     super.key,
-    this.textColor = const Color(0xFF191C1E),
-    this.borderRadius = 12.0,
+    this.textColor = FlashcardConstants.textColor,
+    this.borderRadius = AppLayout.radiusLarge,
     this.maxWidth = 450.0,
   });
 
@@ -52,7 +52,7 @@ class EnglishFlashCard extends StatelessWidget {
                     ),
                   ],
                   border: Border.all(
-                    color: const Color(0xFFC6C5D3).withOpacity(0.1),
+                    color: FlashcardConstants.borderColor.withOpacity(0.1),
                     width: 1,
                   ),
                 ),

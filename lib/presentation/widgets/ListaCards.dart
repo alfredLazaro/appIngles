@@ -9,6 +9,7 @@ import 'package:first_app/presentation/pages/word_detail_screen.dart';
 import 'package:first_app/presentation/widgets/WordCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:logger/logger.dart';
 
 class ListaCards extends StatefulWidget {
@@ -48,7 +49,7 @@ class _ListaCardsState extends State<ListaCards> {
     if (!_scrollController.hasClients) return false;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
-    return currentScroll >= (maxScroll * 0.9);
+    return currentScroll >= (maxScroll * AppLayout.scrollLoadThreshold);
   }
 
   Future<void> speakf(String text) async {

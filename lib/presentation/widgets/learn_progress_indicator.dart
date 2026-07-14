@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 
 class LearnProgressIndicator extends StatelessWidget {
   final int learnValue;
@@ -16,12 +17,12 @@ class LearnProgressIndicator extends StatelessWidget {
 
   Color _getProgressColor() {
     if (learnValue == 0) {
-      return Colors.transparent; // No progress to show
-    } else if (learnValue >= 1 && learnValue <= 10) {
+      return Colors.transparent;
+    } else if (learnValue >= AppLimits.learnLowMin && learnValue <= AppLimits.learnLowMax) {
       return Colors.red;
-    } else if (learnValue >= 11 && learnValue <= 79) {
+    } else if (learnValue >= AppLimits.learnMidMin && learnValue <= AppLimits.learnMidMax) {
       return Colors.orange;
-    } else if (learnValue >= 80 && learnValue <= 100) {
+    } else if (learnValue >= AppLimits.learnHighMin && learnValue <= AppLimits.learnHighMax) {
       return Colors.green;
     }
     return Colors.grey; // Fallback color
@@ -30,7 +31,7 @@ class LearnProgressIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Clamp the value between 0 and 100
-    final clampedValue = learnValue.clamp(0, 100);
+    final clampedValue = learnValue.clamp(0, AppLimits.learnMaxValue);
 
     return Container(
       width: width,

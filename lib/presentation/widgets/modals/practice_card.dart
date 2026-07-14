@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 
 class PracticeCard extends StatelessWidget {
   final IconData icon;
@@ -22,11 +23,11 @@ class PracticeCard extends StatelessWidget {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppLayout.radiusXLarge),
       ),
       child: InkWell(
         onTap: isComingSoon ? null : onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppLayout.radiusXLarge),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Row(
@@ -36,7 +37,7 @@ class PracticeCard extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppLayout.radiusLarge),
                 ),
                 child: Icon(
                   icon,

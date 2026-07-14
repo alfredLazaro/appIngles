@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/presentation/widgets/image_selection_grid.dart';
 import 'package:logger/logger.dart';
@@ -45,15 +46,15 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
     final partOfSpeech = selectedMeaning['partOfSpeech'] as String;
 
     return Dialog(
-      insetPadding: const EdgeInsets.all(20),
+      insetPadding: const EdgeInsets.all(AppLayout.dialogInset),
       child: LayoutBuilder(
         builder: (context, dialogConstraints) {
           final bool esPequeno = dialogConstraints.maxWidth < 400;
 
           return ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.85,
-              minWidth: MediaQuery.of(context).size.width * 0.8,
+              maxHeight: MediaQuery.of(context).size.height * AppLayout.dialogMaxHeightRatio,
+              minWidth: MediaQuery.of(context).size.width * AppLayout.dialogMinWidthRatio,
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),

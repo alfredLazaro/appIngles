@@ -19,7 +19,7 @@ class FlashcardImageWidget extends StatelessWidget {
       height: height,
       width: double.infinity,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(AppLayout.radiusMedium),
         child: Stack(
           fit: StackFit.expand,
           children: [

@@ -10,6 +10,7 @@ import 'package:first_app/presentation/widgets/practice_results_widget.dart';
 import 'package:first_app/presentation/widgets/flashcard/flashcard_word.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
@@ -27,7 +28,7 @@ class FlashcardPracticePage extends StatefulWidget {
     super.key,
     required this.words,
     required this.imagesMap,
-    this.batchSize = 3,
+    this.batchSize = AppLayout.flashcardBatchSize,
   });
 
   @override

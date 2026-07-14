@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/presentation/bloc/matching/matching_state.dart';
 
 class MatchingAnimationController extends ChangeNotifier {
@@ -50,7 +51,7 @@ class MatchingAnimationController extends ChangeNotifier {
     });
     for (final idx in matched) {
       if (!timers.containsKey(idx) && !fadingOut.contains(idx)) {
-        timers[idx] = Timer(const Duration(milliseconds: 800), () {
+        timers[idx] = Timer(AppDurations.matchingFadeDelay, () {
           fadingOut.add(idx);
           notifyListeners();
         });
@@ -62,7 +63,7 @@ class MatchingAnimationController extends ChangeNotifier {
     shakingPair = (left: left, right: right);
     notifyListeners();
     _shakingTimer?.cancel();
-    _shakingTimer = Timer(const Duration(milliseconds: 800), () {
+    _shakingTimer = Timer(AppDurations.matchingFadeDelay, () {
       shakingPair = null;
       notifyListeners();
     });
