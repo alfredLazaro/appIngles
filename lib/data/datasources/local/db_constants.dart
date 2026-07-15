@@ -17,6 +17,7 @@ class WordFields {
   static const String definition = 'definition';
   static const String sentence = 'sentence';
   static const String learn = 'learn';
+  static const String synonyms = 'synonyms';
 }
 
 class ImageFields {

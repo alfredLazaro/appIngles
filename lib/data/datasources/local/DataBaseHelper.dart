@@ -42,6 +42,7 @@ class DatabaseService {
                 ${WordFields.definition}  $textType,
                 ${WordFields.sentence} $textType,
                 ${WordFields.learn} INTEGER NOT NULL DEFAULT 0,
+                ${WordFields.synonyms} TEXT,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 updated_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
