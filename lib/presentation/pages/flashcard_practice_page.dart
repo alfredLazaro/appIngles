@@ -8,9 +8,10 @@ import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
 import 'package:first_app/presentation/widgets/feedback_overlay.dart';
 import 'package:first_app/presentation/widgets/practice_results_widget.dart';
-import 'package:first_app/presentation/widgets/flashcard/flashcard_word.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/presentation/widgets/flashcard/flashcard_word.dart';
 import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
@@ -40,6 +41,9 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   late final FlashcardBloc _bloc;
   bool? _lastIsAnswerCorrect;
   bool _feedbackDismissed = false;
+  bool _precacheStarted = false;
+  bool _precacheComplete = false;
+  final Set<int> _precachedWordIds = {};
 
   @override
   void initState() {
@@ -55,6 +59,58 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     ));
 
     sl<ITtsService>().initialize();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_precacheStarted) {
+      _precacheStarted = true;
+      _precacheFirstBatch().then((_) {
+        if (mounted) setState(() => _precacheComplete = true);
+        _precacheRemainingInBackground();
+      }).catchError((_) {
+        if (mounted) setState(() => _precacheComplete = true);
+        _precacheRemainingInBackground();
+      });
+    }
+  }
+
+  Future<void> _precacheFirstBatch() async {
+    final futures = <Future<void>>[];
+    final firstWords = widget.words.take(widget.batchSize);
+    for (final word in firstWords) {
+      _precachedWordIds.add(word.id);
+      for (final img in (widget.imagesMap[word.id] ?? [])) {
+        futures.add(
+          precacheImage(NetworkImage(img.url), context).catchError((_) {}),
+        );
+      }
+    }
+    await Future.wait(futures);
+  }
+
+  void _precacheRemainingInBackground() {
+    final ctx = context;
+    final remaining = widget.words
+        .skip(widget.batchSize)
+        .where((w) => !_precachedWordIds.contains(w.id))
+        .toList();
+
+    void processChunk(int index) {
+      if (!mounted || index >= remaining.length) return;
+      final chunk =
+          remaining.sublist(index, (index + 3).clamp(0, remaining.length));
+      for (final word in chunk) {
+        _precachedWordIds.add(word.id);
+        for (final img in (widget.imagesMap[word.id] ?? [])) {
+          precacheImage(NetworkImage(img.url), ctx);
+        }
+      }
+      Timer(const Duration(milliseconds: 300), () => processChunk(index + 3));
+    }
+
+    processChunk(0);
   }
 
   @override
@@ -106,6 +162,12 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
         listener: (context, state) {
           if (state is FlashcardCompleted) {
             _submitResult(state.scores);
+          } else if (state is FlashcardLoaded &&
+              state.isAnswerCorrect != _lastIsAnswerCorrect) {
+            _lastIsAnswerCorrect = state.isAnswerCorrect;
+            if (state.isAnswerCorrect != null) {
+              setState(() => _feedbackDismissed = false);
+            }
           }
         },
         builder: (context, state) {
@@ -121,7 +183,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
             );
           }
 
-          if (state is! FlashcardLoaded) {
+          if (state is! FlashcardLoaded || !_precacheComplete) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
@@ -208,12 +270,12 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                     left: 0,
                     right: 0,
                     child: FeedbackOverlay(
-                      text: state.isAnswerCorrect!
-                          ? '¡Correcto!'
-                          : 'Incorrecto',
+                      text:
+                          state.isAnswerCorrect! ? '¡Correcto!' : 'Incorrecto',
                       isCorrect: state.isAnswerCorrect!,
                       displayDuration: const Duration(milliseconds: 800),
-                      onDismiss: () => setState(() => _feedbackDismissed = true),
+                      onDismiss: () =>
+                          setState(() => _feedbackDismissed = true),
                     ),
                   ),
               ],
