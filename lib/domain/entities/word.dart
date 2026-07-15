@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 class Word extends Equatable {
   final int? id;
   final String word;
+  final String partOfSpeech; // Added partOfSpeech field to represent the part of speech of the word 
   final String phonetic;
   final String definition;
   final String sentence;
@@ -13,6 +14,7 @@ class Word extends Equatable {
   const Word({
     this.id,
     required this.word,
+    required this.partOfSpeech,
     required this.phonetic,
     required this.definition,
     required this.sentence,
@@ -25,6 +27,7 @@ class Word extends Equatable {
   List<Object?> get props => [
         id,
         word,
+        partOfSpeech,
         phonetic,
         definition,
         sentence,
@@ -36,6 +39,7 @@ class Word extends Equatable {
   Word copyWith({
     int? id,
     String? word,
+    String? partOfSpeech,
     String? phonetic,
     String? definition,
     String? sentence,
@@ -46,6 +50,7 @@ class Word extends Equatable {
     return Word(
       id: id ?? this.id,
       word: word ?? this.word,
+      partOfSpeech: partOfSpeech ?? this.partOfSpeech,
       phonetic: phonetic ?? this.phonetic,
       definition: definition ?? this.definition,
       sentence: sentence ?? this.sentence,

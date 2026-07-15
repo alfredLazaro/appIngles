@@ -12,6 +12,7 @@ class WordMapper {
     return Word(
       id: model.id,
       word: model.word,
+      partOfSpeech: model.partOfSpeech,
       phonetic: model.phonetic,
       definition: model.definition,
       sentence: model.sentence,
@@ -25,6 +26,7 @@ class WordMapper {
     return WordModel(
       id: entity.id,
       word: entity.word,
+      partOfSpeech: entity.partOfSpeech,
       phonetic: entity.phonetic,
       definition: entity.definition,
       sentence: entity.sentence,
@@ -84,6 +86,7 @@ class WordMapper {
     return Word(
       id: map['id'] as int,
       word: map['word'] as String,
+      partOfSpeech: map['partOfSpeech'] as String,
       phonetic: map['phonetic'] as String,
       definition: map['definition'] as String,
       sentence: map['sentence'],

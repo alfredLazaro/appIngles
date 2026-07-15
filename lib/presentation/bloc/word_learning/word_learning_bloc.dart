@@ -163,6 +163,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     try {
       final word = Word(
         word: event.wordData['word'],
+        partOfSpeech: event.wordData['partOfSpeech'] ?? '',
         phonetic: event.wordData['phonetic'] ?? '',
         definition: event.wordData['definition'] ?? '',
         sentence: event.wordData['example'] ?? '',
