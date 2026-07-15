@@ -5,9 +5,13 @@ import 'package:first_app/data/datasources/local/word_practice_dao.dart';
 import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/datasources/local/translation_dao.dart';
+import 'package:first_app/data/datasources/remote/datamuse_service.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
 import 'package:first_app/data/datasources/remote/translation_service.dart';
 import 'package:first_app/data/datasources/remote/unsplash_service.dart';
+import 'package:first_app/data/repositories/datamuse_repository_impl.dart';
+import 'package:first_app/domain/repositories/datamuse_repository.dart';
+import 'package:first_app/domain/usecases/datamuse/get_means_like_words.dart';
 import 'package:first_app/data/repositories/word_repository_impl.dart';
 import 'package:first_app/data/repositories/image_repository_impl.dart';
 import 'package:first_app/data/repositories/translation_repository_impl.dart';
@@ -44,6 +48,7 @@ void setupDependencies() {
   sl.registerLazySingleton<WordService>(() => WordService());
   sl.registerLazySingleton<ImageService>(() => ImageService());
   sl.registerLazySingleton<TranslateService>(() => TranslateService());
+  sl.registerLazySingleton<DatamuseService>(() => DatamuseService());
 
   // === Repositories ===
   sl.registerLazySingleton<WordRepository>(
@@ -66,6 +71,12 @@ void setupDependencies() {
   sl.registerLazySingleton<TranslationRepository>(
     () => TranslationRepositoryImpl(
       translationDao: sl<TranslationDao>(),
+    ),
+  );
+
+  sl.registerLazySingleton<DatamuseRepository>(
+    () => DatamuseRepositoryImpl(
+      datamuseService: sl<DatamuseService>(),
     ),
   );
 
@@ -102,6 +113,10 @@ void setupDependencies() {
   );
   sl.registerLazySingleton<GetRecentWordsUseCase>(
     () => GetRecentWordsUseCase(sl<WordRepository>()),
+  );
+
+  sl.registerLazySingleton<GetMeansLikeWordsUseCase>(
+    () => GetMeansLikeWordsUseCase(sl<DatamuseRepository>()),
   );
 
   // === Services ===
