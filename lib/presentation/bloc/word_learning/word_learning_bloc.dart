@@ -3,6 +3,7 @@ import 'package:first_app/domain/repositories/translation_repository.dart';
 import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
 import 'package:first_app/domain/usecases/word/get_recent_words.dart';
 import 'package:first_app/domain/usecases/word/search_word_translation.dart';
+import 'package:first_app/domain/usecases/word/get_alternative_translations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
@@ -28,6 +29,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
   final SaveWordImagesUseCase _saveWordImages;
   final InsertLotWordsUseCase _saveLotWords;
   final SearchWordTranslationUseCase _searchWordTranslation;
+  final GetAlternativeTranslationsUseCase _getAlternativeTranslations;
   final TranslationRepository _translationRepository;
 
   WordLearningBloc({
@@ -41,6 +43,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     required SaveWordImagesUseCase saveWordImages,
     required InsertLotWordsUseCase saveLotWords,
     required SearchWordTranslationUseCase searchWordTranslation,
+    required GetAlternativeTranslationsUseCase getAlternativeTranslations,
     required TranslationRepository translationRepository,
   })  : _getRecentWords = getRecentWords,
         _getRecentWordsFull = getRecentWordsFull,
@@ -52,6 +55,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
         _saveWordImages = saveWordImages,
         _saveLotWords = saveLotWords,
         _searchWordTranslation = searchWordTranslation,
+        _getAlternativeTranslations = getAlternativeTranslations,
         _translationRepository = translationRepository,
         super(WordLearningInitial()) {
     // Eventos con sufijo "Event"
@@ -109,6 +113,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
         _searchWordDefinition(event.word),
         _searchImages(event.word),
         _searchWordTranslation(event.word),
+        _getAlternativeTranslations(event.word),
       ]);
 
       final meanings = (results[0] as List<WordMeaning>).map((m) {
@@ -126,8 +131,14 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
 
       final images = results[1] as List<ImageSearchResult>;
       final translation = results[2] as Map<String, dynamic>?;
+      final alternativeTranslations = results[3] as Map<String, String>;
 
-      emit(WordDataLoaded(meanings: meanings, images: images, translation: translation));
+      emit(WordDataLoaded(
+        meanings: meanings,
+        images: images,
+        translation: translation,
+        alternativeTranslations: alternativeTranslations,
+      ));
     } catch (e) {
       emit(WordLearningError('Error al buscar datos: $e'));
     }
@@ -168,13 +179,10 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
 
       if (event.translation != null &&
           event.translation!['translatedText'] != null) {
-        final alternatives = (event.translation!['alternatives'] as List<dynamic>?)
-                ?.cast<String>() ??
-            [];
         await _translationRepository.insertTranslation(
           wordId,
           event.translation!['translatedText'] as String,
-          alternatives,
+          event.selectedAlternatives,
         );
       }
 

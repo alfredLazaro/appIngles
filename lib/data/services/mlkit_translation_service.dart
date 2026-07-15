@@ -20,6 +20,14 @@ class MlKitTranslationService {
     };
   }
 
+  Future<List<String>> translateBatch(List<String> texts) async {
+    final translator = _getTranslator();
+    final results = await Future.wait(
+      texts.map((t) => translator.translateText(t)),
+    );
+    return results.toList();
+  }
+
   void dispose() {
     _translator?.close();
     _translator = null;

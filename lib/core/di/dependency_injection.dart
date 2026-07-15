@@ -29,6 +29,7 @@ import 'package:first_app/domain/usecases/word/get_recent_words.dart';
 import 'package:first_app/domain/usecases/word/get_word_statistics.dart';
 import 'package:first_app/domain/usecases/word/insert_lot_words.dart';
 import 'package:first_app/domain/usecases/word/search_word_translation.dart';
+import 'package:first_app/domain/usecases/word/get_alternative_translations.dart';
 import 'package:first_app/domain/usecases/image/search_images.dart';
 import 'package:first_app/domain/usecases/image/save_word_images.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
@@ -117,6 +118,13 @@ void setupDependencies() {
 
   sl.registerLazySingleton<GetMeansLikeWordsUseCase>(
     () => GetMeansLikeWordsUseCase(sl<DatamuseRepository>()),
+  );
+
+  sl.registerLazySingleton<GetAlternativeTranslationsUseCase>(
+    () => GetAlternativeTranslationsUseCase(
+      sl<GetMeansLikeWordsUseCase>(),
+      sl<MlKitTranslationService>(),
+    ),
   );
 
   // === Services ===

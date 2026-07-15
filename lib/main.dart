@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
             saveWordImages: sl(),
             saveLotWords: sl(),
             searchWordTranslation: sl(),
+            getAlternativeTranslations: sl(),
             translationRepository: sl(),
           ),
         ),

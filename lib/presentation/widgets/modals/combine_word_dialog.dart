@@ -9,6 +9,7 @@ class CombinedWordDialog extends StatefulWidget {
   final List<Map<String, dynamic>> meanings;
   final List<ImageSearchResult> images;
   final Map<String, dynamic>? translation;
+  final Map<String, String>? alternativeTranslations;
 
   const CombinedWordDialog({
     super.key,
@@ -16,6 +17,7 @@ class CombinedWordDialog extends StatefulWidget {
     required this.meanings,
     required this.images,
     this.translation,
+    this.alternativeTranslations,
   });
 
   @override
@@ -27,6 +29,7 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
   int _selectedMeaningIndex = 0;
   int? _selectedDefinitionIndex;
   final List<ImageSearchResult> _selectedImageUrls = [];
+  final Set<String> _selectedAlternatives = {};
 
   @override
   Widget build(BuildContext context) {
@@ -266,8 +269,8 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                         ],
                       ),
                     ),
-                    if (translation['alternatives'] != null &&
-                        (translation['alternatives'] as List).isNotEmpty)
+                    if (widget.alternativeTranslations != null &&
+                        widget.alternativeTranslations!.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 16),
                         child: Column(
@@ -281,18 +284,25 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 4,
-                              children:
-                                  (translation['alternatives'] as List)
-                                      .map((alt) => Chip(
-                                            label: Text('$alt'),
-                                            materialTapTargetSize:
-                                                MaterialTapTargetSize
-                                                    .shrinkWrap,
-                                          ))
-                                      .toList(),
+                            ...widget.alternativeTranslations!.entries.map(
+                              (entry) => CheckboxListTile(
+                                contentPadding: EdgeInsets.zero,
+                                dense: true,
+                                value: _selectedAlternatives.contains(entry.value),
+                                title: Text(
+                                  '${entry.value} (${entry.key})',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                onChanged: (checked) {
+                                  setState(() {
+                                    if (checked == true) {
+                                      _selectedAlternatives.add(entry.value);
+                                    } else {
+                                      _selectedAlternatives.remove(entry.value);
+                                    }
+                                  });
+                                },
+                              ),
                             ),
                           ],
                         ),
@@ -387,6 +397,7 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                     'antonyms': selectedDef['antonyms'] ?? [],
                     'images': _selectedImageUrls,
                     'translation': widget.translation,
+                    'selectedAlternatives': _selectedAlternatives.toList(),
                   });
                 },
                 icon: const Icon(Icons.save, size: 18),

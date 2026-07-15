@@ -30,6 +30,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
   List<Map<String, dynamic>>? _tempDefinitions;
   List<ImageSearchResult>? _tempImages;
   Map<String, dynamic>? _tempTranslation;
+  Map<String, String>? _tempAlternativeTranslations;
   // Cache to keep the last loaded list so it doesn't disappear while searching
   List<WordSummary> _cachedWords = [];
   List<Word> _selecteWords = [];
@@ -147,10 +148,11 @@ class _WordLearningPageState extends State<WordLearningPage> {
         listener: (context, state) {
           if (state is WordLearningError) {
             _showError(state.message);
-          } else if (state is WordDataLoaded) {
+          } else           if (state is WordDataLoaded) {
             _tempDefinitions = state.meanings;
             _tempImages = state.images;
             _tempTranslation = state.translation;
+            _tempAlternativeTranslations = state.alternativeTranslations;
             _showCombinedDialog();
           } else if (state is WordsLoaded) {
             // Update cache whenever words are (re)loaded
@@ -213,6 +215,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
         meanings: _tempDefinitions!,
         images: _tempImages!,
         translation: _tempTranslation,
+        alternativeTranslations: _tempAlternativeTranslations,
       ),
     );
 
@@ -221,12 +224,15 @@ class _WordLearningPageState extends State<WordLearningPage> {
           (result['images'] as List<ImageSearchResult>?) ?? [];
       final translation =
           result['translation'] as Map<String, dynamic>?;
+      final selectedAlternatives =
+          (result['selectedAlternatives'] as List<String>?) ?? [];
 
       context.read<WordLearningBloc>().add(
             SaveNewWordEvent(
               wordData: result,
               selectedImages: selectedImages,
               translation: translation,
+              selectedAlternatives: selectedAlternatives,
             ),
           );
     }
@@ -267,6 +273,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
     _tempDefinitions = null;
     _tempImages = null;
     _tempTranslation = null;
+    _tempAlternativeTranslations = null;
   }
 
   Future<void> _showWordsLimitDialog() async {

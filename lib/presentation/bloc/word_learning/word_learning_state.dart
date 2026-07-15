@@ -46,11 +46,17 @@ class WordDataLoaded extends WordLearningState {
   final List<Map<String, dynamic>> meanings;
   final List<ImageSearchResult> images;
   final Map<String, dynamic>? translation;
+  final Map<String, String>? alternativeTranslations;
 
-  WordDataLoaded({required this.meanings, required this.images, this.translation});
+  WordDataLoaded({
+    required this.meanings,
+    required this.images,
+    this.translation,
+    this.alternativeTranslations,
+  });
 
   @override
-  List<Object?> get props => [meanings, images, translation];
+  List<Object?> get props => [meanings, images, translation, alternativeTranslations];
 }
 
 class ImagesLoaded extends WordLearningState {
