@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:first_app/domain/entities/word_filter.dart';
 import 'package:first_app/domain/entities/word_stats.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 
@@ -26,6 +27,7 @@ class WordListLoaded extends WordListState {
   final bool hasMorePages;
   final bool isLoadingMore;
   final String? filterQuery;
+  final WordFilterMode filterMode;
   final int selectedCount;
   final WordStats? stats;
   final String? errorMessage;
@@ -35,6 +37,7 @@ class WordListLoaded extends WordListState {
     this.hasMorePages = false,
     this.isLoadingMore = false,
     this.filterQuery,
+    this.filterMode = WordFilterMode.all,
     this.selectedCount = 0,
     this.stats,
     this.errorMessage,
@@ -46,6 +49,7 @@ class WordListLoaded extends WordListState {
     bool? hasMorePages,
     bool? isLoadingMore,
     String? filterQuery,
+    WordFilterMode? filterMode,
     int? selectedCount,
     WordStats? stats,
     String? errorMessage,
@@ -57,6 +61,7 @@ class WordListLoaded extends WordListState {
       hasMorePages: hasMorePages ?? this.hasMorePages,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       filterQuery: filterQuery ?? this.filterQuery,
+      filterMode: filterMode ?? this.filterMode,
       selectedCount: selectedCount ?? this.selectedCount,
       stats: stats ?? this.stats,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
@@ -70,6 +75,7 @@ class WordListLoaded extends WordListState {
         hasMorePages,
         isLoadingMore,
         filterQuery,
+        filterMode,
         selectedCount,
         stats,
         errorMessage,

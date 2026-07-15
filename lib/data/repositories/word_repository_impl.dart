@@ -1,6 +1,7 @@
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/insertion_result.dart';
 import 'package:first_app/domain/entities/word.dart';
+import 'package:first_app/domain/entities/word_filter.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
@@ -140,12 +141,14 @@ class WordRepositoryImpl implements WordRepository {
     required int page,
     int pageSize = 20,
     String? searchQuery,
+    WordFilterMode? filterMode,
   }) async {
     try {
       final maps = await _wordBatchDao.getWordsWithImagesPaginated(
         page: page,
         pageSize: pageSize,
         searchQuery: searchQuery,
+        filterMode: filterMode,
       );
 
       // Since you don't have countAllWordsWithImages in DAO, we'll estimate

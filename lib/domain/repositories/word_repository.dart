@@ -3,6 +3,7 @@ import 'package:first_app/domain/entities/insertion_result.dart';
 import 'package:first_app/domain/entities/paginated_result.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_def.dart';
+import 'package:first_app/domain/entities/word_filter.dart';
 import 'package:first_app/domain/entities/word_insertion.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
@@ -26,6 +27,7 @@ abstract class WordRepository {
     required int page,
     int pageSize,
     String? searchQuery,
+    WordFilterMode? filterMode,
   });
   Future<List<FlashcardWord>> getWordsForPractice(int limit);
   Future<List<SentenceModel>> getSentencesForPractice({int limit});

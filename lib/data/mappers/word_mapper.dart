@@ -67,8 +67,11 @@ class WordMapper {
       id: map['id'],
       word: map['word'] ?? '',
       definition: map['definition'] ?? '',
-      tinyImageUrl: map['tinyImageUrl'], // Puede ser null
+      tinyImageUrl: map['tinyImageUrl'],
       learn: map['learn'],
+      hasTranslation: (map['translationCount'] as int? ?? 0) > 0,
+      hasSentence:
+          map['sentence'] != null && (map['sentence'] as String).isNotEmpty,
     );
   }
 

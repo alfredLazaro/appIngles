@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/domain/entities/word_filter.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/usecases/word/get_word_statistics.dart';
 
@@ -23,6 +24,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     on<DeleteWordEvent>(_onDeleteWord);
     on<ToggleWordSelectionEvent>(_onToggleWordSelection);
     on<FilterWordsEvent>(_onFilterWords);
+    on<SetFilterEvent>(_onSetFilter);
     on<LoadWordStatsEvent>(_onLoadWordStats);
     on<ClearSelectionEvent>(_onClearSelection);
   }
@@ -34,10 +36,13 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     emit(const WordListLoading());
 
     try {
+      final filterMode =
+          state is WordListLoaded ? (state as WordListLoaded).filterMode : null;
       final result = await _wordRepository.getWordsWithImagesPaginated(
         page: 1,
         pageSize: _pageSize,
         searchQuery: event.searchQuery,
+        filterMode: filterMode,
       );
       final stats = await _getWordStatisticsUseCase();
       emit(WordListLoaded(
@@ -46,6 +51,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         hasMorePages: result.hasNextPage,
         isLoadingMore: false,
         filterQuery: event.searchQuery,
+        filterMode: filterMode ?? WordFilterMode.all,
         stats: stats,
       ));
     } catch (e) {
@@ -73,6 +79,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         page: nextPage,
         pageSize: _pageSize,
         searchQuery: currentState.filterQuery,
+        filterMode: currentState.filterMode,
       );
 
       // Append new words to existing list
@@ -84,6 +91,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         hasMorePages: result.hasNextPage,
         isLoadingMore: false,
         filterQuery: currentState.filterQuery,
+        filterMode: currentState.filterMode,
         selectedCount: currentState.selectedCount,
         stats: currentState.stats,
       ));
@@ -99,10 +107,13 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     RefreshWordsEvent event,
     Emitter<WordListState> emit,
   ) async {
-    // Get current filter query if exists
+    // Get current filter query and mode if exists
     String? searchQuery;
+    WordFilterMode? filterMode;
     if (state is WordListLoaded) {
-      searchQuery = (state as WordListLoaded).filterQuery;
+      final currentState = state as WordListLoaded;
+      searchQuery = currentState.filterQuery;
+      filterMode = currentState.filterMode;
     }
 
     try {
@@ -110,6 +121,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         page: 1,
         pageSize: _pageSize,
         searchQuery: searchQuery,
+        filterMode: filterMode,
       );
       final stats = await _getWordStatisticsUseCase();
       if (state is WordListLoaded) {
@@ -181,6 +193,8 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     final previousLoadedState =
         state is WordListLoaded ? state as WordListLoaded : null;
 
+    final filterMode = previousLoadedState?.filterMode;
+
     emit(const WordListLoading());
 
     try {
@@ -188,6 +202,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         page: 1,
         pageSize: _pageSize,
         searchQuery: event.query,
+        filterMode: filterMode,
       );
       final stats = await _getWordStatisticsUseCase();
 
@@ -196,6 +211,45 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
         currentPage: 1,
         hasMorePages: result.hasNextPage,
         filterQuery: event.query,
+        filterMode: filterMode ?? WordFilterMode.all,
+        stats: stats,
+      ));
+    } catch (e) {
+      if (previousLoadedState != null) {
+        emit(previousLoadedState.copyWith(
+          errorMessage: 'Error al filtrar: $e',
+        ));
+      } else {
+        emit(WordListError('Error al filtrar: $e'));
+      }
+    }
+  }
+
+  void _onSetFilter(
+    SetFilterEvent event,
+    Emitter<WordListState> emit,
+  ) async {
+    final previousLoadedState =
+        state is WordListLoaded ? state as WordListLoaded : null;
+
+    emit(const WordListLoading());
+
+    try {
+      final searchQuery = previousLoadedState?.filterQuery;
+      final result = await _wordRepository.getWordsWithImagesPaginated(
+        page: 1,
+        pageSize: _pageSize,
+        searchQuery: searchQuery,
+        filterMode: event.mode,
+      );
+      final stats = await _getWordStatisticsUseCase();
+
+      emit(WordListLoaded(
+        words: result.items,
+        currentPage: 1,
+        hasMorePages: result.hasNextPage,
+        filterQuery: searchQuery,
+        filterMode: event.mode,
         stats: stats,
       ));
     } catch (e) {

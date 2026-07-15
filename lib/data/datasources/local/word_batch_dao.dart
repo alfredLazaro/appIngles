@@ -1,5 +1,6 @@
 import "package:flutter/widgets.dart";
 import "package:sqflite/sqflite.dart";
+import "package:first_app/domain/entities/word_filter.dart";
 import "DataBaseHelper.dart";
 
 class WordBatchDao {
@@ -90,6 +91,7 @@ class WordBatchDao {
     required int page,
     required int pageSize,
     String? searchQuery,
+    WordFilterMode? filterMode,
   }) async {
     try {
       final db = await dbHelper.database;
@@ -103,6 +105,22 @@ class WordBatchDao {
         whereArgs = ['%$searchQuery%', '%$searchQuery%'];
       }
 
+      String havingClause = '';
+      if (filterMode != null && filterMode != WordFilterMode.all) {
+        switch (filterMode) {
+          case WordFilterMode.noTranslation:
+            havingClause = 'HAVING translationCount = 0';
+          case WordFilterMode.noSentence:
+            havingClause =
+                "HAVING (sentenceValue IS NULL OR sentenceValue = '')";
+          case WordFilterMode.incomplete:
+            havingClause =
+                "HAVING (translationCount = 0 OR sentenceValue IS NULL OR sentenceValue = '')";
+          case WordFilterMode.all:
+            break;
+        }
+      }
+
       final List<Map<String, dynamic>> result = await db.rawQuery('''
       SELECT 
         w.id,
@@ -112,11 +130,15 @@ class WordBatchDao {
         w.learn,
         w.sentence,
         w.created_at,
-        w.updated_at
+        w.updated_at,
+        COUNT(t.id) as translationCount,
+        MAX(w.sentence) as sentenceValue
       FROM Word w
       LEFT JOIN Image i ON w.id = i.wordId
+      LEFT JOIN Translation t ON w.id = t.wordId
       $whereClause
       GROUP BY w.id
+      $havingClause
       ORDER BY w.id DESC
       LIMIT ? OFFSET ?
     ''', [...whereArgs, pageSize, offset]);

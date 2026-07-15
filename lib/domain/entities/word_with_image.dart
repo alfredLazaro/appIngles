@@ -6,6 +6,8 @@ class WordWithImage extends Equatable {
   final String definition;
   final String? tinyImageUrl;
   final int learn;
+  final bool hasTranslation;
+  final bool hasSentence;
 
   const WordWithImage({
     required this.id,
@@ -13,8 +15,11 @@ class WordWithImage extends Equatable {
     required this.definition,
     this.tinyImageUrl,
     this.learn = 0,
+    this.hasTranslation = true,
+    this.hasSentence = true,
   });
 
   @override
-  List<Object?> get props => [id, word, definition, tinyImageUrl, learn];
+  List<Object?> get props =>
+      [id, word, definition, tinyImageUrl, learn, hasTranslation, hasSentence];
 }

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:first_app/domain/entities/word_filter.dart';
 
 abstract class WordListEvent extends Equatable {
   const WordListEvent();
@@ -66,4 +67,13 @@ class LoadWordStatsEvent extends WordListEvent {
 
   @override
   List<Object?> get props => [];
+}
+
+class SetFilterEvent extends WordListEvent {
+  final WordFilterMode mode;
+
+  const SetFilterEvent(this.mode);
+
+  @override
+  List<Object?> get props => [mode];
 }
