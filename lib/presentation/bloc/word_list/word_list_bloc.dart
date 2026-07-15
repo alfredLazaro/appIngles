@@ -190,6 +190,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     FilterWordsEvent event,
     Emitter<WordListState> emit,
   ) async {
+    _selectedWordIds.clear();
     final previousLoadedState =
         state is WordListLoaded ? state as WordListLoaded : null;
 
@@ -229,6 +230,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     SetFilterEvent event,
     Emitter<WordListState> emit,
   ) async {
+    _selectedWordIds.clear();
     final previousLoadedState =
         state is WordListLoaded ? state as WordListLoaded : null;
 
