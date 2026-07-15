@@ -24,7 +24,6 @@ class MatchingTranslationLayout extends StatelessWidget {
       children: [
         Expanded(
           child: _buildColumn(
-            title: 'Palabras',
             children: List.generate(
               state.round.words.length,
               (i) => AnimatedOpacity(
@@ -46,7 +45,6 @@ class MatchingTranslationLayout extends StatelessWidget {
         ),
         Expanded(
           child: _buildColumn(
-            title: 'Traducciones',
             children: List.generate(
               state.round.translations.length,
               (i) => AnimatedOpacity(
@@ -73,22 +71,10 @@ class MatchingTranslationLayout extends StatelessWidget {
   }
 
   Widget _buildColumn({
-    required String title,
     required List<Widget> children,
   }) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.matchingTitle,
-            ),
-          ),
-        ),
         Expanded(
           child: Center(
             child: SingleChildScrollView(

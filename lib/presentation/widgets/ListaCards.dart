@@ -1,4 +1,5 @@
 import 'package:first_app/core/di/dependency_injection.dart';
+import 'package:first_app/domain/entities/word_filter.dart';
 import 'package:first_app/domain/services/tts_service_interface.dart';
 import 'package:first_app/domain/entities/word_with_image.dart';
 import 'package:first_app/presentation/bloc/word_detail/word_detail_bloc.dart';
@@ -89,6 +90,36 @@ class _ListaCardsState extends State<ListaCards> {
       ),
     );
   }
+
+  Widget _buildFilterBar(WordFilterMode currentMode) {
+    const filters = {
+      WordFilterMode.all: 'Todas',
+      WordFilterMode.noTranslation: 'Sin traducción',
+      WordFilterMode.noSentence: 'Sin frase',
+      WordFilterMode.incomplete: 'Incompletas',
+    };
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: DropdownButton<WordFilterMode>(
+        value: currentMode,
+        isExpanded: true,
+        underline: const SizedBox(),
+        items: filters.entries
+            .map((e) => DropdownMenuItem(
+                  value: e.key,
+                  child: Text(e.value),
+                ))
+            .toList(),
+        onChanged: (mode) {
+          if (mode != null) {
+            context.read<WordListBloc>().add(SetFilterEvent(mode));
+          }
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<WordListBloc, WordListState>(
@@ -107,35 +138,44 @@ class _ListaCardsState extends State<ListaCards> {
       child: BlocBuilder<WordListBloc, WordListState>(
         builder: (context, state) {
           if (state is WordListLoaded) {
-            if (state.words.isEmpty) {
-              return const Center(
-                child: Text('No hay palabras en esta sección.'),
-              );
-            }
+            return Column(
+              children: [
+                _buildFilterBar(state.filterMode),
+                if (state.words.isEmpty)
+                  const Expanded(
+                    child: Center(
+                      child: Text('No hay palabras en esta sección.'),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        context
+                            .read<WordListBloc>()
+                            .add(const RefreshWordsEvent());
+                      },
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: state.words.length +
+                            (state.hasMorePages ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index >= state.words.length) {
+                            return _buildLoadingIndicator();
+                          }
 
-            return RefreshIndicator(
-              onRefresh: () async {
-                context
-                    .read<WordListBloc>()
-                    .add(const RefreshWordsEvent());
-              },
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount:
-                    state.words.length + (state.hasMorePages ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index >= state.words.length) {
-                    return _buildLoadingIndicator();
-                  }
-
-                  final word = state.words[index];
-                  return WordCard(
-                    word: word,
-                    onSpeak: () => speakf(word.word),
-                    onTapImage: () => _navigateToWordDetail(word),
-                  );
-                },
-              ),
+                          final word = state.words[index];
+                          return WordCard(
+                            word: word,
+                            onSpeak: () => speakf(word.word),
+                            onTapImage: () =>
+                                _navigateToWordDetail(word),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+              ],
             );
           }
 
