@@ -189,32 +189,33 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
                   },
                 ),
               ),
-              if (isRoundComplete)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: AppColors.primaryBlue,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: AppColors.primaryBlue,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: Colors.grey.shade400,
+                      disabledForegroundColor: Colors.white70,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      onPressed: () {
-                        _matchingBloc.add(const NextMatchingRound());
-                      },
-                      child: Text(
-                        state.roundIndex + 1 < state.totalRounds
-                            ? 'Siguiente ronda'
-                            : 'Ver resultados',
-                        style: const TextStyle(fontSize: 18),
-                      ),
+                    ),
+                    onPressed: isRoundComplete
+                        ? () => _matchingBloc.add(const NextMatchingRound())
+                        : null,
+                    child: Text(
+                      state.roundIndex + 1 < state.totalRounds
+                          ? 'Siguiente ronda'
+                          : 'Ver resultados',
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ),
                 ),
+              ),
             ],
           ),
           if (state.lastAttemptCorrect != null && !_feedbackDismissed)
