@@ -40,4 +40,5 @@ abstract class WordRepository {
   Future<int> countSentences();
   Future<List<int>> getAllLearnCounts();
   Future<List<InsertionResult>> insertLotWords(List<WordInsertion> words);
+  Future<Map<String, dynamic>?> fetchTranslation(String word);
 }

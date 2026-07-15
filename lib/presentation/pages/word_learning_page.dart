@@ -29,6 +29,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
   final ISpeechToTextService _speechService = sl<ISpeechToTextService>();
   List<Map<String, dynamic>>? _tempDefinitions;
   List<ImageSearchResult>? _tempImages;
+  Map<String, dynamic>? _tempTranslation;
   // Cache to keep the last loaded list so it doesn't disappear while searching
   List<WordSummary> _cachedWords = [];
   List<Word> _selecteWords = [];
@@ -149,6 +150,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
           } else if (state is WordDataLoaded) {
             _tempDefinitions = state.meanings;
             _tempImages = state.images;
+            _tempTranslation = state.translation;
             _showCombinedDialog();
           } else if (state is WordsLoaded) {
             // Update cache whenever words are (re)loaded
@@ -210,17 +212,21 @@ class _WordLearningPageState extends State<WordLearningPage> {
         word: _wordController.text,
         meanings: _tempDefinitions!,
         images: _tempImages!,
+        translation: _tempTranslation,
       ),
     );
 
     if (result != null && mounted) {
       final selectedImages =
           (result['images'] as List<ImageSearchResult>?) ?? [];
+      final translation =
+          result['translation'] as Map<String, dynamic>?;
 
       context.read<WordLearningBloc>().add(
             SaveNewWordEvent(
               wordData: result,
               selectedImages: selectedImages,
+              translation: translation,
             ),
           );
     }
@@ -260,6 +266,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
   void _resetTempData() {
     _tempDefinitions = null;
     _tempImages = null;
+    _tempTranslation = null;
   }
 
   Future<void> _showWordsLimitDialog() async {

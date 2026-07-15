@@ -13,6 +13,7 @@ import 'package:first_app/data/datasources/local/word_crud_dao.dart';
 import 'package:first_app/data/datasources/local/word_practice_dao.dart';
 import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
+import 'package:first_app/data/datasources/remote/translation_service.dart';
 import 'package:first_app/data/mappers/word_mapper.dart';
 import 'package:first_app/domain/entities/sentence_model.dart';
 
@@ -22,16 +23,19 @@ class WordRepositoryImpl implements WordRepository {
   final WordPracticeDao _wordPracticeDao;
   final WordBatchDao _wordBatchDao;
   final WordService _wordService;
+  final TranslateService _translateService;
 
   WordRepositoryImpl({
     required WordCrudDao wordCrudDao,
     required WordPracticeDao wordPracticeDao,
     required WordBatchDao wordBatchDao,
     required WordService wordService,
+    required TranslateService translateService,
   })  : _wordCrudDao = wordCrudDao,
         _wordPracticeDao = wordPracticeDao,
         _wordBatchDao = wordBatchDao,
-        _wordService = wordService;
+        _wordService = wordService,
+        _translateService = translateService;
 
   // ============ EXISTING METHODS ============
 
@@ -266,6 +270,15 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<List<int>> getAllLearnCounts() async {
     return await _wordBatchDao.getAllLearnCounts();
+  }
+
+  @override
+  Future<Map<String, dynamic>?> fetchTranslation(String word) async {
+    try {
+      return await _translateService.translate(word);
+    } catch (e) {
+      return null;
+    }
   }
 
   @override

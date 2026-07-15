@@ -35,6 +35,8 @@ class MyApp extends StatelessWidget {
             searchImages: sl(),
             saveWordImages: sl(),
             saveLotWords: sl(),
+            searchWordTranslation: sl(),
+            translationRepository: sl(),
           ),
         ),
         BlocProvider<WordListBloc>(

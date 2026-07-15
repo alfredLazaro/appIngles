@@ -45,11 +45,12 @@ class WordLearningError extends WordLearningState {
 class WordDataLoaded extends WordLearningState {
   final List<Map<String, dynamic>> meanings;
   final List<ImageSearchResult> images;
+  final Map<String, dynamic>? translation;
 
-  WordDataLoaded({required this.meanings, required this.images});
+  WordDataLoaded({required this.meanings, required this.images, this.translation});
 
   @override
-  List<Object?> get props => [meanings, images];
+  List<Object?> get props => [meanings, images, translation];
 }
 
 class ImagesLoaded extends WordLearningState {

@@ -6,6 +6,7 @@ import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/datasources/local/translation_dao.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
+import 'package:first_app/data/datasources/remote/translation_service.dart';
 import 'package:first_app/data/datasources/remote/unsplash_service.dart';
 import 'package:first_app/data/repositories/word_repository_impl.dart';
 import 'package:first_app/data/repositories/image_repository_impl.dart';
@@ -23,6 +24,7 @@ import 'package:first_app/domain/usecases/word/get_recent_words_summary.dart';
 import 'package:first_app/domain/usecases/word/get_recent_words.dart';
 import 'package:first_app/domain/usecases/word/get_word_statistics.dart';
 import 'package:first_app/domain/usecases/word/insert_lot_words.dart';
+import 'package:first_app/domain/usecases/word/search_word_translation.dart';
 import 'package:first_app/domain/usecases/image/search_images.dart';
 import 'package:first_app/domain/usecases/image/save_word_images.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
@@ -41,6 +43,7 @@ void setupDependencies() {
 
   sl.registerLazySingleton<WordService>(() => WordService());
   sl.registerLazySingleton<ImageService>(() => ImageService());
+  sl.registerLazySingleton<TranslateService>(() => TranslateService());
 
   // === Repositories ===
   sl.registerLazySingleton<WordRepository>(
@@ -49,6 +52,7 @@ void setupDependencies() {
       wordPracticeDao: sl<WordPracticeDao>(),
       wordBatchDao: sl<WordBatchDao>(),
       wordService: sl<WordService>(),
+      translateService: sl<TranslateService>(),
     ),
   );
 
@@ -83,6 +87,9 @@ void setupDependencies() {
   );
   sl.registerLazySingleton<SearchImagesUseCase>(
     () => SearchImagesUseCase(sl<ImageRepository>()),
+  );
+  sl.registerLazySingleton<SearchWordTranslationUseCase>(
+    () => SearchWordTranslationUseCase(sl<WordRepository>()),
   );
   sl.registerLazySingleton<SaveWordImagesUseCase>(
     () => SaveWordImagesUseCase(sl<ImageRepository>()),
