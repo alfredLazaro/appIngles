@@ -43,7 +43,7 @@ flutter pub run flutter_launcher_icons:main  # regenerate app icon
 |---|---|---|
 | Dictionary | `ASSEMPLYAI_API_KEY`? | `BASE_URL_DICTIONARY` → dictionaryapi.dev |
 | Unsplash | `KEY_UNS` | `URL_UNS` |
-| Translation | — | `TRANSL_URL` → libretranslate.com |
+| Translation (on-device) | — | ML Kit Translate (EN→ES, offline) |
 | AssemblyAI | `ASSEMPLYAI_API_KEY` | (speech-to-text) |
 | DeepSeek | `API_DEE` | `URL_D` |
 

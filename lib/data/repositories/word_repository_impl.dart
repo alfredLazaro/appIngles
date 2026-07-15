@@ -13,8 +13,8 @@ import 'package:first_app/data/datasources/local/word_crud_dao.dart';
 import 'package:first_app/data/datasources/local/word_practice_dao.dart';
 import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
-import 'package:first_app/data/datasources/remote/translation_service.dart';
 import 'package:first_app/data/mappers/word_mapper.dart';
+import 'package:first_app/data/services/mlkit_translation_service.dart';
 import 'package:first_app/domain/entities/sentence_model.dart';
 
 /// Implementación concreta del repositorio
@@ -23,19 +23,19 @@ class WordRepositoryImpl implements WordRepository {
   final WordPracticeDao _wordPracticeDao;
   final WordBatchDao _wordBatchDao;
   final WordService _wordService;
-  final TranslateService _translateService;
+  final MlKitTranslationService _mlKitTranslationService;
 
   WordRepositoryImpl({
     required WordCrudDao wordCrudDao,
     required WordPracticeDao wordPracticeDao,
     required WordBatchDao wordBatchDao,
     required WordService wordService,
-    required TranslateService translateService,
+    required MlKitTranslationService mlKitTranslationService,
   })  : _wordCrudDao = wordCrudDao,
         _wordPracticeDao = wordPracticeDao,
         _wordBatchDao = wordBatchDao,
         _wordService = wordService,
-        _translateService = translateService;
+        _mlKitTranslationService = mlKitTranslationService;
 
   // ============ EXISTING METHODS ============
 
@@ -275,7 +275,7 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<Map<String, dynamic>?> fetchTranslation(String word) async {
     try {
-      return await _translateService.translate(word);
+      return await _mlKitTranslationService.translate(word);
     } catch (e) {
       return null;
     }

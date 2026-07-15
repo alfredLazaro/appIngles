@@ -7,8 +7,8 @@ import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/datasources/local/translation_dao.dart';
 import 'package:first_app/data/datasources/remote/datamuse_service.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
-import 'package:first_app/data/datasources/remote/translation_service.dart';
 import 'package:first_app/data/datasources/remote/unsplash_service.dart';
+import 'package:first_app/data/services/mlkit_translation_service.dart';
 import 'package:first_app/data/repositories/datamuse_repository_impl.dart';
 import 'package:first_app/domain/repositories/datamuse_repository.dart';
 import 'package:first_app/domain/usecases/datamuse/get_means_like_words.dart';
@@ -47,8 +47,8 @@ void setupDependencies() {
 
   sl.registerLazySingleton<WordService>(() => WordService());
   sl.registerLazySingleton<ImageService>(() => ImageService());
-  sl.registerLazySingleton<TranslateService>(() => TranslateService());
   sl.registerLazySingleton<DatamuseService>(() => DatamuseService());
+  sl.registerLazySingleton<MlKitTranslationService>(() => MlKitTranslationService());
 
   // === Repositories ===
   sl.registerLazySingleton<WordRepository>(
@@ -57,7 +57,7 @@ void setupDependencies() {
       wordPracticeDao: sl<WordPracticeDao>(),
       wordBatchDao: sl<WordBatchDao>(),
       wordService: sl<WordService>(),
-      translateService: sl<TranslateService>(),
+      mlKitTranslationService: sl<MlKitTranslationService>(),
     ),
   );
 
