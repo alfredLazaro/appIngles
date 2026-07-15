@@ -26,23 +26,11 @@ class MatchingDefinitionLayout extends StatelessWidget {
           flex: 1,
           child: Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: Text(
-                  'Palabras',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
               Expanded(
-                child: Center(
-                  child: SingleChildScrollView(
                     child: Wrap(
                       spacing: 4,
                       runSpacing: 2,
-                      alignment: WrapAlignment.center,
+                      alignment: WrapAlignment.start,
                       children: List.generate(
                         state.round.words.length,
                         (i) => AnimatedOpacity(
@@ -64,8 +52,6 @@ class MatchingDefinitionLayout extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
-                ),
               ),
             ],
           ),
