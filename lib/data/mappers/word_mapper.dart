@@ -17,6 +17,7 @@ class WordMapper {
       definition: model.definition,
       sentence: model.sentence,
       learnCount: model.learn,
+      synonyms: model.synonyms,
       createdAt: DateTime.parse(model.createdAt),
       updatedAt: DateTime.parse(model.updatedAt),
     );
@@ -31,6 +32,7 @@ class WordMapper {
       definition: entity.definition,
       sentence: entity.sentence,
       learn: entity.learnCount,
+      synonyms: entity.synonyms,
       createdAt: entity.createdAt.toIso8601String(),
       updatedAt: entity.updatedAt.toIso8601String(),
     );
@@ -91,8 +93,9 @@ class WordMapper {
       definition: map['definition'] as String,
       sentence: map['sentence'],
       learnCount: map['learn'] as int? ?? 0,
-      createdAt: DateTime.now(), // You might need to parse from map
-      updatedAt: DateTime.now(), // You might need to parse from map
+      synonyms: map['synonyms'] as String? ?? '',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
   }
 

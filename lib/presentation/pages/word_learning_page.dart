@@ -226,6 +226,8 @@ class _WordLearningPageState extends State<WordLearningPage> {
           result['translation'] as Map<String, dynamic>?;
       final selectedAlternatives =
           (result['selectedAlternatives'] as List<String>?) ?? [];
+      final selectedEnglishSynonyms =
+          (result['selectedEnglishSynonyms'] as List<String>?) ?? [];
 
       context.read<WordLearningBloc>().add(
             SaveNewWordEvent(
@@ -233,6 +235,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
               selectedImages: selectedImages,
               translation: translation,
               selectedAlternatives: selectedAlternatives,
+              selectedEnglishSynonyms: selectedEnglishSynonyms,
             ),
           );
     }

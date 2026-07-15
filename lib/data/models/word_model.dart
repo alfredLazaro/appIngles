@@ -1,11 +1,12 @@
 class WordModel {
   final int? id;
   final String word;
-  final String partOfSpeech; // Added partOfSpeech field to represent the part of speech of the word
+  final String partOfSpeech;
   final String phonetic;
   final String definition;
   final String sentence;
   int learn;
+  String synonyms;
   String createdAt;
   String updatedAt;
 
@@ -17,6 +18,7 @@ class WordModel {
     required this.definition,
     required this.sentence,
     required this.learn,
+    this.synonyms = '',
     required this.createdAt,
     required this.updatedAt,
   });
@@ -28,6 +30,7 @@ class WordModel {
     String? definition,
     String? sentence,
     int? learn,
+    String? synonyms,
     String? createdAt,
     String? updatedAt,
     String? partOfSpeech,
@@ -40,6 +43,7 @@ class WordModel {
       definition: definition ?? this.definition,
       sentence: sentence ?? this.sentence,
       learn: learn ?? this.learn,
+      synonyms: synonyms ?? this.synonyms,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -51,8 +55,9 @@ class WordModel {
     required this.partOfSpeech,
     required this.sentence,
   })  : definition = '',
-        phonetic = '', //need correction
+        phonetic = '',
         learn = 0,
+        synonyms = '',
         createdAt = '',
         updatedAt = '';
 
@@ -65,6 +70,7 @@ class WordModel {
       definition: map['definition'] ?? '',
       sentence: map['sentence'] ?? '',
       learn: map['learn'] ?? 0,
+      synonyms: map['synonyms'] ?? '',
       createdAt: map['created_at'] ?? '',
       updatedAt: map['updated_at'] ?? '',
     );
@@ -85,6 +91,7 @@ class WordModel {
       'phonetic': phonetic,
       'sentence': sentence,
       'learn': learn,
+      'synonyms': synonyms,
       'created_at': createdAt,
       'updated_at': updatedAt,
     };
@@ -99,6 +106,7 @@ class WordModel {
       definition: json['definition'] ?? '',
       sentence: json['sentence'] ?? '',
       learn: json['learn'] ?? 0,
+      synonyms: json['synonyms'] ?? '',
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
     );

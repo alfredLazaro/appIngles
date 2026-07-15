@@ -37,16 +37,24 @@ class SaveNewWordEvent extends WordLearningEvent {
   final List<ImageSearchResult> selectedImages;
   final Map<String, dynamic>? translation;
   final List<String> selectedAlternatives;
+  final List<String> selectedEnglishSynonyms;
 
   SaveNewWordEvent({
     required this.wordData,
     required this.selectedImages,
     this.translation,
     this.selectedAlternatives = const [],
+    this.selectedEnglishSynonyms = const [],
   });
 
   @override
-  List<Object?> get props => [wordData, selectedImages, translation, selectedAlternatives];
+  List<Object?> get props => [
+        wordData,
+        selectedImages,
+        translation,
+        selectedAlternatives,
+        selectedEnglishSynonyms,
+      ];
 }
 
 class UpdateWordSentenceEvent extends WordLearningEvent {

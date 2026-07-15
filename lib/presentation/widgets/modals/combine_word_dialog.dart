@@ -30,6 +30,7 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
   int? _selectedDefinitionIndex;
   final List<ImageSearchResult> _selectedImageUrls = [];
   final Set<String> _selectedAlternatives = {};
+  final Set<String> _selectedEnglishSynonyms = {};
 
   @override
   Widget build(BuildContext context) {
@@ -297,8 +298,10 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                                   setState(() {
                                     if (checked == true) {
                                       _selectedAlternatives.add(entry.value);
+                                      _selectedEnglishSynonyms.add(entry.key);
                                     } else {
                                       _selectedAlternatives.remove(entry.value);
+                                      _selectedEnglishSynonyms.remove(entry.key);
                                     }
                                   });
                                 },
@@ -398,6 +401,7 @@ class _CombinedWordDialogState extends State<CombinedWordDialog> {
                     'images': _selectedImageUrls,
                     'translation': widget.translation,
                     'selectedAlternatives': _selectedAlternatives.toList(),
+                    'selectedEnglishSynonyms': _selectedEnglishSynonyms.toList(),
                   });
                 },
                 icon: const Icon(Icons.save, size: 18),

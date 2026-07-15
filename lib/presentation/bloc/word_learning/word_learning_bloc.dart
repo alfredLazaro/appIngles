@@ -168,6 +168,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
         definition: event.wordData['definition'] ?? '',
         sentence: event.wordData['example'] ?? '',
         learnCount: 0,
+        synonyms: event.selectedEnglishSynonyms.join('|'),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
