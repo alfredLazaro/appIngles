@@ -62,13 +62,16 @@ class WordBatchDao {
             conflictAlgorithm: ConflictAlgorithm.replace,
           );
 
+          final wordRows = await txn.query('Word', columns: ['word'], where: 'id = ?', whereArgs: [wordId]);
+          final wordText = wordRows.isNotEmpty ? (wordRows.first['word'] as String) : '';
+
           final existing = await txn.query(
             'outbox',
             where: "entity_type = 'progress' AND entity_id = ? AND status = 'pending'",
             whereArgs: [wordId],
           );
 
-          final payload = '{"learn": $newLearn, "updated_at": "$now"}';
+          final payload = '{"word": "$wordText", "learn": $newLearn, "updated_at": "$now"}';
 
           if (existing.isEmpty) {
             await txn.insert('outbox', {

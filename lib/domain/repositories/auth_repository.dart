@@ -5,4 +5,6 @@ abstract class AuthRepository {
   Future<UserSession?> getUserSession();
   Future<void> saveSession(UserSession session);
   Future<void> clearSession();
+  Future<UserSession> login(String email, String password);
+  Future<UserSession> register(String email, String password);
 }

@@ -78,6 +78,7 @@ class SyncRepositoryImpl implements SyncRepository {
         final payload = r.payloadAsMap;
         return {
           'word_id': r.entityId,
+          'word': payload['word'] ?? '',
           'learn': payload['learn'],
           'updated_at': payload['updated_at'],
         };
@@ -127,6 +128,7 @@ class SyncRepositoryImpl implements SyncRepository {
 
       for (final item in serverItems) {
         final wordId = item['word_id'] as int;
+        final serverWord = item['word'] as String? ?? '';
         final serverLearn = item['learn'] as int;
         final serverUpdatedAt = item['updated_at'] as String;
         final local = await _progressDao.getLearnByWordId(wordId);
@@ -134,6 +136,19 @@ class SyncRepositoryImpl implements SyncRepository {
         if (local == null) {
           await _progressDao.updateFromServer(wordId, serverLearn, serverUpdatedAt, now);
           final db = await DatabaseService().database;
+          await db.insert(
+            'Word',
+            {
+              'id': wordId,
+              'word': serverWord,
+              'definition': '',
+              'sentence': '',
+              'learn': serverLearn,
+              'created_at': serverUpdatedAt,
+              'updated_at': serverUpdatedAt,
+            },
+            conflictAlgorithm: ConflictAlgorithm.ignore,
+          );
           await db.update(
             'Word',
             {'learn': serverLearn, 'updated_at': serverUpdatedAt},

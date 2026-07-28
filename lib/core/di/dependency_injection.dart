@@ -44,6 +44,7 @@ import 'package:first_app/domain/usecases/image/search_images.dart';
 import 'package:first_app/domain/usecases/image/save_word_images.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
 import 'package:first_app/domain/usecases/speak_text.dart';
+import 'package:first_app/presentation/bloc/auth/auth_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:dio/dio.dart';
@@ -121,12 +122,24 @@ void setupDependencies() {
   );
 
   sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(userDao: sl<UserDao>()),
+    () => AuthRepositoryImpl(
+      userDao: sl<UserDao>(),
+      dio: sl<Dio>(),
+      baseUrl: dotenv.env['BASE_URL_SYNC'] ?? 'http://localhost:8080',
+    ),
   );
 
   // === Sync Service ===
   sl.registerLazySingleton<SyncService>(
     () => SyncService(syncRepository: sl<SyncRepository>()),
+  );
+
+  // === Auth Bloc ===
+  sl.registerLazySingleton<AuthBloc>(
+    () => AuthBloc(
+      authRepository: sl<AuthRepository>(),
+      syncRepository: sl<SyncRepository>(),
+    ),
   );
 
   // === Use cases ===

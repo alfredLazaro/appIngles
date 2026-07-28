@@ -1,6 +1,7 @@
 import 'package:first_app/data/datasources/local/progress_dao.dart';
 import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/local/word_practice_dao.dart';
+import 'package:first_app/data/datasources/local/DataBaseHelper.dart';
 import 'package:first_app/domain/entities/progress.dart';
 import 'package:first_app/domain/repositories/progress_repository.dart';
 
@@ -34,22 +35,35 @@ class ProgressRepositoryImpl implements ProgressRepository {
 
   @override
   Future<Progress?> getByWordId(int wordId) async {
-    final learn = await _progressDao.getLearnByWordId(wordId);
-    if (learn == null) return null;
+    final db = await DatabaseService().database;
+    final rows = await db.query(
+      'Word',
+      columns: ['word', 'learn'],
+      where: 'id = ?',
+      whereArgs: [wordId],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
     return Progress(
       wordId: wordId,
-      learn: learn,
+      word: rows.first['word'] as String? ?? '',
+      learn: rows.first['learn'] as int? ?? 0,
       updatedAt: DateTime.now(),
     );
   }
 
   @override
   Future<List<Progress>> getAll() async {
-    final rows = await _progressDao.getAll();
+    final db = await DatabaseService().database;
+    final rows = await db.rawQuery('''
+      SELECT p.*, w.word FROM progress p
+      LEFT JOIN Word w ON p.word_id = w.id
+    ''');
     return rows.map((r) {
       return Progress(
         id: r['id'] as int?,
         wordId: r['word_id'] as int,
+        word: r['word'] as String? ?? '',
         learn: r['learn'] as int? ?? 0,
         updatedAt: DateTime.parse(r['updated_at'] as String),
         userId: r['user_id'] as int?,

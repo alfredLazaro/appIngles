@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
@@ -44,10 +45,10 @@ class FlashcardImageWidget extends StatelessWidget {
         ? images.first.url
         : FlashcardConstants.noImageAvailable;
 
-    return Image.network(
-      imageUrl,
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
       fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) => Container(
+      errorWidget: (context, error, stackTrace) => Container(
         color: Colors.grey[300],
         child: const Icon(
           Icons.image_not_supported,
@@ -55,20 +56,12 @@ class FlashcardImageWidget extends StatelessWidget {
           color: Colors.grey,
         ),
       ),
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Container(
-          color: Colors.grey[200],
-          child: Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                  : null,
-            ),
-          ),
-        );
-      },
+      placeholder: (context, url) => Container(
+        color: Colors.grey[200],
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
     );
   }
 

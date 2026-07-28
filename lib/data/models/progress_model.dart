@@ -3,6 +3,7 @@ import 'package:first_app/domain/entities/progress.dart';
 class ProgressModel {
   final int? id;
   final int wordId;
+  final String word;
   int learn;
   String updatedAt;
   int? userId;
@@ -11,6 +12,7 @@ class ProgressModel {
   ProgressModel({
     this.id,
     required this.wordId,
+    required this.word,
     required this.learn,
     required this.updatedAt,
     this.userId,
@@ -21,6 +23,7 @@ class ProgressModel {
     return ProgressModel(
       id: map['id'] as int?,
       wordId: map['word_id'] as int,
+      word: map['word'] as String? ?? '',
       learn: map['learn'] as int? ?? 0,
       updatedAt: map['updated_at'] as String? ?? '',
       userId: map['user_id'] as int?,
@@ -32,6 +35,7 @@ class ProgressModel {
     return {
       if (id != null) 'id': id,
       'word_id': wordId,
+      'word': word,
       'learn': learn,
       'updated_at': updatedAt,
       if (userId != null) 'user_id': userId,
@@ -43,6 +47,7 @@ class ProgressModel {
     return Progress(
       id: id,
       wordId: wordId,
+      word: word,
       learn: learn,
       updatedAt: DateTime.parse(updatedAt),
       userId: userId,
@@ -54,6 +59,7 @@ class ProgressModel {
     return ProgressModel(
       id: entity.id,
       wordId: entity.wordId,
+      word: entity.word,
       learn: entity.learn,
       updatedAt: entity.updatedAt.toIso8601String(),
       userId: entity.userId,

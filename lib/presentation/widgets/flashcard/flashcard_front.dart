@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/constants/app_constants.dart';
@@ -117,21 +118,18 @@ class _FlashcardFrontState extends State<FlashcardFront> {
                   1,
                   0,
                 ]),
-                child: Image.network(
-                  widget.images.first.url,
+                child: CachedNetworkImage(
+                  imageUrl: widget.images.first.url,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
+                  errorWidget: (context, error, stackTrace) => Container(
                     color: FlashcardConstants.hintBg,
                   ),
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      color: FlashcardConstants.hintBg,
-                      child: const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    );
-                  },
+                  placeholder: (context, url) => Container(
+                    color: FlashcardConstants.hintBg,
+                    child: const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
                 ),
               ),
             )

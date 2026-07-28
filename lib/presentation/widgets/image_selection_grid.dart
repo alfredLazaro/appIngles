@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/image_search_result.dart';
@@ -141,10 +142,10 @@ class _ImageSelectionGridState extends State<ImageSelectionGrid> {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(6),
-                                child: Image.network(
-                                  image.thumbUrl,
+                                child: CachedNetworkImage(
+                                  imageUrl: image.thumbUrl,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
+                                  errorWidget: (_, __, ___) =>
                                       const Icon(Icons.broken_image),
                                 ),
                               ),

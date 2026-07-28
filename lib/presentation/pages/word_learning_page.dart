@@ -10,6 +10,9 @@ import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/services/speech_to_text_interface.dart';
 import 'package:first_app/core/utils/clipboard_helper.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
+import 'package:first_app/presentation/bloc/auth/auth_bloc.dart';
+import 'package:first_app/presentation/bloc/auth/auth_state.dart';
+import 'package:first_app/presentation/widgets/app_drawer.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_event.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_state.dart';
@@ -119,8 +122,17 @@ class _WordLearningPageState extends State<WordLearningPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoggedIn = context.watch<AuthBloc>().state is AuthSuccess;
+
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         title: const Text('Aprendiendo'),
         actions: [
           // Add copy button
@@ -143,6 +155,32 @@ class _WordLearningPageState extends State<WordLearningPage> {
                     _showWordsLimitDialog(),
                   }),
         ],
+        bottom: isLoggedIn
+            ? null
+            : PreferredSize(
+                preferredSize: const Size.fromHeight(40),
+                child: GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, '/auth'),
+                  child: Container(
+                    width: double.infinity,
+                    color: Colors.orange.shade100,
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: Row(
+                      children: [
+                        Icon(Icons.cloud_off, size: 16, color: Colors.orange.shade800),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Inicia sesión para sincronizar tu progreso',
+                            style: TextStyle(fontSize: 12, color: Colors.orange.shade900),
+                          ),
+                        ),
+                        Icon(Icons.chevron_right, size: 16, color: Colors.orange.shade800),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
       ),
       body: BlocListener<WordLearningBloc, WordLearningState>(
         listener: (context, state) {

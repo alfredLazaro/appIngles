@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,6 +34,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     on<MarkAsKnown>(_onMarkAsKnown);
     on<MarkAsUnknown>(_onMarkAsUnknown);
     on<RevealAnswer>(_onRevealAnswer);
+    on<AutoFlipCard>(_onAutoFlipCard);
   }
 
   List<FlashcardSession> _generateSessions(
@@ -174,7 +176,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final isCorrect =
           _validateWordAnswer(event.userAnswer, currentState.word.word);
 
-      await _speakText(currentState.word.word);
+      _speakText(currentState.word.word);
 
       if (isCorrect) {
         final newCount = currentState.learnCount + 3;
@@ -184,13 +186,16 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
             isAnswerCorrect: true,
             userAnswer: event.userAnswer,
             scores: Map.from(_scores)));
-        await Future.delayed(const Duration(seconds: 1));
-        emit(currentState.copyWith(
-            learnCount: newCount,
-            isAnswerCorrect: true,
-            showFront: false,
-            userAnswer: event.userAnswer,
-            scores: Map.from(_scores)));
+        Future.delayed(const Duration(seconds: 1), () {
+          if (!isClosed) {
+            add(AutoFlipCard(
+              newLearnCount: newCount,
+              scores: Map.from(_scores),
+              isCorrect: true,
+              userAnswer: event.userAnswer,
+            ));
+          }
+        });
       } else {
         final newCount =
             (currentState.learnCount - 1).clamp(0, double.infinity).toInt();
@@ -200,20 +205,35 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
             isAnswerCorrect: false,
             userAnswer: event.userAnswer,
             scores: Map.from(_scores)));
-        await Future.delayed(const Duration(seconds: 1));
-        emit(currentState.copyWith(
-            learnCount: newCount,
-            isAnswerCorrect: false,
-            showFront: false,
-            userAnswer: event.userAnswer,
-            scores: Map.from(_scores)));
+        Future.delayed(const Duration(seconds: 1), () {
+          if (!isClosed) {
+            add(AutoFlipCard(
+              newLearnCount: newCount,
+              scores: Map.from(_scores),
+              isCorrect: false,
+              userAnswer: event.userAnswer,
+            ));
+          }
+        });
       }
     }
   }
 
   Future<void> _onSpeakText(
       SpeakFlashcardText event, Emitter<FlashcardState> emit) async {
-    await _speakText(event.text);
+    _speakText(event.text);
+  }
+
+  void _onAutoFlipCard(AutoFlipCard event, Emitter<FlashcardState> emit) {
+    if (state is FlashcardLoaded) {
+      final currentState = state as FlashcardLoaded;
+      emit(currentState.copyWith(
+          learnCount: event.newLearnCount,
+          isAnswerCorrect: event.isCorrect,
+          showFront: false,
+          userAnswer: event.userAnswer,
+          scores: Map.from(event.scores)));
+    }
   }
 
   void _onMarkAsKnown(MarkAsKnown event, Emitter<FlashcardState> emit) {

@@ -4,11 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/core/services/sync_scheduler.dart';
 import 'package:first_app/core/services/sync_service.dart';
+import 'package:first_app/presentation/bloc/auth/auth_bloc.dart';
+import 'package:first_app/presentation/bloc/auth/auth_event.dart';
 import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
-import 'package:first_app/presentation/pages/main_navigation_page.dart';
+import 'package:first_app/presentation/pages/auth_page.dart';
+import 'package:first_app/presentation/widgets/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +31,9 @@ class MyApp extends StatelessWidget {
       syncService: sl<SyncService>(),
       child: MultiBlocProvider(
         providers: [
+          BlocProvider<AuthBloc>(
+            create: (_) => sl<AuthBloc>()..add(const CheckAuth()),
+          ),
           BlocProvider<WordLearningBloc>(
             create: (_) => WordLearningBloc(
               getRecentWords: sl(),
@@ -68,7 +74,11 @@ class MyApp extends StatelessWidget {
               displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
           ),
-          home: const MainNavigationPage(),
+          home: const AuthGate(),
+          routes: {
+            '/auth': (_) => const AuthPage(),
+            '/home': (_) => const AuthGate(),
+          },
         ),
       ),
     );

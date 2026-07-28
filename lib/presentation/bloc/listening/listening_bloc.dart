@@ -68,14 +68,14 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
     emit(_buildLoaded(0));
   }
 
-  Future<void> _onPlayAudio(
+  void _onPlayAudio(
     PlayCurrentWordAudioListening event,
     Emitter<ListeningState> emit,
-  ) async {
+  ) {
     final state = this.state;
     if (state is! ListeningLoaded) return;
 
-    await _speakText(state.currentWord.word);
+    _speakText(state.currentWord.word);
   }
 
   void _onSubmitAnswer(

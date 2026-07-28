@@ -73,3 +73,17 @@ class MarkAsUnknown extends FlashcardEvent {}
 class RevealAnswer extends FlashcardEvent {
   const RevealAnswer();
 }
+
+class AutoFlipCard extends FlashcardEvent {
+  final int newLearnCount;
+  final Map<int, int> scores;
+  final bool isCorrect;
+  final String userAnswer;
+
+  const AutoFlipCard({
+    required this.newLearnCount,
+    required this.scores,
+    required this.isCorrect,
+    required this.userAnswer,
+  });
+}
