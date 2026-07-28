@@ -1,10 +1,14 @@
 import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/core/services/speech_to_text_service.dart';
+import 'package:first_app/core/services/sync_service.dart';
 import 'package:first_app/data/datasources/local/word_crud_dao.dart';
 import 'package:first_app/data/datasources/local/word_practice_dao.dart';
 import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/datasources/local/translation_dao.dart';
+import 'package:first_app/data/datasources/local/progress_dao.dart';
+import 'package:first_app/data/datasources/local/outbox_dao.dart';
+import 'package:first_app/data/datasources/local/user_dao.dart';
 import 'package:first_app/data/datasources/remote/datamuse_service.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
 import 'package:first_app/data/datasources/remote/unsplash_service.dart';
@@ -15,9 +19,15 @@ import 'package:first_app/domain/usecases/datamuse/get_means_like_words.dart';
 import 'package:first_app/data/repositories/word_repository_impl.dart';
 import 'package:first_app/data/repositories/image_repository_impl.dart';
 import 'package:first_app/data/repositories/translation_repository_impl.dart';
+import 'package:first_app/data/repositories/progress_repository_impl.dart';
+import 'package:first_app/data/repositories/sync_repository_impl.dart';
+import 'package:first_app/data/repositories/auth_repository_impl.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/repositories/translation_repository.dart';
+import 'package:first_app/domain/repositories/progress_repository.dart';
+import 'package:first_app/domain/repositories/sync_repository.dart';
+import 'package:first_app/domain/repositories/auth_repository.dart';
 import 'package:first_app/domain/services/tts_service_interface.dart';
 import 'package:first_app/domain/services/speech_to_text_interface.dart';
 import 'package:first_app/domain/usecases/word/save_word.dart';
@@ -35,16 +45,27 @@ import 'package:first_app/domain/usecases/image/save_word_images.dart';
 import 'package:first_app/domain/usecases/validate_word_answer.dart';
 import 'package:first_app/domain/usecases/speak_text.dart';
 import 'package:get_it/get_it.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:dio/dio.dart';
 
 final sl = GetIt.instance;
 
 void setupDependencies() {
-  // === Data sources ===
+  // === Core ===
+  sl.registerLazySingleton<Dio>(() => Dio(BaseOptions(
+    connectTimeout: const Duration(seconds: 10),
+    receiveTimeout: const Duration(seconds: 15),
+  )));
+
+  // === Data sources (DAOs) ===
   sl.registerLazySingleton<WordCrudDao>(() => WordCrudDao());
   sl.registerLazySingleton<WordPracticeDao>(() => WordPracticeDao());
   sl.registerLazySingleton<WordBatchDao>(() => WordBatchDao());
   sl.registerLazySingleton<ImageDao>(() => ImageDao());
   sl.registerLazySingleton<TranslationDao>(() => TranslationDao());
+  sl.registerLazySingleton<ProgressDao>(() => ProgressDao());
+  sl.registerLazySingleton<OutboxDao>(() => OutboxDao());
+  sl.registerLazySingleton<UserDao>(() => UserDao());
 
   sl.registerLazySingleton<WordService>(() => WordService());
   sl.registerLazySingleton<ImageService>(() => ImageService());
@@ -79,6 +100,33 @@ void setupDependencies() {
     () => DatamuseRepositoryImpl(
       datamuseService: sl<DatamuseService>(),
     ),
+  );
+
+  sl.registerLazySingleton<ProgressRepository>(
+    () => ProgressRepositoryImpl(
+      progressDao: sl<ProgressDao>(),
+      wordBatchDao: sl<WordBatchDao>(),
+      wordPracticeDao: sl<WordPracticeDao>(),
+    ),
+  );
+
+  sl.registerLazySingleton<SyncRepository>(
+    () => SyncRepositoryImpl(
+      outboxDao: sl<OutboxDao>(),
+      userDao: sl<UserDao>(),
+      progressDao: sl<ProgressDao>(),
+      dio: sl<Dio>(),
+      baseUrl: dotenv.env['BASE_URL_SYNC'] ?? 'http://localhost:8080',
+    ),
+  );
+
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(userDao: sl<UserDao>()),
+  );
+
+  // === Sync Service ===
+  sl.registerLazySingleton<SyncService>(
+    () => SyncService(syncRepository: sl<SyncRepository>()),
   );
 
   // === Use cases ===

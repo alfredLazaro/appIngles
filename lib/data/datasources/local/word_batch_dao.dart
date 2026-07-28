@@ -1,7 +1,7 @@
 import "package:flutter/widgets.dart";
 import "package:sqflite/sqflite.dart";
+import "package:first_app/data/datasources/local/DataBaseHelper.dart";
 import "package:first_app/domain/entities/word_filter.dart";
-import "DataBaseHelper.dart";
 
 class WordBatchDao {
   final dbHelper = DatabaseService();
@@ -22,7 +22,7 @@ class WordBatchDao {
         );
       }
 
-      final ids = await batch.commit();
+      final ids = await batch.commit(noResult: false);
 
       for (int i = 0; i < words.length; i++) {
         results.add({
@@ -38,25 +38,63 @@ class WordBatchDao {
     }
   }
 
+  /// Actualiza learn counts en transacción atómica: Word + progress + outbox
   Future<void> batchUpdateLearnCounts(Map<int, int> updates) async {
     try {
       final db = await dbHelper.database;
-      final batch = db.batch();
       final now = DateTime.now().toIso8601String();
 
-      updates.forEach((id, count) {
-        batch.update(
-          'Word',
-          {
-            'learn': count,
-            'updated_at': now,
-          },
-          where: 'id = ?',
-          whereArgs: [id],
-        );
-      });
+      await db.transaction((txn) async {
+        for (final entry in updates.entries) {
+          final wordId = entry.key;
+          final newLearn = entry.value;
 
-      await batch.commit(noResult: true);
+          await txn.update(
+            'Word',
+            {'learn': newLearn, 'updated_at': now},
+            where: 'id = ?',
+            whereArgs: [wordId],
+          );
+
+          await txn.insert(
+            'progress',
+            {'word_id': wordId, 'learn': newLearn, 'updated_at': now},
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+
+          final existing = await txn.query(
+            'outbox',
+            where: "entity_type = 'progress' AND entity_id = ? AND status = 'pending'",
+            whereArgs: [wordId],
+          );
+
+          final payload = '{"learn": $newLearn, "updated_at": "$now"}';
+
+          if (existing.isEmpty) {
+            await txn.insert('outbox', {
+              'entity_type': 'progress',
+              'entity_id': wordId,
+              'operation': 'upsert',
+              'payload': payload,
+              'status': 'pending',
+              'created_at': now,
+              'updated_at': now,
+            });
+          } else {
+            await txn.update(
+              'outbox',
+              {
+                'payload': payload,
+                'updated_at': now,
+                'attempts': 0,
+                'next_retry_at': null,
+              },
+              where: "entity_type = 'progress' AND entity_id = ? AND status = 'pending'",
+              whereArgs: [wordId],
+            );
+          }
+        }
+      });
     } catch (e) {
       _logError('batchUpdateLearnCounts', e,
           {'updatesCount': updates.length});

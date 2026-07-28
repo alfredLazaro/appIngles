@@ -1,12 +1,11 @@
 import 'package:first_app/data/datasources/local/db_constants.dart';
-//import 'package:logger/logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
   static Database? _database;
-  //Logger lo = Logger();
+
   factory DatabaseService() {
     return _instance;
   }
@@ -30,7 +29,6 @@ class DatabaseService {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    //lo.d("base de datos creada _onCreate");
     const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     const textType = 'TEXT NOT NULL';
     await db.execute('''
@@ -68,10 +66,65 @@ class DatabaseService {
                 FOREIGN KEY (${TranslationFields.wordId}) REFERENCES ${DBTables.word}(${WordFields.id}) ON DELETE CASCADE
             )
         ''');
+    await _createV2Tables(db);
+  }
+
+  Future<void> _createV2Tables(Database db) async {
+    await db.execute('''
+      CREATE TABLE ${DBTables.progress}(
+        ${ProgressFields.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${ProgressFields.wordId} INTEGER NOT NULL UNIQUE,
+        ${ProgressFields.learn} INTEGER NOT NULL DEFAULT 0,
+        ${ProgressFields.updatedAt} TEXT NOT NULL DEFAULT (datetime('now')),
+        ${ProgressFields.userId} INTEGER,
+        ${ProgressFields.syncedAt} TEXT
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE ${DBTables.outbox}(
+        ${OutboxFields.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${OutboxFields.entityType} TEXT NOT NULL,
+        ${OutboxFields.entityId} INTEGER NOT NULL,
+        ${OutboxFields.operation} TEXT NOT NULL DEFAULT 'upsert',
+        ${OutboxFields.payload} TEXT NOT NULL,
+        ${OutboxFields.status} TEXT NOT NULL DEFAULT 'pending',
+        ${OutboxFields.attempts} INTEGER NOT NULL DEFAULT 0,
+        ${OutboxFields.maxAttempts} INTEGER NOT NULL DEFAULT 15,
+        ${OutboxFields.nextRetryAt} TEXT,
+        ${OutboxFields.createdAt} TEXT NOT NULL DEFAULT (datetime('now')),
+        ${OutboxFields.updatedAt} TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    ''');
+    await db.execute('''
+      CREATE UNIQUE INDEX idx_outbox_pending_entity
+      ON ${DBTables.outbox}(${OutboxFields.entityType}, ${OutboxFields.entityId})
+      WHERE ${OutboxFields.status} = 'pending'
+    ''');
+    await db.execute('''
+      CREATE TABLE ${DBTables.users}(
+        ${UserFields.id} INTEGER PRIMARY KEY,
+        ${UserFields.email} TEXT NOT NULL,
+        ${UserFields.token} TEXT,
+        ${UserFields.createdAt} TEXT NOT NULL DEFAULT (datetime('now')),
+        ${UserFields.updatedAt} TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE app_preferences(
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    ''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {}
+    if (oldVersion < 2) {
+      await _createV2Tables(db);
+      await db.execute('''
+        INSERT INTO progress (word_id, learn, updated_at)
+        SELECT id, learn, updated_at FROM Word
+      ''');
+    }
   }
 
   Future<void> close() async {

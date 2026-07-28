@@ -8,19 +8,58 @@ class WordPracticeDao {
   Future<void> updateLearn(int id, int count) async {
     try {
       final db = await dbHelper.database;
-      final rowsUpdated = await db.update(
-        'Word',
-        {
-          'learn': count,
-          'updated_at': DateTime.now().toIso8601String(),
-        },
-        where: 'id = ?',
-        whereArgs: [id],
-      );
+      final now = DateTime.now().toIso8601String();
 
-      if (rowsUpdated == 0) {
-        throw Exception('Word with id $id not found for learn update');
-      }
+      await db.transaction((txn) async {
+        final rowsUpdated = await txn.update(
+          'Word',
+          {'learn': count, 'updated_at': now},
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+
+        if (rowsUpdated == 0) {
+          throw Exception('Word with id $id not found for learn update');
+        }
+
+        await txn.insert(
+          'progress',
+          {'word_id': id, 'learn': count, 'updated_at': now},
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+
+        final existing = await txn.query(
+          'outbox',
+          where: "entity_type = 'progress' AND entity_id = ? AND status = 'pending'",
+          whereArgs: [id],
+        );
+
+        final payload = '{"learn": $count, "updated_at": "$now"}';
+
+        if (existing.isEmpty) {
+          await txn.insert('outbox', {
+            'entity_type': 'progress',
+            'entity_id': id,
+            'operation': 'upsert',
+            'payload': payload,
+            'status': 'pending',
+            'created_at': now,
+            'updated_at': now,
+          });
+        } else {
+          await txn.update(
+            'outbox',
+            {
+              'payload': payload,
+              'updated_at': now,
+              'attempts': 0,
+              'next_retry_at': null,
+            },
+            where: "entity_type = 'progress' AND entity_id = ? AND status = 'pending'",
+            whereArgs: [id],
+          );
+        }
+      });
     } catch (e) {
       _logError('updateLearn', e, {'id': id, 'count': count});
       rethrow;

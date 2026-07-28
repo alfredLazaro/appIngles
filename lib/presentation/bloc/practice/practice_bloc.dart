@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:first_app/core/services/sync_service.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/match_round.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
@@ -14,14 +15,17 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
   final WordRepository _wordRepository;
   final ImageRepository _imageRepository;
   final TranslationRepository _translationRepository;
+  final SyncService? _syncService;
 
   PracticeBloc({
     required WordRepository wordRepository,
     required ImageRepository imageRepository,
     required TranslationRepository translationRepository,
+    SyncService? syncService,
   })  : _wordRepository = wordRepository,
         _imageRepository = imageRepository,
         _translationRepository = translationRepository,
+        _syncService = syncService,
         super(PracticeInitial()) {
     on<LoadPracticeDataEvent>(_onLoadPracticeData);
     on<StartPracticeEvent>(_onStartPractice);
@@ -37,7 +41,6 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     try {
       int totalCount;
 
-      // Get count based on practice type
       switch (event.type) {
         case PracticeType.flashcard:
         case PracticeType.spelling:
@@ -116,13 +119,8 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
   }
 
   Future<FlashcardPracticeData> _loadFlashcardPractice(int count) async {
-    // Load words for practice
     final words = await _wordRepository.getWordsForPractice(count);
-
-    // Get word IDs
     final wordIds = words.map((w) => w.id).toList();
-
-    // Load images
     final images = await _imageRepository.getImagesByWordIds(wordIds);
     return FlashcardPracticeData(
       words: words,
@@ -147,10 +145,8 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
   }
 
   Future<SentencePracticeData> _loadSentencePractice(int count) async {
-    // Load sentences for practice
     final sentences =
         await _wordRepository.getSentencesForPractice(limit: count);
-
     return SentencePracticeData(
       sentences: sentences,
     );
@@ -194,6 +190,7 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     try {
       await _wordRepository
           .batchUpdateLearnCounts(event.result.learnCountUpdates);
+      _syncService?.onPracticeCompleted();
       emit(PracticeCompleted(event.result));
     } catch (e) {
       emit(PracticeError('Error al guardar progreso: $e'));
