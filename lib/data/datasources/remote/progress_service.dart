@@ -79,7 +79,7 @@ class ProgressService {
   // obtener traducciones por ids de palabras, para que no sea tan pesado
   Future<List<dynamic>> getTranslationsByWordsIds(String token, List<int> wordIds) async {
     final response = await _dio.post(
-      '/translations/words',
+      '/translations/by-word',
       data: {'word_ids': wordIds},
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
@@ -88,7 +88,7 @@ class ProgressService {
 
   Future<List<dynamic>> getImagesByWordsIds(String token, List<int> wordIds) async {
     final response = await _dio.post(
-      '/images/words',
+      '/images/by-word',
       data: {'word_ids': wordIds},
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );

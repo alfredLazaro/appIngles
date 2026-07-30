@@ -1,11 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first_app/core/di/dependency_injection.dart';
+import 'package:first_app/domain/repositories/sync_repository.dart';
 import 'package:first_app/presentation/bloc/auth/auth_bloc.dart';
 import 'package:first_app/presentation/bloc/auth/auth_event.dart';
 import 'package:first_app/presentation/bloc/auth/auth_state.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
+
+  @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  String? _selectedCategory;
+  bool _isLoading = false;
+
+  static const _categories = [
+    /* 'Principiante',
+    'Intermedio',
+    'Avanzado', */
+    'verb',
+    /* 'parsalverb', */
+  ];
+
+  Future<void> _downloadWords(String category) async {
+    setState(() => _isLoading = true);
+    try {
+      await sl<SyncRepository>().pullWordsByCategory(category);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Palabras descargadas correctamente')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +82,40 @@ class AppDrawer extends StatelessWidget {
                     Navigator.pushNamed(context, '/auth');
                   },
                 ),
+              if (loggedIn) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: DropdownButtonFormField<String>(
+                    initialValue: _selectedCategory,
+                    decoration: const InputDecoration(
+                      labelText: 'Categoría',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                    ),
+                    items: _categories.map((cat) {
+                      return DropdownMenuItem(value: cat, child: Text(cat));
+                    }).toList(),
+                    onChanged: (val) => setState(() => _selectedCategory = val),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: ElevatedButton.icon(
+                    onPressed: _selectedCategory != null && !_isLoading
+                        ? () => _downloadWords(_selectedCategory!)
+                        : null,
+                    icon: _isLoading
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.download),
+                    label: Text(_isLoading ? 'Descargando...' : 'Descargar palabras'),
+                  ),
+                ),
+                const Divider(),
+              ],
               ListTile(
                 leading: const Icon(Icons.settings),
                 title: const Text('Configuración'),
