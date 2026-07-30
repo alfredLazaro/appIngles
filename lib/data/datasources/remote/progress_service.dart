@@ -44,4 +44,54 @@ class ProgressService {
     );
     return response.data as List<dynamic>;
   }
+  //solo para admin por si crece la lista de palabras en el futuro 
+  Future<List<dynamic>> getAllWords(String token) async {
+    final response = await _dio.get(
+      '/words',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return response.data as List<dynamic>;
+  }
+
+  Future<List<dynamic>> getAllTranslations(String token) async {
+    final response = await _dio.get(
+      '/translations',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return response.data as List<dynamic>;
+  }
+  Future<List<dynamic>> getAllImages(String token) async {
+    final response = await _dio.get(
+      '/images',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return response.data as List<dynamic>;
+  }
+
+  //cargar por categorias, para que no sea tan pesado 
+  Future<List<dynamic>> getWordsByCategory(String token, String category) async {
+    final response = await _dio.get(
+      '/words/category/$category',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return response.data as List<dynamic>;
+  }
+  // obtener traducciones por ids de palabras, para que no sea tan pesado
+  Future<List<dynamic>> getTranslationsByWordsIds(String token, List<int> wordIds) async {
+    final response = await _dio.post(
+      '/translations/words',
+      data: {'word_ids': wordIds},
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return response.data as List<dynamic>;
+  }
+
+  Future<List<dynamic>> getImagesByWordsIds(String token, List<int> wordIds) async {
+    final response = await _dio.post(
+      '/images/words',
+      data: {'word_ids': wordIds},
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return response.data as List<dynamic>;
+  }
 }
