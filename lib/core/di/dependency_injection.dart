@@ -118,6 +118,8 @@ void setupDependencies() {
       userDao: sl<UserDao>(),
       progressDao: sl<ProgressDao>(),
       progressService: sl<ProgressService>(),
+      imageDao: sl<ImageDao>(),
+      translationDao: sl<TranslationDao>(),
     ),
   );
 

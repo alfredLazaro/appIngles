@@ -10,4 +10,5 @@ abstract class SyncRepository {
   Future<bool> sync();
   Future<void> pullAndReconcile();
   Future<DateTime?> getLastSyncTime();
+  Future<void> pullWordsByCategory(String category);
 }

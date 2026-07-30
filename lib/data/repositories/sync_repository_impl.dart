@@ -2,9 +2,11 @@ import 'package:flutter/widgets.dart';
 import 'package:first_app/data/datasources/local/outbox_dao.dart';
 import 'package:first_app/data/datasources/local/user_dao.dart';
 import 'package:first_app/data/datasources/local/progress_dao.dart';
-import 'package:first_app/data/datasources/local/word_batch_dao.dart';
+import 'package:first_app/data/datasources/local/ImageDao.dart';
+import 'package:first_app/data/datasources/local/translation_dao.dart';
 import 'package:first_app/data/datasources/local/DataBaseHelper.dart';
 import 'package:first_app/data/datasources/remote/progress_service.dart';
+import 'package:first_app/data/models/image_model.dart';
 import 'package:first_app/domain/entities/outbox_event.dart';
 import 'package:first_app/domain/repositories/sync_repository.dart';
 import 'package:sqflite/sqflite.dart';
@@ -14,16 +16,21 @@ class SyncRepositoryImpl implements SyncRepository {
   final UserDao _userDao;
   final ProgressDao _progressDao;
   final ProgressService _progressService;
-  //final WordBatchDao _wordBatchDao;
+  final ImageDao _imageDao;
+  final TranslationDao _translationDao;
   SyncRepositoryImpl({
     required OutboxDao outboxDao,
     required UserDao userDao,
     required ProgressDao progressDao,
     required ProgressService progressService,
+    required ImageDao imageDao,
+    required TranslationDao translationDao,
   })  : _outboxDao = outboxDao,
         _userDao = userDao,
         _progressDao = progressDao,
-        _progressService = progressService;
+        _progressService = progressService,
+        _imageDao = imageDao,
+        _translationDao = translationDao;
 
   @override
   Future<int> countPending() => _outboxDao.countPending();
@@ -204,28 +211,81 @@ class SyncRepositoryImpl implements SyncRepository {
     } catch (_) {}
   }
 
+  @override
   Future<void> pullWordsByCategory(String category) async {
-    try{
+    try {
       final user = await _userDao.getSession();
       final token = user?['token'] as String?;
-      final userId = user?['id'] as int?;
-      if (token == null || userId == null) return;
+      if (token == null) return;
 
       final words = await _progressService.getWordsByCategory(token, category);
-      for (final word in words) {
+      if (words.isEmpty) return;
 
-      }
-     List<int> wordIds = words.map<int>((word) => word['id'] as int).toList();
-      final translations = await _progressService.getTranslationsByWordsIds(token, wordIds);
-      for (final translation in translations) {
-        
-      }
-      final images = await _progressService.getImagesByWordsIds(token, wordIds);
-      for (final image in images) {
+      final now = DateTime.now().toIso8601String();
+      final newIds = <int>[];
 
+      final db = await DatabaseService().database;
+      await db.transaction((txn) async {
+        for (final w in words) {
+          final wordText = (w['word'] as String?)?.trim() ?? '';
+          if (wordText.isEmpty) continue;
+
+          final count = Sqflite.firstIntValue(
+            await txn.rawQuery(
+              'SELECT COUNT(*) FROM Word WHERE word = ?',
+              [wordText],
+            ),
+          ) ?? 0;
+          if (count > 0) continue;
+
+          final wordId = w['id'] as int;
+          newIds.add(wordId);
+
+          await txn.insert('Word', {
+            'id': wordId,
+            'word': wordText,
+            'partOfSpeech': w['partOfSpeech'] ?? '',
+            'phonetic': w['phonetic'] ?? '',
+            'definition': w['definition'] ?? '',
+            'sentence': w['sentence'] ?? '',
+            'learn': w['learn'] ?? 0,
+            'synonyms': w['synonyms'] ?? '',
+            'created_at': w['created_at'] ?? now,
+            'updated_at': w['updated_at'] ?? now,
+          }, conflictAlgorithm: ConflictAlgorithm.ignore);
+
+          await txn.insert('progress', {
+            'word_id': wordId,
+            'learn': w['learn'] ?? 0,
+            'updated_at': now,
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+      });
+
+      if (newIds.isEmpty) return;
+
+      final translations = await _progressService.getTranslationsByWordsIds(token, newIds);
+      if (translations.isNotEmpty) {
+        await _translationDao.batchInsertTranslations(
+          translations.cast<Map<String, dynamic>>(),
+        );
       }
 
-    }catch (e) {
+      final images = await _progressService.getImagesByWordsIds(token, newIds);
+      if (images.isNotEmpty) {
+        for (final img in images) {
+          await _imageDao.insertImage(Image_Model(
+            id: img['id'],
+            wordId: img['wordId'],
+            name: img['name'] as String? ?? '',
+            url: img['url'],
+            tinyurl: img['tinyurl'],
+            author: img['author'],
+            source: img['source'],
+          ));
+        }
+      }
+    } catch (e) {
       debugPrint('❌ SyncRepositoryImpl.pullWordsByCategory error: $e');
     }
   }
