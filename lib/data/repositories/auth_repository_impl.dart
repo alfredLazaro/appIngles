@@ -51,8 +51,8 @@ class AuthRepositoryImpl implements AuthRepository {
     final data = response.data as Map<String, dynamic>;
     return UserSession(
       id: data['user_id'] as int,
-      email: data['email'] as String,
-      token: data['token'] as String,
+      email: email,
+      token: data['token'] as String? ?? '',
     );
   }
 
@@ -65,8 +65,8 @@ class AuthRepositoryImpl implements AuthRepository {
     final data = response.data as Map<String, dynamic>;
     return UserSession(
       id: data['user_id'] as int,
-      email: data['email'] as String,
-      token: data['token'] as String,
+      email: email,
+      token: data['token'] as String? ?? '',
     );
   }
 }

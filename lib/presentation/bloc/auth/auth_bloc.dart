@@ -3,6 +3,7 @@ import 'package:first_app/domain/repositories/auth_repository.dart';
 import 'package:first_app/domain/repositories/sync_repository.dart';
 import 'package:first_app/presentation/bloc/auth/auth_event.dart';
 import 'package:first_app/presentation/bloc/auth/auth_state.dart';
+import 'package:dio/dio.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
@@ -67,12 +68,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   String _extractMessage(Object e) {
+    if (e is DioException) {
+      final statusCode = e.response?.statusCode;
+      if (statusCode == 401) return 'Email o contraseña incorrectos';
+      if (statusCode == 409) return 'Este email ya está registrado';
+      if (statusCode == 404) return 'Ruta no encontrada en el servidor';
+      if (statusCode != null) return 'Error del servidor (HTTP $statusCode)';
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        return 'El servidor no respondió a tiempo';
+      }
+      if (e.type == DioExceptionType.connectionError) {
+        return 'No se pudo conectar con el servidor';
+      }
+    }
     final s = e.toString();
-    if (s.contains('401')) return 'Email o contraseña incorrectos';
-    if (s.contains('409')) return 'Este email ya está registrado';
     if (s.contains('SocketException') || s.contains('Connection refused')) {
       return 'No se pudo conectar con el servidor';
     }
-    return 'Error inesperado. Intenta de nuevo.';
+    return 'Error: ${e.toString().substring(0, e.toString().length.clamp(0, 120))}';
   }
 }
