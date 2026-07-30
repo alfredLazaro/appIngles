@@ -3,29 +3,26 @@ import 'package:first_app/data/datasources/local/outbox_dao.dart';
 import 'package:first_app/data/datasources/local/user_dao.dart';
 import 'package:first_app/data/datasources/local/progress_dao.dart';
 import 'package:first_app/data/datasources/local/DataBaseHelper.dart';
+import 'package:first_app/data/datasources/remote/progress_service.dart';
 import 'package:first_app/domain/entities/outbox_event.dart';
 import 'package:first_app/domain/repositories/sync_repository.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:dio/dio.dart';
 
 class SyncRepositoryImpl implements SyncRepository {
   final OutboxDao _outboxDao;
   final UserDao _userDao;
   final ProgressDao _progressDao;
-  final Dio _dio;
-  final String _baseUrl;
+  final ProgressService _progressService;
 
   SyncRepositoryImpl({
     required OutboxDao outboxDao,
     required UserDao userDao,
     required ProgressDao progressDao,
-    required Dio dio,
-    required String baseUrl,
+    required ProgressService progressService,
   })  : _outboxDao = outboxDao,
         _userDao = userDao,
         _progressDao = progressDao,
-        _dio = dio,
-        _baseUrl = baseUrl;
+        _progressService = progressService;
 
   @override
   Future<int> countPending() => _outboxDao.countPending();
@@ -85,11 +82,7 @@ class SyncRepositoryImpl implements SyncRepository {
       }).toList();
 
       try {
-        await _dio.put(
-          '$_baseUrl/progress',
-          data: batch,
-          options: Options(headers: {'Authorization': 'Bearer $token'}),
-        );
+        await _progressService.pushProgress(batch, token);
         await _outboxDao.deleteByIds(ids);
         await _setLastSyncTime(DateTime.now());
         await pullAndReconcile();
@@ -117,13 +110,7 @@ class SyncRepositoryImpl implements SyncRepository {
       final userId = user?['id'] as int?;
       if (token == null || userId == null) return;
 
-      final response = await _dio.get(
-        '$_baseUrl/progress',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
-      if (response.statusCode != 200) return;
-
-      final serverItems = response.data as List<dynamic>;
+      final serverItems = await _progressService.pullProgress(token);
       final now = DateTime.now().toIso8601String();
 
       for (final item in serverItems) {

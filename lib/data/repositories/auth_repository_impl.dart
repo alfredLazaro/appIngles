@@ -1,20 +1,17 @@
 import 'package:first_app/data/datasources/local/user_dao.dart';
+import 'package:first_app/data/datasources/remote/progress_service.dart';
 import 'package:first_app/domain/entities/user_session.dart';
 import 'package:first_app/domain/repositories/auth_repository.dart';
-import 'package:dio/dio.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final UserDao _userDao;
-  final Dio _dio;
-  final String _baseUrl;
+  final ProgressService _progressService;
 
   AuthRepositoryImpl({
     required UserDao userDao,
-    required Dio dio,
-    required String baseUrl,
+    required ProgressService progressService,
   })  : _userDao = userDao,
-        _dio = dio,
-        _baseUrl = baseUrl;
+        _progressService = progressService;
 
   @override
   Future<bool> isLoggedIn() => _userDao.hasSession();
@@ -44,11 +41,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserSession> login(String email, String password) async {
-    final response = await _dio.post(
-      '$_baseUrl/auth/login',
-      data: {'email': email, 'password': password},
-    );
-    final data = response.data as Map<String, dynamic>;
+    final data = await _progressService.login(email, password);
     return UserSession(
       id: data['user_id'] as int,
       email: email,
@@ -58,11 +51,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserSession> register(String email, String password) async {
-    final response = await _dio.post(
-      '$_baseUrl/auth/register',
-      data: {'email': email, 'password': password},
-    );
-    final data = response.data as Map<String, dynamic>;
+    final data = await _progressService.register(email, password);
     return UserSession(
       id: data['user_id'] as int,
       email: email,

@@ -11,6 +11,7 @@ import 'package:first_app/data/datasources/local/outbox_dao.dart';
 import 'package:first_app/data/datasources/local/user_dao.dart';
 import 'package:first_app/data/datasources/remote/datamuse_service.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
+import 'package:first_app/data/datasources/remote/progress_service.dart';
 import 'package:first_app/data/datasources/remote/unsplash_service.dart';
 import 'package:first_app/data/services/mlkit_translation_service.dart';
 import 'package:first_app/data/repositories/datamuse_repository_impl.dart';
@@ -47,16 +48,10 @@ import 'package:first_app/domain/usecases/speak_text.dart';
 import 'package:first_app/presentation/bloc/auth/auth_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:dio/dio.dart';
 
 final sl = GetIt.instance;
 
 void setupDependencies() {
-  // === Core ===
-  sl.registerLazySingleton<Dio>(() => Dio(BaseOptions(
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 15),
-  )));
 
   // === Data sources (DAOs) ===
   sl.registerLazySingleton<WordCrudDao>(() => WordCrudDao());
@@ -111,21 +106,25 @@ void setupDependencies() {
     ),
   );
 
+  sl.registerLazySingleton<ProgressService>(
+    () => ProgressService(
+      baseUrl: dotenv.env['BASE_URL_SYNC'] ?? 'http://localhost:8080',
+    ),
+  );
+
   sl.registerLazySingleton<SyncRepository>(
     () => SyncRepositoryImpl(
       outboxDao: sl<OutboxDao>(),
       userDao: sl<UserDao>(),
       progressDao: sl<ProgressDao>(),
-      dio: sl<Dio>(),
-      baseUrl: dotenv.env['BASE_URL_SYNC'] ?? 'http://localhost:8080',
+      progressService: sl<ProgressService>(),
     ),
   );
 
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
       userDao: sl<UserDao>(),
-      dio: sl<Dio>(),
-      baseUrl: dotenv.env['BASE_URL_SYNC'] ?? 'http://localhost:8080',
+      progressService: sl<ProgressService>(),
     ),
   );
 
