@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:first_app/data/datasources/local/outbox_dao.dart';
 import 'package:first_app/data/datasources/local/user_dao.dart';
 import 'package:first_app/data/datasources/local/progress_dao.dart';
+import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/local/DataBaseHelper.dart';
 import 'package:first_app/data/datasources/remote/progress_service.dart';
 import 'package:first_app/domain/entities/outbox_event.dart';
@@ -13,7 +14,7 @@ class SyncRepositoryImpl implements SyncRepository {
   final UserDao _userDao;
   final ProgressDao _progressDao;
   final ProgressService _progressService;
-
+  //final WordBatchDao _wordBatchDao;
   SyncRepositoryImpl({
     required OutboxDao outboxDao,
     required UserDao userDao,
@@ -201,5 +202,31 @@ class SyncRepositoryImpl implements SyncRepository {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (_) {}
+  }
+
+  Future<void> pullWordsByCategory(String category) async {
+    try{
+      final user = await _userDao.getSession();
+      final token = user?['token'] as String?;
+      final userId = user?['id'] as int?;
+      if (token == null || userId == null) return;
+
+      final words = await _progressService.getWordsByCategory(token, category);
+      for (final word in words) {
+
+      }
+     List<int> wordIds = words.map<int>((word) => word['id'] as int).toList();
+      final translations = await _progressService.getTranslationsByWordsIds(token, wordIds);
+      for (final translation in translations) {
+        
+      }
+      final images = await _progressService.getImagesByWordsIds(token, wordIds);
+      for (final image in images) {
+
+      }
+
+    }catch (e) {
+      debugPrint('❌ SyncRepositoryImpl.pullWordsByCategory error: $e');
+    }
   }
 }
