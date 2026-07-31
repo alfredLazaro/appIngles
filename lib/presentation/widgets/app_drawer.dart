@@ -5,6 +5,8 @@ import 'package:first_app/domain/repositories/sync_repository.dart';
 import 'package:first_app/presentation/bloc/auth/auth_bloc.dart';
 import 'package:first_app/presentation/bloc/auth/auth_event.dart';
 import 'package:first_app/presentation/bloc/auth/auth_state.dart';
+import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
+import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -22,7 +24,7 @@ class _AppDrawerState extends State<AppDrawer> {
     'Intermedio',
     'Avanzado', */
     'verb',
-    /* 'parsalverb', */
+    'phrasal_verb',
   ];
 
   Future<void> _downloadWords(String category) async {
@@ -30,6 +32,7 @@ class _AppDrawerState extends State<AppDrawer> {
     try {
       await sl<SyncRepository>().pullWordsByCategory(category);
       if (mounted) {
+        context.read<WordListBloc>().add(const RefreshWordsEvent());
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Palabras descargadas correctamente')),
         );

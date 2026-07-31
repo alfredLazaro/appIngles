@@ -35,9 +35,9 @@ class ImageFields {
 
 class TranslationFields {
   static const String id = 'id';
-  static const String wordTranslate = 'wordTranslate';
+  static const String wordTranslate = 'word_translate';
   static const String alternatives = 'alternatives';
-  static const String wordId = 'wordId';
+  static const String wordId = 'word_id';
 }
 
 class ProgressFields {

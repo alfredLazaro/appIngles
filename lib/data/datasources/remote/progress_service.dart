@@ -71,25 +71,23 @@ class ProgressService {
   //cargar por categorias, para que no sea tan pesado 
   Future<List<dynamic>> getWordsByCategory(String token, String category) async {
     final response = await _dio.get(
-      '/words/category/$category',
+      '/words?part_of_speech=$category',
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
     return response.data as List<dynamic>;
   }
   // obtener traducciones por ids de palabras, para que no sea tan pesado
   Future<List<dynamic>> getTranslationsByWordsIds(String token, List<int> wordIds) async {
-    final response = await _dio.post(
-      '/translations/by-word',
-      data: {'word_ids': wordIds},
+    final response = await _dio.get(
+      '/translations/by-word?word_ids=${wordIds.join(',')}',
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
     return response.data as List<dynamic>;
   }
 
   Future<List<dynamic>> getImagesByWordsIds(String token, List<int> wordIds) async {
-    final response = await _dio.post(
-      '/images/by-word',
-      data: {'word_ids': wordIds},
+    final response = await _dio.get(
+      '/images/by-word?word_ids=${wordIds.join(',')}',
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
     return response.data as List<dynamic>;
