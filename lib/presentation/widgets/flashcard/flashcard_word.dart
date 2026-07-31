@@ -59,6 +59,14 @@ class WordFlashcard extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Text(
+                        word.partOfSpeech.isNotEmpty ? word.partOfSpeech : '',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textAccent,
+                        ),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -130,15 +138,6 @@ class WordFlashcard extends StatelessWidget {
                 color: AppColors.textPrimary ,
               ),
             ),
-          ),
-        ),
-        const Text(
-          'example',
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.05,
-            color: AppColors.textSecondary,
           ),
         ),
       ],

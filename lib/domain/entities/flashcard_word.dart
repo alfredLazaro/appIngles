@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 class FlashcardWord extends Equatable {
   final int id;
   final String word;
+  final String partOfSpeech;
   final String phonetic;
   final String definition;
   final String sentence;
@@ -11,6 +12,7 @@ class FlashcardWord extends Equatable {
   const FlashcardWord({
     required this.id,
     required this.word,
+    this.partOfSpeech = '',
     this.phonetic = '',
     required this.definition,
     required this.sentence,
@@ -18,10 +20,12 @@ class FlashcardWord extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, word, phonetic, definition, sentence, learnCount];
+  List<Object?> get props =>
+      [id, word, partOfSpeech, phonetic, definition, sentence, learnCount];
 
   FlashcardWord copyWith({
     String? word,
+    String? partOfSpeech,
     String? phonetic,
     String? definition,
     String? sentence,
@@ -30,6 +34,7 @@ class FlashcardWord extends Equatable {
     return FlashcardWord(
       id: id,
       word: word ?? this.word,
+      partOfSpeech: partOfSpeech ?? this.partOfSpeech,
       phonetic: phonetic ?? this.phonetic,
       definition: definition ?? this.definition,
       sentence: sentence ?? this.sentence,
