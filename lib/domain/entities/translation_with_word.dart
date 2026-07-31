@@ -18,7 +18,7 @@ class TranslationWithWord extends Equatable {
   factory TranslationWithWord.fromMap(Map<String, dynamic> map) {
     return TranslationWithWord(
       translationId: map['id'] as int,
-      wordTranslate: map['wordTranslate'] as String,
+      wordTranslate: map['word_translate'] as String,
       alternatives: map['alternatives'] as String?,
       word: map['word'] as String,
       definition: map['definition'] as String,

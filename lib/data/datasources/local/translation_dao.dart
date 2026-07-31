@@ -27,8 +27,10 @@ class TranslationDao {
       for (final translation in translations) {
         final data = {
           TranslationFields.wordId: wordId,
-          TranslationFields.wordTranslate: translation['wordTranslate'],
-          TranslationFields.alternatives: translation['alternatives'],
+          TranslationFields.wordTranslate:
+              translation[TranslationFields.wordTranslate],
+          TranslationFields.alternatives:
+              translation[TranslationFields.alternatives],
         };
         final id = await txn.insert(
           DBTables.translation,

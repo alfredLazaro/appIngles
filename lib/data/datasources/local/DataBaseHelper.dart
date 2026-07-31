@@ -66,10 +66,6 @@ class DatabaseService {
                 FOREIGN KEY (${TranslationFields.wordId}) REFERENCES ${DBTables.word}(${WordFields.id}) ON DELETE CASCADE
             )
         ''');
-    await _createV2Tables(db);
-  }
-
-  Future<void> _createV2Tables(Database db) async {
     await db.execute('''
       CREATE TABLE ${DBTables.progress}(
         ${ProgressFields.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -117,15 +113,7 @@ class DatabaseService {
     ''');
   }
 
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await _createV2Tables(db);
-      await db.execute('''
-        INSERT INTO progress (word_id, learn, updated_at)
-        SELECT id, learn, updated_at FROM Word
-      ''');
-    }
-  }
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {}
 
   Future<void> close() async {
     final db = await _instance.database;

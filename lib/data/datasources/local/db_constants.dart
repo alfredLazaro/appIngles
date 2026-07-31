@@ -38,6 +38,7 @@ class TranslationFields {
   static const String wordTranslate = 'word_translate';
   static const String alternatives = 'alternatives';
   static const String wordId = 'word_id';
+  static const String createdAt = 'created_at';
 }
 
 class ProgressFields {

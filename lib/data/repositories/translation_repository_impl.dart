@@ -1,6 +1,7 @@
 // data/repositories/translation_repository_impl.dart
 import 'package:first_app/domain/entities/translation_entity.dart';
 import 'package:first_app/domain/repositories/translation_repository.dart';
+import 'package:first_app/data/datasources/local/db_constants.dart';
 import 'package:first_app/data/datasources/local/translation_dao.dart';
 import 'package:first_app/data/mappers/translation_mapper.dart';
 
@@ -55,9 +56,9 @@ class TranslationRepositoryImpl implements TranslationRepository {
     List<String> alternatives,
   ) async {
     final map = {
-      'wordId': wordId,
-      'wordTranslate': wordTranslate,
-      'alternatives': alternatives.join('|'),
+      TranslationFields.wordId: wordId,
+      TranslationFields.wordTranslate: wordTranslate,
+      TranslationFields.alternatives: alternatives.join('|'),
     };
     return await _translationDao.insertTranslation(map);
   }
@@ -81,10 +82,10 @@ class TranslationRepositoryImpl implements TranslationRepository {
   ) async {
     final map = <String, dynamic>{};
     if (wordTranslate != null) {
-      map['wordTranslate'] = wordTranslate;
+      map[TranslationFields.wordTranslate] = wordTranslate;
     }
     if (alternatives != null) {
-      map['alternatives'] = alternatives.join('|');
+      map[TranslationFields.alternatives] = alternatives.join('|');
     }
     return await _translationDao.updateTranslation(id, map);
   }

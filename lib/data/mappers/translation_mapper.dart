@@ -1,4 +1,5 @@
 // data/mappers/translation_mapper.dart
+import 'package:first_app/data/datasources/local/db_constants.dart';
 import 'package:first_app/domain/entities/translation.dart';
 import 'package:first_app/domain/entities/translation_entity.dart';
 import 'package:first_app/domain/entities/translation_with_word.dart';
@@ -8,15 +9,16 @@ class TranslationMapper {
 
   TranslationEntity mapToTranslationEntity(Map<String, dynamic> map) {
     return TranslationEntity(
-      id: map['id'] as int?,
-      wordId: map['wordId'] as int,
-      wordTranslate: map['wordTranslate'] as String,
-      alternatives: (map['alternatives'] as String? ?? '')
+      id: map[TranslationFields.id] as int?,
+      wordId: (map[TranslationFields.wordId] as num?)?.toInt() ?? 0,
+      wordTranslate:
+          map[TranslationFields.wordTranslate] as String? ?? '',
+      alternatives: (map[TranslationFields.alternatives] as String? ?? '')
           .split('|')
           .where((item) => item.isNotEmpty)
           .toList(),
-      createdAt: map['created_at'] != null
-          ? DateTime.parse(map['created_at'] as String)
+      createdAt: map[TranslationFields.createdAt] != null
+          ? DateTime.parse(map[TranslationFields.createdAt] as String)
           : null,
     );
   }
@@ -28,10 +30,10 @@ class TranslationMapper {
 
   Map<String, dynamic> translationEntityToMap(TranslationEntity entity) {
     return {
-      if (entity.id != null) 'id': entity.id,
-      'wordId': entity.wordId,
-      'wordTranslate': entity.wordTranslate,
-      'alternatives': entity.alternatives.join('|'),
+      if (entity.id != null) TranslationFields.id: entity.id,
+      TranslationFields.wordId: entity.wordId,
+      TranslationFields.wordTranslate: entity.wordTranslate,
+      TranslationFields.alternatives: entity.alternatives.join('|'),
     };
   }
 
@@ -47,9 +49,9 @@ class TranslationMapper {
 
   Map<String, dynamic> mapToDatabase(Translation entity) {
     return {
-      'wordId': entity.wordId,
-      'wordTranslate': entity.wordTranslate,
-      'alternatives': entity.alternatives,
+      TranslationFields.wordId: entity.wordId,
+      TranslationFields.wordTranslate: entity.wordTranslate,
+      TranslationFields.alternatives: entity.alternatives,
     };
   }
 

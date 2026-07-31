@@ -18,8 +18,8 @@ class Translation {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'wordTranslate': wordTranslate,
-      'wordId': wordId,
+      'word_translate': wordTranslate,
+      'word_id': wordId,
       'alternatives': alternatives,
     };
   }
@@ -27,8 +27,8 @@ class Translation {
   factory Translation.fromMap(Map<String, dynamic> map) {
     return Translation(
       id: map['id'] as int?,
-      wordTranslate: map['wordTranslate'] as String,
-      wordId: map['wordId'] as int,
+      wordTranslate: map['word_translate'] as String? ?? '',
+      wordId: (map['word_id'] as num?)?.toInt() ?? 0,
       alternatives: map['alternatives'] as String?,
     );
   }

@@ -176,7 +176,7 @@ class WordBatchDao {
         MAX(w.sentence) as sentenceValue
       FROM Word w
       LEFT JOIN Image i ON w.id = i.wordId
-      LEFT JOIN Translation t ON w.id = t.wordId
+      LEFT JOIN Translation t ON w.id = t.word_id
       $whereClause
       GROUP BY w.id
       $havingClause
