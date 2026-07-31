@@ -77,6 +77,7 @@ class WordPracticeDao {
       SELECT 
         w.id,
         w.word,
+        w.partOfSpeech,
         w.definition,
         w.phonetic,
         w.sentence,
