@@ -5,6 +5,7 @@ import 'package:first_app/domain/usecases/word/get_recent_words.dart';
 import 'package:first_app/domain/usecases/word/search_word_translation.dart';
 import 'package:first_app/domain/usecases/word/get_alternative_translations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_meaning.dart';
 import 'package:first_app/domain/usecases/word/save_word.dart';
@@ -61,7 +62,7 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     // Eventos con sufijo "Event"
     on<LoadRecentWordsEvent>(_onLoadRecentWords);
     on<FetchWordsEvent>(_onFetchWords);
-    on<SearchWordEvent>(_onSearchWord);
+    on<SearchWordEvent>(_onSearchWord, transformer: droppable());
     on<SearchWordImagesEvent>(_onSearchWordImages);
     on<SaveNewWordEvent>(_onSaveNewWord);
     on<UpdateWordSentenceEvent>(_onUpdateSentence);
@@ -108,30 +109,42 @@ class WordLearningBloc extends Bloc<WordLearningEvent, WordLearningState> {
     Emitter<WordLearningState> emit,
   ) async {
     emit(WordLearningLoading());
+    final definitionsFuture = _searchWordDefinition(event.word).
+catchError((e) {
+      emit(WordLearningError('Error searching word definition: $e'));
+      return <WordMeaning>[];
+    });
+    final imagesFuture = _searchImages(event.word).
+catchError((e) {
+      emit(WordLearningError('Error searching images: $e'));
+      return <ImageSearchResult>[];
+    });
+    final translationFuture = _searchWordTranslation(event.word).
+    catchError((e) {
+      emit(WordLearningError('Error searching word translation: $e'));
+      return null;
+    });
+    final alternativesFuture = _getAlternativeTranslations(event.word).
+    catchError((e) {
+      emit(WordLearningError('Error getting alternative translations: $e'));
+      return <String, String>{};
+    });
     try {
-      final results = await Future.wait([
-        _searchWordDefinition(event.word),
-        _searchImages(event.word),
-        _searchWordTranslation(event.word),
-        _getAlternativeTranslations(event.word),
-      ]);
+      final meaningsRaw = await definitionsFuture;
+      final images = await imagesFuture;
+      final translation = await translationFuture;
+      final alternativeTranslations = await alternativesFuture;
 
-      final meanings = (results[0] as List<WordMeaning>).map((m) {
+      final meanings = meaningsRaw.map((m) {
         return {
           'partOfSpeech': m.partOfSpeech,
-          'definitions': m.definitions.map((d) {
-            return {
+          'definitions': m.definitions.map((d) =>{
               'definition': d.definition,
               'example': d.example,
               'phonetic': d.phonetic,
-            };
           }).toList(),
         };
       }).toList();
-
-      final images = results[1] as List<ImageSearchResult>;
-      final translation = results[2] as Map<String, dynamic>?;
-      final alternativeTranslations = results[3] as Map<String, String>;
 
       emit(WordDataLoaded(
         meanings: meanings,

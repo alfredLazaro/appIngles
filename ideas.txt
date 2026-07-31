@@ -1,0 +1,12 @@
+Progress
+PROPOSITO
+Para cambio de dispositivo y guardado de palabras aprendidas del usuario. Si se puede poner la misma palabra y se reiniciaria elprogreso.
+1:el progress debe tener word como string?
+si: no se guarda la lista de palabras de usuario, se usa como recuperatorio de aprendido
+no: mala practica.
+2: se debe comparar si la palabra existe para no buscarla con el progress?
+si: para no repetir la misma palabra n veces.
+no: la palabra puede tener otro significado en un diferente contexto, si se trata de duplicar se reemplaza.
+3: es necesario guardar word_id en progress?
+si: para referencia de la palabra completa
+no: solo para recordar que la palabra fue aprendida un porcentaje

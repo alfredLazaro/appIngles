@@ -48,6 +48,7 @@ dependencies:
   equatable: ^2.0.5
   get_it: ^9.2.1
   google_mlkit_translation: ^0.13.1
+  bloc_concurrency: ^0.2.5
 
 dev_dependencies:
   flutter_test:
