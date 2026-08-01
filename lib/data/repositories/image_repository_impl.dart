@@ -44,7 +44,7 @@ class ImageRepositoryImpl implements ImageRepository {
             author: (map['user'] is Map)
                 ? (map['user'] as Map)['name'] as String
                 : (map['user'] as String?) ?? 'Desconocido',
-            description: (map['alt_description'] as String?) ?? 'Unsplash',
+            description: (map['fuente'] as String?) ?? 'Unsplash',
           )).toList();
     
   }

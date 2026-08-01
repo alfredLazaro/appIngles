@@ -71,7 +71,7 @@ class ImageService {
                 photo['urls']?['thumb'] ?? 'https://default-image-url.com',
           },
           'user': {'name': photo['user']?['name'] ?? 'Autor desconocido'},
-          'alt_description': 'Unsplash',
+          'fuente': 'Unsplash',
         };
       }).toList();
       return images;

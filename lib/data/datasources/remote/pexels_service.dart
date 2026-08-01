@@ -71,7 +71,7 @@ class PexelsService {
                 photo['src']?['tiny'] ?? 'https://default-image-url.com',
           },
           'user': {'name': photo['photographer'] ?? 'Autor desconocido'},
-          'alt_description': photo['alt'] ?? 'Pexels',
+          'fuente': 'Pexels',
         };
       }).toList();
       return images;
