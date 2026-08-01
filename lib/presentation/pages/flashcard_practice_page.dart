@@ -265,10 +265,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
                   ],
                 ),
                 if (state.isAnswerCorrect != null && !_feedbackDismissed)
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
+                  Positioned.fill(
                     child: FeedbackOverlay(
                       text:
                           state.isAnswerCorrect! ? '¡Correcto!' : 'Incorrecto',

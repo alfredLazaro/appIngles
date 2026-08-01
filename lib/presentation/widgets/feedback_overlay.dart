@@ -43,22 +43,39 @@ class _FeedbackOverlayState extends State<FeedbackOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedOpacity(
-      opacity: _opacity,
-      duration: widget.fadeDuration,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        color: widget.isCorrect
-            ? AppColors.successLight.withValues(alpha: 0.3)
-            : AppColors.errorLight,
-        child: Center(
-          child: Text(
-            widget.text,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: widget.isCorrect ? AppColors.success : AppColors.error,
+    return Center(
+      child: AnimatedOpacity(
+        opacity: _opacity,
+        duration: widget.fadeDuration,
+        child: Container(
+          width: 170,
+          height: 170,
+          decoration: BoxDecoration(
+            color: widget.isCorrect
+                ? AppColors.successLight.withValues(alpha: 0.9)
+                : AppColors.errorLight.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: (widget.isCorrect ? AppColors.success : AppColors.error)
+                    .withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                widget.text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: widget.isCorrect ? AppColors.success : AppColors.error,
+                ),
+              ),
             ),
           ),
         ),

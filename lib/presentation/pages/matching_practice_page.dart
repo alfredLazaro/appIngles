@@ -219,10 +219,7 @@ class _MatchingPracticePageState extends State<MatchingPracticePage> {
             ],
           ),
           if (state.lastAttemptCorrect != null && !_feedbackDismissed)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
+            Positioned.fill(
               child: FeedbackOverlay(
                 text: state.lastAttemptCorrect!
                     ? '¡Correcto!'
