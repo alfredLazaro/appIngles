@@ -130,26 +130,6 @@ class SyncRepositoryImpl implements SyncRepository {
 
         if (local == null) {
           await _progressDao.updateFromServer(wordId, serverLearn, serverUpdatedAt, now);
-          final db = await DatabaseService().database;
-          await db.insert(
-            'Word',
-            {
-              'id': wordId,
-              'word': serverWord,
-              'definition': '',
-              'sentence': '',
-              'learn': serverLearn,
-              'created_at': serverUpdatedAt,
-              'updated_at': serverUpdatedAt,
-            },
-            conflictAlgorithm: ConflictAlgorithm.ignore,
-          );
-          await db.update(
-            'Word',
-            {'learn': serverLearn, 'updated_at': serverUpdatedAt},
-            where: 'id = ?',
-            whereArgs: [wordId],
-          );
         } else {
           final localUpdatedAt = await _getLocalUpdatedAt(wordId);
           if (localUpdatedAt == null || serverUpdatedAt.compareTo(localUpdatedAt) > 0) {
