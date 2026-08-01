@@ -25,19 +25,6 @@ class ImageDao {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getImagesRange({
-    required int offset,
-    required int limit,
-  }) async {
-    final db = await dbHelper.database;
-    return await db.query(
-      'Image',
-      orderBy: 'id DESC',
-      limit: limit,
-      offset: offset,
-    );
-  }
-
   Future<int> updateImag(Image_Model img) async {
     final db = await dbHelper.database;
     return await db.update(
