@@ -7,6 +7,7 @@ import 'package:first_app/presentation/bloc/auth/auth_event.dart';
 import 'package:first_app/presentation/bloc/auth/auth_state.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
+import 'package:first_app/presentation/pages/progress_list_page.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -119,6 +120,20 @@ class _AppDrawerState extends State<AppDrawer> {
                 ),
                 const Divider(),
               ],
+              ListTile(
+                leading: const Icon(Icons.trending_up),
+                title: const Text('Progreso'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProgressListPage(),
+                    ),
+                  );
+                },
+              ),
+              const Divider(),
               ListTile(
                 leading: const Icon(Icons.settings),
                 title: const Text('Configuración'),

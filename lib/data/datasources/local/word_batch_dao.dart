@@ -56,14 +56,14 @@ class WordBatchDao {
             whereArgs: [wordId],
           );
 
-          await txn.insert(
-            'progress',
-            {'word_id': wordId, 'learn': newLearn, 'updated_at': now},
-            conflictAlgorithm: ConflictAlgorithm.replace,
-          );
-
           final wordRows = await txn.query('Word', columns: ['word'], where: 'id = ?', whereArgs: [wordId]);
           final wordText = wordRows.isNotEmpty ? (wordRows.first['word'] as String) : '';
+
+          await txn.insert(
+            'progress',
+            {'word_id': wordId, 'word': wordText, 'learn': newLearn, 'updated_at': now},
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
 
           final existing = await txn.query(
             'outbox',

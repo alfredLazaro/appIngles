@@ -123,21 +123,21 @@ class SyncRepositoryImpl implements SyncRepository {
 
       for (final item in serverItems) {
         final wordId = item['word_id'] as int;
-        final serverWord = item['word'] as String? ?? '';
+        final serverWord = item['word'] as String;
         final serverLearn = item['learn'] as int;
         final serverUpdatedAt = item['updated_at'] as String;
         final local = await _progressDao.getLearnByWordId(wordId);
 
         if (local == null) {
-          await _progressDao.updateFromServer(wordId, serverLearn, serverUpdatedAt, now);
+          await _progressDao.updateFromServer(wordId, serverLearn, serverWord, serverUpdatedAt, now);
         } else {
           final localUpdatedAt = await _getLocalUpdatedAt(wordId);
           if (localUpdatedAt == null || serverUpdatedAt.compareTo(localUpdatedAt) > 0) {
-            await _progressDao.updateFromServer(wordId, serverLearn, serverUpdatedAt, now);
+            await _progressDao.updateFromServer(wordId, serverLearn, serverWord, serverUpdatedAt, now);
             final db = await DatabaseService().database;
             await db.update(
               'Word',
-              {'learn': serverLearn, 'updated_at': serverUpdatedAt},
+              {'learn': serverLearn, 'updated_at': serverUpdatedAt, 'word': serverWord},
               where: 'id = ?',
               whereArgs: [wordId],
             );
@@ -236,6 +236,7 @@ class SyncRepositoryImpl implements SyncRepository {
 
           await txn.insert('progress', {
             'word_id': wordId,
+            'word': wordText,
             'learn': w['learn'] ?? 0,
             'updated_at': now,
           }, conflictAlgorithm: ConflictAlgorithm.replace);

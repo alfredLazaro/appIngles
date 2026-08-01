@@ -1,6 +1,7 @@
 import "package:flutter/widgets.dart";
 import "package:sqflite/sqflite.dart";
 import "DataBaseHelper.dart";
+import "../../models/progress_model.dart";
 
 class ProgressDao {
   final dbHelper = DatabaseService();
@@ -8,7 +9,7 @@ class ProgressDao {
   Future<Map<int, int>> getAllLearnCounts() async {
     try {
       final db = await dbHelper.database;
-      final rows = await db.rawQuery('SELECT word_id, learn FROM progress');
+      final rows = await db.rawQuery('SELECT word_id, learn, word FROM progress');
       return {for (final r in rows) r['word_id'] as int: (r['learn'] as int?) ?? 0};
     } catch (e) {
       debugPrint('❌ ProgressDao.getAllLearnCounts error: $e');
@@ -16,11 +17,12 @@ class ProgressDao {
     }
   }
 
-  Future<void> upsertInTransaction(Database txn, int wordId, int learn, String now) async {
+  Future<void> upsertInTransaction(Database txn, int wordId, int learn, String word, String now) async {
     await txn.insert(
       'progress',
       {
         'word_id': wordId,
+        'word': word,
         'learn': learn,
         'updated_at': now,
       },
@@ -28,12 +30,12 @@ class ProgressDao {
     );
   }
 
-  Future<void> upsert(int wordId, int learn, String now) async {
+  Future<void> upsert(int wordId, int learn, String word, String now) async {
     try {
       final db = await dbHelper.database;
       await db.insert(
         'progress',
-        {'word_id': wordId, 'learn': learn, 'updated_at': now},
+        {'word_id': wordId, 'learn': learn, 'word': word, 'updated_at': now},
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
@@ -70,13 +72,14 @@ class ProgressDao {
     }
   }
 
-  Future<void> updateFromServer(int wordId, int learn, String updatedAt, String syncedAt) async {
+  Future<void> updateFromServer(int wordId, int learn, String word, String updatedAt, String syncedAt) async {
     try {
       final db = await dbHelper.database;
       await db.insert(
         'progress',
         {
           'word_id': wordId,
+          'word': word,
           'learn': learn,
           'updated_at': updatedAt,
           'synced_at': syncedAt,
@@ -86,6 +89,36 @@ class ProgressDao {
     } catch (e) {
       debugPrint('❌ ProgressDao.updateFromServer error: $e');
       rethrow;
+    }
+  }
+
+  Future<List<ProgressModel>> getWithLearnGreaterThanZero() async {
+    try {
+      final db = await dbHelper.database;
+      final rows = await db.query('progress', where: 'learn > 0');
+      return rows.map(ProgressModel.fromMap).toList();
+    } catch (e) {
+      debugPrint('❌ ProgressDao.getWithLearnGreaterThanZero error: $e');
+      return [];
+    }
+  }
+
+  Future<Set<DateTime>> getPracticeDates() async {
+    try {
+      final db = await dbHelper.database;
+      final rows = await db.rawQuery(
+          "SELECT DISTINCT date(updated_at) AS d FROM progress WHERE updated_at IS NOT NULL");
+      return rows.map((r) {
+        final parts = (r['d'] as String).split('-');
+        return DateTime(
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+          int.parse(parts[2]),
+        );
+      }).toSet();
+    } catch (e) {
+      debugPrint('❌ ProgressDao.getPracticeDates error: $e');
+      return {};
     }
   }
 

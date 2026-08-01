@@ -6,4 +6,6 @@ abstract class ProgressRepository {
   Future<void> updateLearnCount(int wordId, int newLearn);
   Future<Progress?> getByWordId(int wordId);
   Future<List<Progress>> getAll();
+  Future<List<Progress>> getWithLearnGreaterThanZero();
+  Future<Set<DateTime>> getPracticeDates();
 }

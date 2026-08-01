@@ -70,6 +70,7 @@ class DatabaseService {
       CREATE TABLE ${DBTables.progress}(
         ${ProgressFields.id} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${ProgressFields.wordId} INTEGER NOT NULL UNIQUE,
+        ${WordFields.word} TEXT NOT NULL,
         ${ProgressFields.learn} INTEGER NOT NULL DEFAULT 0,
         ${ProgressFields.updatedAt} TEXT NOT NULL DEFAULT (datetime('now')),
         ${ProgressFields.userId} INTEGER,

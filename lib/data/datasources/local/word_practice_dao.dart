@@ -22,14 +22,14 @@ class WordPracticeDao {
           throw Exception('Word with id $id not found for learn update');
         }
 
-        await txn.insert(
-          'progress',
-          {'word_id': id, 'learn': count, 'updated_at': now},
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-
         final wordRows = await txn.query('Word', columns: ['word'], where: 'id = ?', whereArgs: [id]);
         final wordText = wordRows.isNotEmpty ? (wordRows.first['word'] as String) : '';
+
+        await txn.insert(
+          'progress',
+          {'word_id': id, 'word': wordText, 'learn': count, 'updated_at': now},
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
 
         final existing = await txn.query(
           'outbox',

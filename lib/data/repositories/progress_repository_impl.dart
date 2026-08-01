@@ -71,4 +71,15 @@ class ProgressRepositoryImpl implements ProgressRepository {
       );
     }).toList();
   }
+
+  @override
+  Future<List<Progress>> getWithLearnGreaterThanZero() async {
+    final models = await _progressDao.getWithLearnGreaterThanZero();
+    return models.map((m) => m.toEntity()).toList();
+  }
+
+  @override
+  Future<Set<DateTime>> getPracticeDates() async {
+    return await _progressDao.getPracticeDates();
+  }
 }
