@@ -61,7 +61,7 @@ class PexelsService {
       final List<Map<String, dynamic>> images =
           (response.data['photos'] as List).map((photo) {
         return {
-          'id': photo['id'],
+          'id': photo['id'].toString(),
           'url': {
             'regular':
                 photo['src']?['large'] ?? 'https://default-image-url.com',

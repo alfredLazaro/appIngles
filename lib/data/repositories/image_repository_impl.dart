@@ -3,6 +3,7 @@ import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/entities/word_image.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/data/datasources/remote/unsplash_service.dart';
+import 'package:first_app/data/datasources/remote/pexels_service.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/models/image_model.dart';
 import 'package:first_app/data/mappers/image_mapper.dart';
@@ -10,19 +11,32 @@ import 'package:logger/logger.dart';
 
 class ImageRepositoryImpl implements ImageRepository {
   final ImageService _imageService;
+  final PexelsService _pexelsService;
   final ImageDao _imageDao;
   final Logger _logger = Logger();
 
   ImageRepositoryImpl({
     required ImageService imageService,
+    required PexelsService pexelsService,
     required ImageDao imageDao,
   })  : _imageService = imageService,
+        _pexelsService = pexelsService,
         _imageDao = imageDao;
 
   @override
   Future<List<ImageSearchResult>> searchImages(String query) async {
-    try {
-      final rawImages = await _imageService.getMinImg(query);
+    final results = await Future.wait([
+      _imageService.getMinImg(query).catchError((e) {
+        _logger.e('Error buscando en Unsplash: $e');
+        return <Map<String, dynamic>>[];
+      }),
+      _pexelsService.getMinImg(query).catchError((e) {
+        _logger.e('Error buscando en Pexels: $e');
+        return <Map<String, dynamic>>[];
+      }),
+    ]);
+
+    final rawImages = [...results[0], ...results[1]];
       return rawImages.map((map) => ImageSearchResult(
             id: map['id'] as String,
             regularUrl: (map['url'] as Map)['regular'] as String,
@@ -32,10 +46,7 @@ class ImageRepositoryImpl implements ImageRepository {
                 : (map['user'] as String?) ?? 'Desconocido',
             description: (map['alt_description'] as String?) ?? 'Unsplash',
           )).toList();
-    } catch (e) {
-      _logger.e('Error buscando imágenes: $e');
-      return [];
-    }
+    
   }
 
   @override

@@ -11,6 +11,7 @@ import 'package:first_app/data/datasources/local/outbox_dao.dart';
 import 'package:first_app/data/datasources/local/user_dao.dart';
 import 'package:first_app/data/datasources/remote/datamuse_service.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
+import 'package:first_app/data/datasources/remote/pexels_service.dart';
 import 'package:first_app/data/datasources/remote/progress_service.dart';
 import 'package:first_app/data/datasources/remote/unsplash_service.dart';
 import 'package:first_app/data/services/mlkit_translation_service.dart';
@@ -65,6 +66,7 @@ void setupDependencies() {
 
   sl.registerLazySingleton<WordService>(() => WordService());
   sl.registerLazySingleton<ImageService>(() => ImageService());
+  sl.registerLazySingleton<PexelsService>(() => PexelsService()); 
   sl.registerLazySingleton<DatamuseService>(() => DatamuseService());
   sl.registerLazySingleton<MlKitTranslationService>(() => MlKitTranslationService());
 
@@ -82,6 +84,7 @@ void setupDependencies() {
   sl.registerLazySingleton<ImageRepository>(
     () => ImageRepositoryImpl(
       imageService: sl<ImageService>(),
+      pexelsService: sl<PexelsService>(),
       imageDao: sl<ImageDao>(),
     ),
   );
