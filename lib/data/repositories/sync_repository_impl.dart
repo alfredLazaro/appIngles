@@ -244,7 +244,7 @@ class SyncRepositoryImpl implements SyncRepository {
           await txn.insert('Word', {
             'id': wordId,
             'word': wordText,
-            'partOfSpeech': w['partOfSpeech'] ?? '',
+            'partOfSpeech': w['part_of_speech'] ?? '',
             'phonetic': w['phonetic'] ?? '',
             'definition': w['definition'] ?? '',
             'sentence': w['sentence'] ?? '',

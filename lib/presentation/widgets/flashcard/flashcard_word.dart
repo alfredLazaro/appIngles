@@ -81,7 +81,7 @@ class WordFlashcard extends StatelessWidget {
                               },
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
-                              child: Text(
+                                child: Text(
                                   word.word.isNotEmpty
                                       ? word.word
                                       : FlashcardConstants.wordNotFound,

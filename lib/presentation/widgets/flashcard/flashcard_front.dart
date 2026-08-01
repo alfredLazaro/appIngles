@@ -27,16 +27,21 @@ class FlashcardFront extends StatefulWidget {
 
 class _FlashcardFrontState extends State<FlashcardFront> {
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(() => setState(() {}));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -186,6 +191,7 @@ class _FlashcardFrontState extends State<FlashcardFront> {
         const SizedBox(height: 8),
         TextField(
           controller: _controller,
+          focusNode: _focusNode,
           textAlign: TextAlign.center,
           textCapitalization: TextCapitalization.none,
           decoration: InputDecoration(
