@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/domain/entities/word.dart';
 import 'package:first_app/domain/entities/word_sumary.dart';
 import 'package:first_app/presentation/widgets/bulk_insert_dialog.dart';
@@ -153,6 +156,12 @@ class _WordLearningPageState extends State<WordLearningPage> {
               tooltip: 'last n words',
               onPressed: () => {
                     _showWordsLimitDialog(),
+                  }),
+          IconButton(
+              icon: const Icon(Icons.image),
+              tooltip: 'last n images',
+              onPressed: () => {
+                    _showImagesLimitDialog(),
                   }),
         ],
         bottom: isLoggedIn
@@ -402,5 +411,91 @@ class _WordLearningPageState extends State<WordLearningPage> {
         backgroundColor: Colors.green,
       ),
     );
+  }
+
+  Future<void> _showImagesLimitDialog() async {
+    // Create a TextEditingController for the input field
+    final TextEditingController limitController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Obtener imágenes recientes'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Ingresa el número de imágenes a obtener:'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: limitController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Límite',
+                hintText: 'Ej: 9',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.numbers),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Dejar vacío para usar el valor por defecto (9)',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              limitController.dispose();
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final input = limitController.text.trim();
+
+              int limit = AppLayout.defaultWordLoadLimit;
+              if (input.isNotEmpty) {
+                limit = int.tryParse(input) ?? AppLayout.defaultWordLoadLimit;
+
+                if (limit <= 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content:
+                          Text('Por favor ingresa un número válido mayor a 0'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+              }
+
+              limitController.dispose();
+              Navigator.pop(dialogContext);
+
+              await _copyLastImages(limit);
+            },
+            child: const Text('Obtener'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _copyLastImages(int limit) async {
+    try {
+      final images = await sl<ImageDao>().getLastImages(limit: limit);
+      if (images.isEmpty) {
+        _showError('No hay imágenes para copiar');
+        return;
+      }
+      final json = jsonEncode(images);
+      await ClipboardHelper.copyText(json);
+      _showSuccess('${images.length} imágenes copiadas al portapapeles');
+    } catch (e) {
+      _showError('Error obteniendo imágenes: $e');
+    }
   }
 }

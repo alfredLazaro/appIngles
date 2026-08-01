@@ -16,6 +16,15 @@ class ImageDao {
     return result.map((json) => Image_Model.fromMap(json)).toList();
   }
 
+  Future<List<Map<String, dynamic>>> getLastImages({int limit = 9}) async {
+    final db = await dbHelper.database;
+    return await db.query(
+      'Image',
+      orderBy: 'id DESC',
+      limit: limit,
+    );
+  }
+
   Future<int> updateImag(Image_Model img) async {
     final db = await dbHelper.database;
     return await db.update(
