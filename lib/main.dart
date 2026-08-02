@@ -61,6 +61,7 @@ class MyApp extends StatelessWidget {
               wordRepository: sl(),
               imageRepository: sl(),
               translationRepository: sl(),
+              connectivityService: sl(),
               syncService: sl(),
             ),
           ),

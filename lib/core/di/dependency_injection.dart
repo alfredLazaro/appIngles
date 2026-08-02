@@ -1,3 +1,5 @@
+import 'package:first_app/core/services/connectivity_service.dart';
+import 'package:first_app/core/services/edge_tts_service.dart';
 import 'package:first_app/core/services/fallback_tts_service.dart';
 import 'package:first_app/core/services/speech_to_text_service.dart';
 import 'package:first_app/core/services/sync_service.dart';
@@ -193,7 +195,11 @@ void setupDependencies() {
   );
 
   // === Services ===
-  sl.registerLazySingleton<ITtsService>(() => FallbackTtsService());
+  sl.registerLazySingleton<ConnectivityService>(() => ConnectivityService());
+  sl.registerLazySingleton<EdgeTtsService>(() => EdgeTtsService());
+  sl.registerLazySingleton<ITtsService>(
+    () => FallbackTtsService(primary: sl<EdgeTtsService>()),
+  );
   sl.registerLazySingleton<ISpeechToTextService>(() => SpeechToTextService());
 
   // === Use cases (shared) ===

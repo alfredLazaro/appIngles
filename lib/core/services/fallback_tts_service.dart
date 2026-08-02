@@ -2,6 +2,7 @@
 import 'package:first_app/core/services/edge_tts_service.dart';
 import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/domain/services/tts_service_interface.dart';
+import 'package:logger/logger.dart';
 
 class FallbackTtsService implements ITtsService {
   FallbackTtsService({

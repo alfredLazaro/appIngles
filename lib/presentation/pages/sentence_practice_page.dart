@@ -1,4 +1,5 @@
 import 'package:first_app/core/di/dependency_injection.dart';
+import 'package:first_app/core/services/edge_tts_service.dart';
 import 'package:first_app/domain/entities/sentence_model.dart';
 import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
@@ -10,7 +11,7 @@ import 'package:first_app/presentation/widgets/practice_results_widget.dart';
 import 'package:first_app/presentation/widgets/sentence/sentence_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:first_app/domain/services/tts_service_interface.dart';
+import 'package:logger/logger.dart';
 
 class SentencePracticePage extends StatefulWidget {
   final List<SentenceModel> sentences;
@@ -24,7 +25,8 @@ class SentencePracticePage extends StatefulWidget {
 }
 
 class _SentencePracticePageState extends State<SentencePracticePage> {
-  final ITtsService _ttsService = sl<ITtsService>();
+  final EdgeTtsService _ttsService = sl<EdgeTtsService>();
+  final Logger _logger = Logger();
   final PageController _pageController = PageController();
   int get totalSentences => widget.sentences.length;
   int _currentIndex = 0;
@@ -33,7 +35,10 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
   @override
   void initState() {
     super.initState();
-    //_loadSentences();
+    _ttsService.initialize();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _speakCurrentSentence();
+    });
   }
 
   @override
@@ -92,6 +97,7 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
                       setState(() {
                         _currentIndex = index;
                       });
+                      _speakCurrentSentence();
                     },
                     itemBuilder: (context, index) {
                       final sentence = widget.sentences[index];
@@ -125,6 +131,20 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
               ],
             ),
     );
+  }
+
+  void _speakCurrentSentence() {
+    if (widget.sentences.isEmpty) return;
+    _ttsService
+        .speak(widget.sentences[_currentIndex].sentence)
+        .catchError((Object e) {
+      _logger.e('Error al reproducir audio: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo reproducir el audio')),
+        );
+      }
+    });
   }
 
   void _finishPractice() {

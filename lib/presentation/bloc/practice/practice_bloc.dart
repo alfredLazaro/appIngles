@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:first_app/core/services/connectivity_service.dart';
 import 'package:first_app/core/services/sync_service.dart';
 import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/match_round.dart';
@@ -16,15 +17,18 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
   final ImageRepository _imageRepository;
   final TranslationRepository _translationRepository;
   final SyncService? _syncService;
+  final ConnectivityService _connectivityService;
 
   PracticeBloc({
     required WordRepository wordRepository,
     required ImageRepository imageRepository,
     required TranslationRepository translationRepository,
+    required ConnectivityService connectivityService,
     SyncService? syncService,
   })  : _wordRepository = wordRepository,
         _imageRepository = imageRepository,
         _translationRepository = translationRepository,
+        _connectivityService = connectivityService,
         _syncService = syncService,
         super(PracticeInitial()) {
     on<LoadPracticeDataEvent>(_onLoadPracticeData);
