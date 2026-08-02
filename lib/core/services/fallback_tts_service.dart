@@ -12,6 +12,7 @@ class FallbackTtsService implements ITtsService {
   })  : _primary = primary ?? EdgeTtsService(),
         _fallback = fallback ?? TtsService();
 
+  final Logger _logger = Logger();
   final ITtsService _primary;
   final ITtsService _fallback;
   final Duration retryAfter;
@@ -53,6 +54,7 @@ class FallbackTtsService implements ITtsService {
 
     if (!_shouldSkipPrimary) {
       try {
+        _logger.i('TTS -> EdgeTtsService (primario)');
         await _primary.speak(clean).timeout(const Duration(seconds: 5));
         _primaryDownSince = null;
         _usingFallback = false;
@@ -63,6 +65,7 @@ class FallbackTtsService implements ITtsService {
     }
 
     _usingFallback = true;
+    _logger.i('TTS -> TtsService (fallback)');
     await _fallback.speak(clean);
   }
 
