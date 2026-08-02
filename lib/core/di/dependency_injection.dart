@@ -1,4 +1,4 @@
-import 'package:first_app/core/services/tts_service.dart';
+import 'package:first_app/core/services/fallback_tts_service.dart';
 import 'package:first_app/core/services/speech_to_text_service.dart';
 import 'package:first_app/core/services/sync_service.dart';
 import 'package:first_app/data/datasources/local/word_crud_dao.dart';
@@ -193,7 +193,7 @@ void setupDependencies() {
   );
 
   // === Services ===
-  sl.registerLazySingleton<ITtsService>(() => TtsService());
+  sl.registerLazySingleton<ITtsService>(() => FallbackTtsService());
   sl.registerLazySingleton<ISpeechToTextService>(() => SpeechToTextService());
 
   // === Use cases (shared) ===
