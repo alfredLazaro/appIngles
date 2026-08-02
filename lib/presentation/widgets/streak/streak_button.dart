@@ -1,7 +1,7 @@
 import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/core/utils/streak_calculator.dart';
 import 'package:first_app/domain/repositories/progress_repository.dart';
-import 'package:first_app/presentation/widgets/streak/month_practice_calendar.dart';
+import 'package:first_app/presentation/pages/practice_calendar_page.dart';
 import 'package:flutter/material.dart';
 
 class StreakButton extends StatefulWidget {
@@ -27,23 +27,10 @@ class _StreakButtonState extends State<StreakButton> {
   }
 
   Future<void> _showCalendar(Set<DateTime> practiceDates) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Días de práctica',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            MonthPracticeCalendar(practiceDates: practiceDates),
-          ],
-        ),
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PracticeCalendarPage(practiceDates: practiceDates),
       ),
     );
   }
