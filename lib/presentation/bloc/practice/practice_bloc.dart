@@ -87,6 +87,15 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     emit(PracticeLoading());
 
     try {
+      if (event.type == PracticeType.sentence) {
+        final hasInternet = await _connectivityService.hasInternet();
+        if (!hasInternet) {
+          emit(const PracticeError(
+              'Se requiere conexión a internet para iniciar la práctica'));
+          return;
+        }
+      }
+
       PracticeData practiceData;
 
       switch (event.type) {

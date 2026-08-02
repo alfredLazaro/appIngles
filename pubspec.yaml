@@ -51,6 +51,7 @@ dependencies:
   bloc_concurrency: ^0.2.5
   flutter_edge_tts: ^0.0.2
   audioplayers: ^6.7.1
+  internet_connection_checker_plus: ^3.1.1
 
 dev_dependencies:
   flutter_test:
