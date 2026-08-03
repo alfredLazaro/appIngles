@@ -6,14 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/services/tts_service_interface.dart';
 import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_bloc.dart';
-import 'package:logger/logger.dart';
 
 class SentenceBuilderWidget extends StatelessWidget {
   final int sentenceId;
   final String originalSentence;
   final ITtsService ttsService;
-
-  static final Logger _logger = Logger();
 
   const SentenceBuilderWidget({
     super.key,
@@ -104,19 +101,7 @@ class SentenceBuilderWidget extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.volume_up, size: 28),
               color: Colors.blue,
-              onPressed: () async {
-                try {
-                  await ttsService.speak(originalSentence);
-                } catch (e) {
-                  _logger.e('Error al reproducir audio: $e');
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('No se pudo reproducir el audio')),
-                    );
-                  }
-                }
-              },
+              onPressed: () => ttsService.speak(originalSentence),
             ),
           ],
         ),

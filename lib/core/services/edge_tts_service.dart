@@ -15,8 +15,6 @@ class EdgeTtsService implements ITtsService {
   static const _voiceForLocale = {
     'en-US': 'en-US-AriaNeural',
     'en-GB': 'en-GB-SoniaNeural',
-    'es-ES': 'es-ES-ElviraNeural',
-    'es-MX': 'es-MX-DaliaNeural',
   };
 
   @override
