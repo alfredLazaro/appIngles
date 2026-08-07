@@ -24,28 +24,28 @@ class MatchRound extends Equatable {
   }) {
     final random = Random();
 
-    final translationsByWordId = <int, List<TranslationEntity>>{};
+    final translationsByword_id = <int, List<TranslationEntity>>{};
     for (final t in allTranslations) {
-      translationsByWordId.putIfAbsent(t.wordId, () => []).add(t);
+      translationsByword_id.putIfAbsent(t.word_id, () => []).add(t);
     }
 
     final validWords =
-        allWords.where((w) => translationsByWordId.containsKey(w.id)).toList();
+        allWords.where((w) => translationsByword_id.containsKey(w.id)).toList();
 
     final batches = _createBatches(validWords, batchSize);
 
     return batches.map((batchWords) {
       // Una traducción al azar por palabra, elegida una sola vez (no en cada shuffle)
-      final selectedByWordId = <int, TranslationEntity>{
+      final selectedByword_id = <int, TranslationEntity>{
         for (final word in batchWords)
-          word.id: translationsByWordId[word.id]![
-              random.nextInt(translationsByWordId[word.id]!.length)],
+          word.id: translationsByword_id[word.id]![
+              random.nextInt(translationsByword_id[word.id]!.length)],
       };
 
       final (shuffled, correctMapping) =
           _shuffleAndMap<FlashcardWord, TranslationEntity, int>(
         batch: batchWords,
-        optionOf: (word) => selectedByWordId[word.id]!,
+        optionOf: (word) => selectedByword_id[word.id]!,
         keyOf: (t) => t.id!,
         random: random,
       );

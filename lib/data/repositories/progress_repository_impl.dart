@@ -29,23 +29,23 @@ class ProgressRepositoryImpl implements ProgressRepository {
   }
 
   @override
-  Future<void> updateLearnCount(int wordId, int newLearn) async {
-    await _wordPracticeDao.updateLearn(wordId, newLearn);
+  Future<void> updateLearnCount(int word_id, int newLearn) async {
+    await _wordPracticeDao.updateLearn(word_id, newLearn);
   }
 
   @override
-  Future<Progress?> getByWordId(int wordId) async {
+  Future<Progress?> getByword_id(int word_id) async {
     final db = await DatabaseService().database;
     final rows = await db.query(
       'Word',
       columns: ['word', 'learn'],
       where: 'id = ?',
-      whereArgs: [wordId],
+      whereArgs: [word_id],
       limit: 1,
     );
     if (rows.isEmpty) return null;
     return Progress(
-      wordId: wordId,
+      word_id: word_id,
       word: rows.first['word'] as String? ?? '',
       learn: rows.first['learn'] as int? ?? 0,
       updatedAt: DateTime.now(),
@@ -62,7 +62,7 @@ class ProgressRepositoryImpl implements ProgressRepository {
     return rows.map((r) {
       return Progress(
         id: r['id'] as int?,
-        wordId: r['word_id'] as int,
+        word_id: r['word_id'] as int,
         word: r['word'] as String? ?? '',
         learn: r['learn'] as int? ?? 0,
         updatedAt: DateTime.parse(r['updated_at'] as String),

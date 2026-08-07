@@ -5,10 +5,10 @@ class DeleteWordUseCase {
 
   DeleteWordUseCase(this._repository);
 
-  Future<void> call(int wordId) async {
-    if (wordId <= 0) {
+  Future<void> call(int word_id) async {
+    if (word_id <= 0) {
       throw Exception('ID de palabra inválido');
     }
-    return await _repository.deleteWord(wordId);
+    return await _repository.deleteWord(word_id);
   }
 }

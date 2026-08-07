@@ -122,24 +122,24 @@ class SyncRepositoryImpl implements SyncRepository {
       final now = DateTime.now().toIso8601String();
 
       for (final item in serverItems) {
-        final wordId = item['word_id'] as int;
+        final word_id = item['word_id'] as int;
         final serverWord = item['word'] as String;
         final serverLearn = item['learn'] as int;
         final serverUpdatedAt = item['updated_at'] as String;
-        final local = await _progressDao.getLearnByWordId(wordId);
+        final local = await _progressDao.getLearnByword_id(word_id);
 
         if (local == null) {
-          await _progressDao.updateFromServer(wordId, serverLearn, serverWord, serverUpdatedAt, now);
+          await _progressDao.updateFromServer(word_id, serverLearn, serverWord, serverUpdatedAt, now);
         } else {
-          final localUpdatedAt = await _getLocalUpdatedAt(wordId);
+          final localUpdatedAt = await _getLocalUpdatedAt(word_id);
           if (localUpdatedAt == null || serverUpdatedAt.compareTo(localUpdatedAt) > 0) {
-            await _progressDao.updateFromServer(wordId, serverLearn, serverWord, serverUpdatedAt, now);
+            await _progressDao.updateFromServer(word_id, serverLearn, serverWord, serverUpdatedAt, now);
             final db = await DatabaseService().database;
             await db.update(
               'Word',
               {'learn': serverLearn, 'updated_at': serverUpdatedAt, 'word': serverWord},
               where: 'id = ?',
-              whereArgs: [wordId],
+              whereArgs: [word_id],
             );
           }
         }
@@ -149,14 +149,14 @@ class SyncRepositoryImpl implements SyncRepository {
     }
   }
 
-  Future<String?> _getLocalUpdatedAt(int wordId) async {
+  Future<String?> _getLocalUpdatedAt(int word_id) async {
     try {
       final db = await DatabaseService().database;
       final rows = await db.query(
         'progress',
         columns: ['updated_at'],
         where: 'word_id = ?',
-        whereArgs: [wordId],
+        whereArgs: [word_id],
         limit: 1,
       );
       if (rows.isEmpty) return null;
@@ -218,11 +218,11 @@ class SyncRepositoryImpl implements SyncRepository {
           ) ?? 0;
           if (count > 0) continue;
 
-          final wordId = w['id'] as int;
-          newIds.add(wordId);
+          final word_id = w['id'] as int;
+          newIds.add(word_id);
 
           await txn.insert('Word', {
-            'id': wordId,
+            'id': word_id,
             'word': wordText,
             'partOfSpeech': w['part_of_speech'] ?? '',
             'phonetic': w['phonetic'] ?? '',
@@ -235,7 +235,7 @@ class SyncRepositoryImpl implements SyncRepository {
           }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
           await txn.insert('progress', {
-            'word_id': wordId,
+            'word_id': word_id,
             'word': wordText,
             'learn': w['learn'] ?? 0,
             'updated_at': now,
@@ -257,7 +257,7 @@ class SyncRepositoryImpl implements SyncRepository {
         for (final img in images) {
           await _imageDao.insertImage(Image_Model(
             id: img['id'],
-            wordId: img['wordId'],
+            word_id: img['word_id'],
             name: img['name'] as String? ?? '',
             url: img['url'],
             tinyurl: img['tinyurl'],

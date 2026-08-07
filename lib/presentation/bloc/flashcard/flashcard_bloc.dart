@@ -259,10 +259,10 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   void _onRevealAnswer(RevealAnswer event, Emitter<FlashcardState> emit) {
     if (state is FlashcardLoaded) {
       final currentState = state as FlashcardLoaded;
-      final wordId = currentState.word.id;
+      final word_id = currentState.word.id;
       final newCount =
           (currentState.learnCount - 1).clamp(0, double.infinity).toInt();
-      _scores[wordId] = newCount;
+      _scores[word_id] = newCount;
       emit(currentState.copyWith(
           learnCount: newCount,
           isAnswerRevealed: true,

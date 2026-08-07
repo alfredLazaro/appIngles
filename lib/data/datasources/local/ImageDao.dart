@@ -57,48 +57,48 @@ class ImageDao {
     return null;
   }
 
-  Future<List<Image_Model>> getByWordId(int id) async {
+  Future<List<Image_Model>> getByword_id(int id) async {
     final db = await dbHelper.database;
     final result = await db.query(
       'Image',
-      where: 'wordId = ?',
+      where: 'word_id = ?',
       whereArgs: [id],
     );
     return result.map((e) => Image_Model.fromMap(e)).toList();
   }
 
-  Future<int> deleteByWordId(int id) async {
+  Future<int> deleteByword_id(int id) async {
     final db = await dbHelper.database;
     final result = await db.delete(
       'Image',
-      where: 'wordId = ?',
+      where: 'word_id = ?',
       whereArgs: [id],
     );
     return result;
   }
 
-  Future<Map<int, List<Image_Model>>> getImagesByWordIds(
-      List<int> wordIds) async {
-    if (wordIds.isEmpty) return {};
+  Future<Map<int, List<Image_Model>>> getImagesByword_ids(
+      List<int> word_ids) async {
+    if (word_ids.isEmpty) return {};
 
     final db = await dbHelper.database;
 
     // Convertir lista a string para rawQuery
-    final idsString = wordIds.join(', ');
+    final idsString = word_ids.join(', ');
 
     // Consulta más eficiente con rawQuery
     final results = await db.rawQuery('''
     SELECT 
       ${ImageFields.id},
-      ${ImageFields.wordId},
+      ${ImageFields.word_id},
       ${ImageFields.name},
       ${ImageFields.url},
       ${ImageFields.tinyurl},
       ${ImageFields.author},
       ${ImageFields.source}
     FROM ${DBTables.image}
-    WHERE ${ImageFields.wordId} IN ($idsString)
-    ORDER BY ${ImageFields.wordId}, ${ImageFields.id}
+    WHERE ${ImageFields.word_id} IN ($idsString)
+    ORDER BY ${ImageFields.word_id}, ${ImageFields.id}
   ''');
 
     return _groupImages(results);
@@ -110,10 +110,10 @@ class ImageDao {
 
     for (final row in rows) {
       final image = Image_Model.fromMap(row);
-      final wordId = row[ImageFields.wordId] as int;
+      final word_id = row[ImageFields.word_id] as int;
 
-      result.putIfAbsent(wordId, () => []);
-      result[wordId]!.add(image);
+      result.putIfAbsent(word_id, () => []);
+      result[word_id]!.add(image);
     }
 
     return result;

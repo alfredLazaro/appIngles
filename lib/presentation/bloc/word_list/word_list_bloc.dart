@@ -9,7 +9,7 @@ import 'word_list_state.dart';
 class WordListBloc extends Bloc<WordListEvent, WordListState> {
   final WordRepository _wordRepository;
   final GetWordStatisticsUseCase _getWordStatisticsUseCase;
-  final Set<int> _selectedWordIds = {};
+  final Set<int> _selectedword_ids = {};
   final int _pageSize = 20;
 
   WordListBloc({
@@ -157,10 +157,10 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     Emitter<WordListState> emit,
   ) async {
     try {
-      await _wordRepository.deleteWord(event.wordId);
+      await _wordRepository.deleteWord(event.word_id);
 
       // Remove from selection if selected
-      _selectedWordIds.remove(event.wordId);
+      _selectedword_ids.remove(event.word_id);
 
       // Refresh the list
       add(const RefreshWordsEvent());
@@ -177,20 +177,20 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
 
     final currentState = state as WordListLoaded;
 
-    if (_selectedWordIds.contains(event.wordId)) {
-      _selectedWordIds.remove(event.wordId);
+    if (_selectedword_ids.contains(event.word_id)) {
+      _selectedword_ids.remove(event.word_id);
     } else {
-      _selectedWordIds.add(event.wordId);
+      _selectedword_ids.add(event.word_id);
     }
 
-    emit(currentState.copyWith(selectedCount: _selectedWordIds.length));
+    emit(currentState.copyWith(selectedCount: _selectedword_ids.length));
   }
 
   void _onFilterWords(
     FilterWordsEvent event,
     Emitter<WordListState> emit,
   ) async {
-    _selectedWordIds.clear();
+    _selectedword_ids.clear();
     final previousLoadedState =
         state is WordListLoaded ? state as WordListLoaded : null;
 
@@ -230,7 +230,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     SetFilterEvent event,
     Emitter<WordListState> emit,
   ) async {
-    _selectedWordIds.clear();
+    _selectedword_ids.clear();
     final previousLoadedState =
         state is WordListLoaded ? state as WordListLoaded : null;
 
@@ -284,7 +284,7 @@ class WordListBloc extends Bloc<WordListEvent, WordListState> {
     ClearSelectionEvent event,
     Emitter<WordListState> emit,
   ) {
-    _selectedWordIds.clear();
+    _selectedword_ids.clear();
 
     if (state is WordListLoaded) {
       final currentState = state as WordListLoaded;

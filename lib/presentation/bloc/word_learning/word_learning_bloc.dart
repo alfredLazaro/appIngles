@@ -186,22 +186,22 @@ catchError((e) {
         updatedAt: DateTime.now(),
       );
 
-      final wordId = await _saveWord(word);
+      final word_id = await _saveWord(word);
       final savedImages = await _saveWordImages(
         event.selectedImages,
-        wordId,
+        word_id,
       );
 
       if (event.translation != null &&
           event.translation!['translatedText'] != null) {
         await _translationRepository.insertTranslation(
-          wordId,
+          word_id,
           event.translation!['translatedText'] as String,
           event.selectedAlternatives,
         );
       }
 
-      emit(WordSaved(wordId: wordId, imagesCount: savedImages.length));
+      emit(WordSaved(word_id: word_id, imagesCount: savedImages.length));
 
       add(LoadRecentWordsEvent());
     } catch (e) {
@@ -214,7 +214,7 @@ catchError((e) {
     Emitter<WordLearningState> emit,
   ) async {
     try {
-      await _updateSentence(event.wordId, event.newSentence);
+      await _updateSentence(event.word_id, event.newSentence);
       add(LoadRecentWordsEvent());
     } catch (e) {
       emit(WordLearningError('Error actualizando oración: $e'));
@@ -226,7 +226,7 @@ catchError((e) {
     Emitter<WordLearningState> emit,
   ) async {
     try {
-      await _deleteWord(event.wordId);
+      await _deleteWord(event.word_id);
       add(LoadRecentWordsEvent());
     } catch (e) {
       emit(WordLearningError('Error eliminando palabra: $e'));

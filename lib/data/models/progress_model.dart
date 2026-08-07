@@ -2,7 +2,7 @@ import 'package:first_app/domain/entities/progress.dart';
 
 class ProgressModel {
   final int? id;
-  final int wordId;
+  final int word_id;
   final String word;
   int learn;
   String updatedAt;
@@ -11,7 +11,7 @@ class ProgressModel {
 
   ProgressModel({
     this.id,
-    required this.wordId,
+    required this.word_id,
     required this.word,
     required this.learn,
     required this.updatedAt,
@@ -22,7 +22,7 @@ class ProgressModel {
   factory ProgressModel.fromMap(Map<String, dynamic> map) {
     return ProgressModel(
       id: map['id'] as int?,
-      wordId: map['word_id'] as int,
+      word_id: map['word_id'] as int,
       word: map['word'] as String? ?? '',
       learn: map['learn'] as int? ?? 0,
       updatedAt: map['updated_at'] as String? ?? '',
@@ -34,7 +34,7 @@ class ProgressModel {
   Map<String, dynamic> toMap() {
     return {
       if (id != null) 'id': id,
-      'word_id': wordId,
+      'word_id': word_id,
       'word': word,
       'learn': learn,
       'updated_at': updatedAt,
@@ -46,7 +46,7 @@ class ProgressModel {
   Progress toEntity() {
     return Progress(
       id: id,
-      wordId: wordId,
+      word_id: word_id,
       word: word,
       learn: learn,
       updatedAt: DateTime.parse(updatedAt),
@@ -58,7 +58,7 @@ class ProgressModel {
   static ProgressModel fromEntity(Progress entity) {
     return ProgressModel(
       id: entity.id,
-      wordId: entity.wordId,
+      word_id: entity.word_id,
       word: entity.word,
       learn: entity.learn,
       updatedAt: entity.updatedAt.toIso8601String(),

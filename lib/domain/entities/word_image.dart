@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class WordImage extends Equatable {
   final int? id;
-  final int wordId;
+  final int word_id;
   final String url;
   final String tinyUrl;
   final String name;
@@ -11,7 +11,7 @@ class WordImage extends Equatable {
 
   const WordImage({
     this.id,
-    required this.wordId,
+    required this.word_id,
     required this.url,
     required this.tinyUrl,
     required this.name,
@@ -21,5 +21,5 @@ class WordImage extends Equatable {
 
   @override
   List<Object?> get props =>
-      [id, wordId, url, tinyUrl, name, author, source];
+      [id, word_id, url, tinyUrl, name, author, source];
 }

@@ -33,12 +33,12 @@ class DatabaseService {
   Future<void> _cleanupOrphanedRows(Database db) async {
     await db.transaction((txn) async {
       await txn.rawDelete(
-        'DELETE FROM Image WHERE ${ImageFields.wordId} '
+        'DELETE FROM Image WHERE ${ImageFields.word_id} '
         'NOT IN (SELECT ${WordFields.id} FROM ${DBTables.word})',
       );
       await txn.rawDelete(
         'DELETE FROM ${DBTables.translation} '
-        'WHERE ${TranslationFields.wordId} '
+        'WHERE ${TranslationFields.word_id} '
         'NOT IN (SELECT ${WordFields.id} FROM ${DBTables.word})',
       );
     });
@@ -64,28 +64,28 @@ class DatabaseService {
     await db.execute('''
             CREATE TABLE ${DBTables.image}(
                 ${ImageFields.id} $idType,
-                ${ImageFields.wordId} INTEGER,
+                ${ImageFields.word_id} INTEGER,
                 ${ImageFields.name} TEXT,
                 ${ImageFields.url} TEXT,
                 ${ImageFields.tinyurl} TEXT,
                 ${ImageFields.author} TEXT,
                 ${ImageFields.source} TEXT,
-                FOREIGN KEY (${ImageFields.wordId}) REFERENCES ${DBTables.word}(${WordFields.id}) ON DELETE CASCADE
+                FOREIGN KEY (${ImageFields.word_id}) REFERENCES ${DBTables.word}(${WordFields.id}) ON DELETE CASCADE
             )
         ''');
     await db.execute('''
             CREATE TABLE ${DBTables.translation}(
                 ${TranslationFields.id} $idType,
                 ${TranslationFields.wordTranslate} TEXT,
-                ${TranslationFields.wordId} INTEGER,
+                ${TranslationFields.word_id} INTEGER,
                 ${TranslationFields.alternatives} TEXT,
-                FOREIGN KEY (${TranslationFields.wordId}) REFERENCES ${DBTables.word}(${WordFields.id}) ON DELETE CASCADE
+                FOREIGN KEY (${TranslationFields.word_id}) REFERENCES ${DBTables.word}(${WordFields.id}) ON DELETE CASCADE
             )
         ''');
     await db.execute('''
       CREATE TABLE ${DBTables.progress}(
         ${ProgressFields.id} INTEGER PRIMARY KEY AUTOINCREMENT,
-        ${ProgressFields.wordId} INTEGER NOT NULL UNIQUE,
+        ${ProgressFields.word_id} INTEGER NOT NULL UNIQUE,
         ${WordFields.word} TEXT NOT NULL,
         ${ProgressFields.learn} INTEGER NOT NULL DEFAULT 0,
         ${ProgressFields.updatedAt} TEXT NOT NULL DEFAULT (datetime('now')),

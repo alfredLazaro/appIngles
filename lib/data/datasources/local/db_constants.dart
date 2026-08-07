@@ -30,20 +30,20 @@ class ImageFields {
   static const String tinyurl = 'tinyurl';
   static const String author = 'author';
   static const String source = 'source';
-  static const String wordId = 'wordId';
+  static const String word_id = 'word_id';
 }
 
 class TranslationFields {
   static const String id = 'id';
   static const String wordTranslate = 'word_translate';
   static const String alternatives = 'alternatives';
-  static const String wordId = 'word_id';
+  static const String word_id = 'word_id';
   static const String createdAt = 'created_at';
 }
 
 class ProgressFields {
   static const String id = 'id';
-  static const String wordId = 'word_id';
+  static const String word_id = 'word_id';
   static const String learn = 'learn';
   static const String updatedAt = 'updated_at';
   static const String userId = 'user_id';

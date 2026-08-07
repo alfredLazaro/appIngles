@@ -29,21 +29,21 @@ class RefreshWordsEvent extends WordListEvent {
 }
 
 class DeleteWordEvent extends WordListEvent {
-  final int wordId;
+  final int word_id;
 
-  const DeleteWordEvent(this.wordId);
+  const DeleteWordEvent(this.word_id);
 
   @override
-  List<Object?> get props => [wordId];
+  List<Object?> get props => [word_id];
 }
 
 class ToggleWordSelectionEvent extends WordListEvent {
-  final int wordId;
+  final int word_id;
 
-  const ToggleWordSelectionEvent(this.wordId);
+  const ToggleWordSelectionEvent(this.word_id);
 
   @override
-  List<Object?> get props => [wordId];
+  List<Object?> get props => [word_id];
 }
 
 class FilterWordsEvent extends WordListEvent {

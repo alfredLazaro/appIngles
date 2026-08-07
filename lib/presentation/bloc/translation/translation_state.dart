@@ -18,17 +18,17 @@ class TranslationLoading extends TranslationState {}
 
 class TranslationLoaded extends TranslationState {
   final List<TranslationEntity> translations;
-  final int? wordId;
+  final int? word_id;
   final int? translationCount;
 
   const TranslationLoaded({
     required this.translations,
-    this.wordId,
+    this.word_id,
     this.translationCount,
   });
 
   @override
-  List<Object?> get props => [translations, wordId, translationCount];
+  List<Object?> get props => [translations, word_id, translationCount];
 }
 
 class TranslationDetailLoaded extends TranslationState {
@@ -81,16 +81,16 @@ class TranslationDeleted extends TranslationState {
 }
 
 class TranslationCountLoaded extends TranslationState {
-  final int wordId;
+  final int word_id;
   final int count;
 
   const TranslationCountLoaded({
-    required this.wordId,
+    required this.word_id,
     required this.count,
   });
 
   @override
-  List<Object?> get props => [wordId, count];
+  List<Object?> get props => [word_id, count];
 }
 
 class TranslationError extends TranslationState {

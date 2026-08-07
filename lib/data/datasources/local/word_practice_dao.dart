@@ -83,7 +83,7 @@ class WordPracticeDao {
         w.sentence,
         w.learn
       FROM Word w
-      LEFT JOIN Image i ON w.id = i.wordId
+      LEFT JOIN Image i ON w.id = i.word_id
       GROUP BY w.id
       ORDER BY w.learn ASC, w.id DESC
       LIMIT ?

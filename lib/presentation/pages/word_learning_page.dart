@@ -298,7 +298,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
         onUpdate: (newSentence) {
           context.read<WordLearningBloc>().add(
                 UpdateWordSentenceEvent(
-                  wordId: word.id!,
+                  word_id: word.id!,
                   newSentence: newSentence,
                 ),
               );

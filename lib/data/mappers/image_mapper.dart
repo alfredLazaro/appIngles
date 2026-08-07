@@ -13,7 +13,7 @@ class ImageMapper {
   static WordImage toWordImage(Image_Model imgModel) {
     return WordImage(
       id: imgModel.id,
-      wordId: imgModel.wordId ?? 0,
+      word_id: imgModel.word_id ?? 0,
       url: imgModel.url ?? '',
       tinyUrl: imgModel.tinyurl ?? '',
       name: imgModel.name ?? '',
@@ -37,12 +37,12 @@ class ImageMapper {
   static Map<int, List<FlashcardImage>> mapToFlashcardImages(
     Map<int, List<Image_Model>> imagesMap,
   ) {
-    return imagesMap.map((wordId, imageModels) {
+    return imagesMap.map((word_id, imageModels) {
       final flashcardImages = imageModels
           .map((image) => toFlashcardImage(image))
           .whereType<FlashcardImage>()
           .toList();
-      return MapEntry(wordId, flashcardImages);
+      return MapEntry(word_id, flashcardImages);
     });
   }
 }

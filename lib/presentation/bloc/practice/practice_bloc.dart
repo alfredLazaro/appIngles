@@ -133,8 +133,8 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
 
   Future<FlashcardPracticeData> _loadFlashcardPractice(int count) async {
     final words = await _wordRepository.getWordsForPractice(count);
-    final wordIds = words.map((w) => w.id).toList();
-    final images = await _imageRepository.getImagesByWordIds(wordIds);
+    final word_ids = words.map((w) => w.id).toList();
+    final images = await _imageRepository.getImagesByword_ids(word_ids);
     return FlashcardPracticeData(
       words: words,
       imagesMap: images,
@@ -143,9 +143,9 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
 
   Future<MatchingPracticeData> _loadMatchingPractice(int count) async {
     final words = await _wordRepository.getWordsForPractice(count);
-    final wordIds = words.map((w) => w.id).toList();
+    final word_ids = words.map((w) => w.id).toList();
     final translations =
-        await _translationRepository.getTranslationsByWordIds(wordIds);
+        await _translationRepository.getTranslationsByword_ids(word_ids);
     final rounds = MatchRound.generateRounds(
       allWords: words,
       allTranslations: translations,

@@ -52,14 +52,14 @@ class ImageRepositoryImpl implements ImageRepository {
   @override
   Future<List<int>> saveImages(
     List<ImageSearchResult> images,
-    int wordId,
+    int word_id,
   ) async {
     List<int> savedIds = [];
 
     for (final image in images) {
       try {
         final imageModel = Image_Model(
-          wordId: wordId,
+          word_id: word_id,
           name: image.description,
           author: image.author,
           url: image.regularUrl,
@@ -78,21 +78,21 @@ class ImageRepositoryImpl implements ImageRepository {
   }
 
   @override
-  Future<List<WordImage>> getImagesByWordId(int wordId) async {
+  Future<List<WordImage>> getImagesByword_id(int word_id) async {
     try {
-      final imageModels = await _imageDao.getByWordId(wordId);
+      final imageModels = await _imageDao.getByword_id(word_id);
       return imageModels.map((m) => ImageMapper.toWordImage(m)).toList();
     } catch (e) {
-      _logger.e('Error obteniendo imágenes para wordId $wordId: $e');
+      _logger.e('Error obteniendo imágenes para word_id $word_id: $e');
       return [];
     }
   }
 
   @override
-  Future<Map<int, List<FlashcardImage>>> getImagesByWordIds(
-      List<int> wordIds) async {
+  Future<Map<int, List<FlashcardImage>>> getImagesByword_ids(
+      List<int> word_ids) async {
     try {
-      final imagesMap = await _imageDao.getImagesByWordIds(wordIds);
+      final imagesMap = await _imageDao.getImagesByword_ids(word_ids);
       return ImageMapper.mapToFlashcardImages(imagesMap);
     } catch (e) {
       _logger.e('Error guardando imagen: $e');

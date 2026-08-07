@@ -1,6 +1,6 @@
 class Progress {
   final int? id;
-  final int wordId;
+  final int word_id;
   final String word;
   final int learn;
   final DateTime updatedAt;
@@ -9,7 +9,7 @@ class Progress {
 
   const Progress({
     this.id,
-    required this.wordId,
+    required this.word_id,
     required this.word,
     required this.learn,
     required this.updatedAt,
@@ -19,7 +19,7 @@ class Progress {
 
   Progress copyWith({
     int? id,
-    int? wordId,
+    int? word_id,
     String? word,
     int? learn,
     DateTime? updatedAt,
@@ -28,7 +28,7 @@ class Progress {
   }) {
     return Progress(
       id: id ?? this.id,
-      wordId: wordId ?? this.wordId,
+      word_id: word_id ?? this.word_id,
       word: word ?? this.word,
       learn: learn ?? this.learn,
       updatedAt: updatedAt ?? this.updatedAt,

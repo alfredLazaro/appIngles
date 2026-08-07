@@ -15,10 +15,10 @@ abstract class WordRepository {
   Future<List<WordSummary>> getRecentWordsSummary({int limit = 9});
   Future<List<Word>> getRecentWords({int limit = 9});
   Future<int> saveWord(Word word);
-  Future<void> updateSentence(int wordId, String newSentence);
-  Future<void> deleteWord(int wordId);
+  Future<void> updateSentence(int word_id, String newSentence);
+  Future<void> deleteWord(int word_id);
   Future<List<WordMeaning>> searchWordMeanings(String word);
-  Future<void> updateLearnCount(int wordId, int newLearn);
+  Future<void> updateLearnCount(int word_id, int newLearn);
   // New methods based on your DAO
   Future<Word?> getWordById(int id);
   Future<bool> wordExists(String wordText);

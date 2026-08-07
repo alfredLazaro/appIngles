@@ -46,29 +46,29 @@ class WordBatchDao {
 
       await db.transaction((txn) async {
         for (final entry in updates.entries) {
-          final wordId = entry.key;
+          final word_id = entry.key;
           final newLearn = entry.value;
 
           await txn.update(
             'Word',
             {'learn': newLearn, 'updated_at': now},
             where: 'id = ?',
-            whereArgs: [wordId],
+            whereArgs: [word_id],
           );
 
-          final wordRows = await txn.query('Word', columns: ['word'], where: 'id = ?', whereArgs: [wordId]);
+          final wordRows = await txn.query('Word', columns: ['word'], where: 'id = ?', whereArgs: [word_id]);
           final wordText = wordRows.isNotEmpty ? (wordRows.first['word'] as String) : '';
 
           await txn.insert(
             'progress',
-            {'word_id': wordId, 'word': wordText, 'learn': newLearn, 'updated_at': now},
+            {'word_id': word_id, 'word': wordText, 'learn': newLearn, 'updated_at': now},
             conflictAlgorithm: ConflictAlgorithm.replace,
           );
 
           final existing = await txn.query(
             'outbox',
             where: "entity_type = 'progress' AND entity_id = ? AND status = 'pending'",
-            whereArgs: [wordId],
+            whereArgs: [word_id],
           );
 
           final payload = '{"word": "$wordText", "learn": $newLearn, "updated_at": "$now"}';
@@ -76,7 +76,7 @@ class WordBatchDao {
           if (existing.isEmpty) {
             await txn.insert('outbox', {
               'entity_type': 'progress',
-              'entity_id': wordId,
+              'entity_id': word_id,
               'operation': 'upsert',
               'payload': payload,
               'status': 'pending',
@@ -93,7 +93,7 @@ class WordBatchDao {
                 'next_retry_at': null,
               },
               where: "entity_type = 'progress' AND entity_id = ? AND status = 'pending'",
-              whereArgs: [wordId],
+              whereArgs: [word_id],
             );
           }
         }
@@ -116,7 +116,7 @@ class WordBatchDao {
           w.definition,
           MIN(i.tinyurl) as tinyImageUrl
         FROM Word w
-        LEFT JOIN Image i ON w.id = i.wordId
+        LEFT JOIN Image i ON w.id = i.word_id
         GROUP BY w.id
         ORDER BY w.id DESC
       ''');
@@ -175,7 +175,7 @@ class WordBatchDao {
         COUNT(t.id) as translationCount,
         MAX(w.sentence) as sentenceValue
       FROM Word w
-      LEFT JOIN Image i ON w.id = i.wordId
+      LEFT JOIN Image i ON w.id = i.word_id
       LEFT JOIN Translation t ON w.id = t.word_id
       $whereClause
       GROUP BY w.id

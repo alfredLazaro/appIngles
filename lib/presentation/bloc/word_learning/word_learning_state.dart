@@ -24,13 +24,13 @@ class WordsLoaded extends WordLearningState {
 }
 
 class WordSaved extends WordLearningState {
-  final int wordId;
+  final int word_id;
   final int imagesCount;
 
-  WordSaved({required this.wordId, required this.imagesCount});
+  WordSaved({required this.word_id, required this.imagesCount});
 
   @override
-  List<Object?> get props => [wordId, imagesCount];
+  List<Object?> get props => [word_id, imagesCount];
 }
 
 class WordLearningError extends WordLearningState {

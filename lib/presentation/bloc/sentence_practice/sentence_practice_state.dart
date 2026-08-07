@@ -11,7 +11,7 @@ class SentencePracticeInitial extends SentencePracticeState {
 }
 
 class SentencePracticeLoaded extends SentencePracticeState {
-  final int wordId;
+  final int word_id;
   final String originalSentence;
   final List<String> shuffledWords;
   final List<bool> wordVisibility;
@@ -20,7 +20,7 @@ class SentencePracticeLoaded extends SentencePracticeState {
   final bool showResult;
 
   const SentencePracticeLoaded({
-    required this.wordId,
+    required this.word_id,
     required this.originalSentence,
     required this.shuffledWords,
     required this.wordVisibility,
@@ -30,7 +30,7 @@ class SentencePracticeLoaded extends SentencePracticeState {
   });
 
   SentencePracticeLoaded copyWith({
-    int? wordId,
+    int? word_id,
     String? originalSentence,
     List<String>? shuffledWords,
     List<bool>? wordVisibility,
@@ -39,7 +39,7 @@ class SentencePracticeLoaded extends SentencePracticeState {
     bool? showResult,
   }) {
     return SentencePracticeLoaded(
-      wordId: wordId ?? this.wordId,
+      word_id: word_id ?? this.word_id,
       originalSentence: originalSentence ?? this.originalSentence,
       shuffledWords: shuffledWords ?? this.shuffledWords,
       wordVisibility: wordVisibility ?? this.wordVisibility,
@@ -51,7 +51,7 @@ class SentencePracticeLoaded extends SentencePracticeState {
 
   @override
   List<Object> get props => [
-        wordId,
+        word_id,
         originalSentence,
         shuffledWords,
         wordVisibility,

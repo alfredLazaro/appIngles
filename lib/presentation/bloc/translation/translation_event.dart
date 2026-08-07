@@ -10,13 +10,13 @@ abstract class TranslationEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadTranslationsByWordIdEvent extends TranslationEvent {
-  final int wordId;
+class LoadTranslationsByword_idEvent extends TranslationEvent {
+  final int word_id;
 
-  const LoadTranslationsByWordIdEvent(this.wordId);
+  const LoadTranslationsByword_idEvent(this.word_id);
 
   @override
-  List<Object?> get props => [wordId];
+  List<Object?> get props => [word_id];
 }
 
 class LoadAllTranslationsEvent extends TranslationEvent {
@@ -33,31 +33,31 @@ class SearchTranslationsEvent extends TranslationEvent {
 }
 
 class AddTranslationEvent extends TranslationEvent {
-  final int wordId;
+  final int word_id;
   final String wordTranslate;
   final List<String> alternatives;
 
   const AddTranslationEvent({
-    required this.wordId,
+    required this.word_id,
     required this.wordTranslate,
     this.alternatives = const [],
   });
 
   @override
-  List<Object?> get props => [wordId, wordTranslate, alternatives];
+  List<Object?> get props => [word_id, wordTranslate, alternatives];
 }
 
 class AddBulkTranslationsEvent extends TranslationEvent {
-  final int wordId;
+  final int word_id;
   final List<Map<String, dynamic>> translations;
 
   const AddBulkTranslationsEvent({
-    required this.wordId,
+    required this.word_id,
     required this.translations,
   });
 
   @override
-  List<Object?> get props => [wordId, translations];
+  List<Object?> get props => [word_id, translations];
 }
 
 class UpdateTranslationEvent extends TranslationEvent {
@@ -84,22 +84,22 @@ class DeleteTranslationEvent extends TranslationEvent {
   List<Object?> get props => [id];
 }
 
-class DeleteTranslationsByWordIdEvent extends TranslationEvent {
-  final int wordId;
+class DeleteTranslationsByword_idEvent extends TranslationEvent {
+  final int word_id;
 
-  const DeleteTranslationsByWordIdEvent(this.wordId);
+  const DeleteTranslationsByword_idEvent(this.word_id);
 
   @override
-  List<Object?> get props => [wordId];
+  List<Object?> get props => [word_id];
 }
 
 class GetTranslationCountEvent extends TranslationEvent {
-  final int wordId;
+  final int word_id;
 
-  const GetTranslationCountEvent(this.wordId);
+  const GetTranslationCountEvent(this.word_id);
 
   @override
-  List<Object?> get props => [wordId];
+  List<Object?> get props => [word_id];
 }
 
 class GetTranslationByIdEvent extends TranslationEvent {
@@ -112,10 +112,10 @@ class GetTranslationByIdEvent extends TranslationEvent {
 }
 
 class GetTranslationsWithWordDetailsEvent extends TranslationEvent {
-  final int wordId;
+  final int word_id;
 
-  const GetTranslationsWithWordDetailsEvent(this.wordId);
+  const GetTranslationsWithWordDetailsEvent(this.word_id);
 
   @override
-  List<Object?> get props => [wordId];
+  List<Object?> get props => [word_id];
 }

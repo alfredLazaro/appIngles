@@ -8,12 +8,12 @@ abstract class WordDetailEvent extends Equatable {
 }
 
 class LoadWordDetailEvent extends WordDetailEvent {
-  final int wordId;
+  final int word_id;
 
-  const LoadWordDetailEvent(this.wordId);
+  const LoadWordDetailEvent(this.word_id);
 
   @override
-  List<Object?> get props => [wordId];
+  List<Object?> get props => [word_id];
 }
 
 class SaveWordDetailEvent extends WordDetailEvent {
@@ -32,12 +32,12 @@ class SaveWordDetailEvent extends WordDetailEvent {
 }
 
 class DeleteWordDetailEvent extends WordDetailEvent {
-  final int wordId;
+  final int word_id;
 
-  const DeleteWordDetailEvent(this.wordId);
+  const DeleteWordDetailEvent(this.word_id);
 
   @override
-  List<Object?> get props => [wordId];
+  List<Object?> get props => [word_id];
 }
 
 class AddImagesToWordEvent extends WordDetailEvent {

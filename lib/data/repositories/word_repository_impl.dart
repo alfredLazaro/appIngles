@@ -68,20 +68,20 @@ class WordRepositoryImpl implements WordRepository {
   }
 
   @override
-  Future<void> updateSentence(int wordId, String newSentence) async {
+  Future<void> updateSentence(int word_id, String newSentence) async {
     try {
-      await _wordCrudDao.updateSentence(wordId, newSentence);
+      await _wordCrudDao.updateSentence(word_id, newSentence);
     } catch (e) {
       throw Exception('Error al actualizar oración: $e');
     }
   }
 
   @override
-  Future<void> deleteWord(int wordId) async {
+  Future<void> deleteWord(int word_id) async {
     try {
-      await _imageDao.deleteByWordId(wordId);
-      await _translationDao.deleteTranslationsByWordId(wordId);
-      await _wordCrudDao.deleteWord(wordId);
+      await _imageDao.deleteByword_id(word_id);
+      await _translationDao.deleteTranslationsByword_id(word_id);
+      await _wordCrudDao.deleteWord(word_id);
     } catch (e) {
       throw Exception('Error al eliminar palabra: $e');
     }
@@ -111,9 +111,9 @@ class WordRepositoryImpl implements WordRepository {
   }
 
   @override
-  Future<void> updateLearnCount(int wordId, int newLearn) async {
+  Future<void> updateLearnCount(int word_id, int newLearn) async {
     try {
-      await _wordPracticeDao.updateLearn(wordId, newLearn);
+      await _wordPracticeDao.updateLearn(word_id, newLearn);
     } catch (e) {
       throw Exception('Error al actualizar conteo de aprendizaje: $e');
     }

@@ -398,7 +398,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     if (text.isEmpty) return;
     setState(() {
       _localTranslations.add(TranslationEntity(
-        wordId: widget.wordWithImage.id,
+        word_id: widget.wordWithImage.id,
         wordTranslate: text,
       ));
     });

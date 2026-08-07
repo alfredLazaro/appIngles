@@ -58,25 +58,25 @@ class SaveNewWordEvent extends WordLearningEvent {
 }
 
 class UpdateWordSentenceEvent extends WordLearningEvent {
-  final int wordId;
+  final int word_id;
   final String newSentence;
 
   UpdateWordSentenceEvent({
-    required this.wordId,
+    required this.word_id,
     required this.newSentence,
   });
 
   @override
-  List<Object?> get props => [wordId, newSentence];
+  List<Object?> get props => [word_id, newSentence];
 }
 
 class DeleteWordEvent extends WordLearningEvent {
-  final int wordId;
+  final int word_id;
 
-  DeleteWordEvent(this.wordId);
+  DeleteWordEvent(this.word_id);
 
   @override
-  List<Object?> get props => [wordId];
+  List<Object?> get props => [word_id];
 }
 
 class ChangePageEvent extends WordLearningEvent {

@@ -5,13 +5,13 @@
 class Translation {
   final int? id;
   final String wordTranslate;
-  final int wordId;
+  final int word_id;
   final String? alternatives;
 
   Translation({
     this.id,
     required this.wordTranslate,
-    required this.wordId,
+    required this.word_id,
     this.alternatives,
   });
 
@@ -19,7 +19,7 @@ class Translation {
     return {
       'id': id,
       'word_translate': wordTranslate,
-      'word_id': wordId,
+      'word_id': word_id,
       'alternatives': alternatives,
     };
   }
@@ -28,7 +28,7 @@ class Translation {
     return Translation(
       id: map['id'] as int?,
       wordTranslate: map['word_translate'] as String? ?? '',
-      wordId: (map['word_id'] as num?)?.toInt() ?? 0,
+      word_id: (map['word_id'] as num?)?.toInt() ?? 0,
       alternatives: map['alternatives'] as String?,
     );
   }
@@ -36,20 +36,20 @@ class Translation {
   Translation copyWith({
     int? id,
     String? wordTranslate,
-    int? wordId,
+    int? word_id,
     String? alternatives,
   }) {
     return Translation(
       id: id ?? this.id,
       wordTranslate: wordTranslate ?? this.wordTranslate,
-      wordId: wordId ?? this.wordId,
+      word_id: word_id ?? this.word_id,
       alternatives: alternatives ?? this.alternatives,
     );
   }
 
   @override
   String toString() {
-    return 'Translation(id: $id, wordTranslate: $wordTranslate, wordId: $wordId, alternatives: $alternatives)';
+    return 'Translation(id: $id, wordTranslate: $wordTranslate, word_id: $word_id, alternatives: $alternatives)';
   }
 
   @override
@@ -58,7 +58,7 @@ class Translation {
     return other is Translation &&
         other.id == id &&
         other.wordTranslate == wordTranslate &&
-        other.wordId == wordId &&
+        other.word_id == word_id &&
         other.alternatives == alternatives;
   }
 
@@ -66,7 +66,7 @@ class Translation {
   int get hashCode {
     return id.hashCode ^
         wordTranslate.hashCode ^
-        wordId.hashCode ^
+        word_id.hashCode ^
         alternatives.hashCode;
   }
 }

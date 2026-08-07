@@ -10,7 +10,7 @@ class TranslationMapper {
   TranslationEntity mapToTranslationEntity(Map<String, dynamic> map) {
     return TranslationEntity(
       id: map[TranslationFields.id] as int?,
-      wordId: (map[TranslationFields.wordId] as num?)?.toInt() ?? 0,
+      word_id: (map[TranslationFields.word_id] as num?)?.toInt() ?? 0,
       wordTranslate:
           map[TranslationFields.wordTranslate] as String? ?? '',
       alternatives: (map[TranslationFields.alternatives] as String? ?? '')
@@ -31,7 +31,7 @@ class TranslationMapper {
   Map<String, dynamic> translationEntityToMap(TranslationEntity entity) {
     return {
       if (entity.id != null) TranslationFields.id: entity.id,
-      TranslationFields.wordId: entity.wordId,
+      TranslationFields.word_id: entity.word_id,
       TranslationFields.wordTranslate: entity.wordTranslate,
       TranslationFields.alternatives: entity.alternatives.join('|'),
     };
@@ -49,7 +49,7 @@ class TranslationMapper {
 
   Map<String, dynamic> mapToDatabase(Translation entity) {
     return {
-      TranslationFields.wordId: entity.wordId,
+      TranslationFields.word_id: entity.word_id,
       TranslationFields.wordTranslate: entity.wordTranslate,
       TranslationFields.alternatives: entity.alternatives,
     };
@@ -75,13 +75,13 @@ class TranslationMapper {
   Translation mapRawToEntity({
     int? id,
     required String wordTranslate,
-    required int wordId,
+    required int word_id,
     String? alternatives,
   }) {
     return Translation(
       id: id,
       wordTranslate: wordTranslate,
-      wordId: wordId,
+      word_id: word_id,
       alternatives: alternatives,
     );
   }

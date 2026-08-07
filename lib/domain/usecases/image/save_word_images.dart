@@ -8,9 +8,9 @@ class SaveWordImagesUseCase {
 
   Future<List<int>> call(
     List<ImageSearchResult> images,
-    int wordId,
+    int word_id,
   ) async {
-    if (wordId <= 0) {
+    if (word_id <= 0) {
       throw Exception('ID de palabra inválido');
     }
 
@@ -18,6 +18,6 @@ class SaveWordImagesUseCase {
       return [];
     }
 
-    return await _repository.saveImages(images, wordId);
+    return await _repository.saveImages(images, word_id);
   }
 }

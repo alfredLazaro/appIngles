@@ -43,7 +43,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
   bool _feedbackDismissed = false;
   bool _precacheStarted = false;
   bool _precacheComplete = false;
-  final Set<int> _precachedWordIds = {};
+  final Set<int> _precachedword_ids = {};
 
   @override
   void initState() {
@@ -80,7 +80,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     final futures = <Future<void>>[];
     final firstWords = widget.words.take(widget.batchSize);
     for (final word in firstWords) {
-      _precachedWordIds.add(word.id);
+      _precachedword_ids.add(word.id);
       for (final img in (widget.imagesMap[word.id] ?? [])) {
         futures.add(
           precacheImage(NetworkImage(img.url), context).catchError((_) {}),
@@ -94,7 +94,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     final ctx = context;
     final remaining = widget.words
         .skip(widget.batchSize)
-        .where((w) => !_precachedWordIds.contains(w.id))
+        .where((w) => !_precachedword_ids.contains(w.id))
         .toList();
 
     void processChunk(int index) {
@@ -102,7 +102,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
       final chunk =
           remaining.sublist(index, (index + 3).clamp(0, remaining.length));
       for (final word in chunk) {
-        _precachedWordIds.add(word.id);
+        _precachedword_ids.add(word.id);
         for (final img in (widget.imagesMap[word.id] ?? [])) {
           precacheImage(NetworkImage(img.url), ctx);
         }

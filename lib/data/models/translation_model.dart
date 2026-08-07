@@ -5,13 +5,13 @@ import 'package:first_app/domain/entities/translation_entity.dart';
 class TranslationModel {
   final int? id;
   final String wordTranslate;
-  final int wordId;
+  final int word_id;
   final String? alternatives;
 
   TranslationModel({
     this.id,
     required this.wordTranslate,
-    required this.wordId,
+    required this.word_id,
     this.alternatives,
   });
 
@@ -19,7 +19,7 @@ class TranslationModel {
     return {
       if (id != null) TranslationFields.id: id,
       TranslationFields.wordTranslate: wordTranslate,
-      TranslationFields.wordId: wordId,
+      TranslationFields.word_id: word_id,
       TranslationFields.alternatives: alternatives,
     };
   }
@@ -29,7 +29,7 @@ class TranslationModel {
       id: map[TranslationFields.id] as int?,
       wordTranslate:
           map[TranslationFields.wordTranslate] as String? ?? '',
-      wordId: (map[TranslationFields.wordId] as num?)?.toInt() ?? 0,
+      word_id: (map[TranslationFields.word_id] as num?)?.toInt() ?? 0,
       alternatives: map[TranslationFields.alternatives] as String?,
     );
   }
@@ -39,7 +39,7 @@ class TranslationModel {
     return TranslationEntity(
       id: id,
       wordTranslate: wordTranslate,
-      wordId: wordId,
+      word_id: word_id,
       alternatives: (alternatives ?? '')
           .split('|')
           .where((item) => item.isNotEmpty)
@@ -52,7 +52,7 @@ class TranslationModel {
     return TranslationModel(
       id: entity.id,
       wordTranslate: entity.wordTranslate,
-      wordId: entity.wordId,
+      word_id: entity.word_id,
       alternatives: entity.alternatives.join('|'),
     );
   }

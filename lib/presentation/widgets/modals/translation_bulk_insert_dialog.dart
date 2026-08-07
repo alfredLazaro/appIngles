@@ -8,13 +8,13 @@ import 'package:first_app/presentation/bloc/translation/translation_event.dart';
 import 'package:first_app/presentation/bloc/translation/translation_state.dart';
 
 class TranslationBulkInsertDialog extends StatefulWidget {
-  final int wordId;
+  final int word_id;
   final String wordText; // To show which word we're adding translations for
   final TranslationBloc? bloc; // Make it optional
 
   const TranslationBulkInsertDialog({
     super.key,
-    required this.wordId,
+    required this.word_id,
     required this.wordText,
     this.bloc,
   });
@@ -22,7 +22,7 @@ class TranslationBulkInsertDialog extends StatefulWidget {
   // Helper method to show the dialog
   static Future<void> show(
     BuildContext context, {
-    required int wordId,
+    required int word_id,
     required String wordText,
     TranslationBloc? bloc,
   }) async {
@@ -30,7 +30,7 @@ class TranslationBulkInsertDialog extends StatefulWidget {
       context: context,
       barrierDismissible: false,
       builder: (context) => TranslationBulkInsertDialog(
-        wordId: wordId,
+        word_id: word_id,
         wordText: wordText,
         bloc: bloc,
       ),
@@ -113,7 +113,7 @@ class _TranslationBulkInsertDialogState
     // Get bloc from widget or context
     final bloc = widget.bloc ?? context.read<TranslationBloc>();
     bloc.add(AddBulkTranslationsEvent(
-      wordId: widget.wordId,
+      word_id: widget.word_id,
       translations: translations,
     ));
   }
@@ -258,13 +258,13 @@ class _TranslationBulkInsertDialogState
 // ============================================================================
 
 class TranslationBulkInsertWidget extends StatefulWidget {
-  final int wordId;
+  final int word_id;
   final String wordText;
   final VoidCallback? onSuccess;
 
   const TranslationBulkInsertWidget({
     super.key,
-    required this.wordId,
+    required this.word_id,
     required this.wordText,
     this.onSuccess,
   });
@@ -338,7 +338,7 @@ class _TranslationBulkInsertWidgetState
     }
 
     context.read<TranslationBloc>().add(AddBulkTranslationsEvent(
-          wordId: widget.wordId,
+          word_id: widget.word_id,
           translations: translations,
         ));
   }

@@ -1,6 +1,6 @@
 class Image_Model {
   int? id;
-  int? wordId;
+  int? word_id;
   String? name;
   String? url;
   String? tinyurl;
@@ -9,7 +9,7 @@ class Image_Model {
 
   Image_Model(
       {this.id,
-      this.wordId,
+      this.word_id,
       required this.name,
       this.url,
       this.tinyurl,
@@ -19,7 +19,7 @@ class Image_Model {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'wordId': wordId,
+      'word_id': word_id,
       'name': name,
       'url': url,
       'tinyurl': tinyurl,
@@ -32,7 +32,7 @@ class Image_Model {
   factory Image_Model.fromMap(Map<String, dynamic> map) {
     return Image_Model(
         id: map['id'],
-        wordId: map['wordId'],
+        word_id: map['word_id'],
         name: map['nameImg'],
         url: map['url'],
         tinyurl: map['tinyurl'],

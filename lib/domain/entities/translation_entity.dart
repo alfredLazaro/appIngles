@@ -1,13 +1,13 @@
 class TranslationEntity {
   final int? id;
-  final int wordId;
+  final int word_id;
   final String wordTranslate;
   final List<String> alternatives;
   final DateTime? createdAt;
 
   const TranslationEntity({
     this.id,
-    required this.wordId,
+    required this.word_id,
     required this.wordTranslate,
     this.alternatives = const [],
     this.createdAt,
@@ -15,14 +15,14 @@ class TranslationEntity {
 
   TranslationEntity copyWith({
     int? id,
-    int? wordId,
+    int? word_id,
     String? wordTranslate,
     List<String>? alternatives,
     DateTime? createdAt,
   }) {
     return TranslationEntity(
       id: id ?? this.id,
-      wordId: wordId ?? this.wordId,
+      word_id: word_id ?? this.word_id,
       wordTranslate: wordTranslate ?? this.wordTranslate,
       alternatives: alternatives ?? this.alternatives,
       createdAt: createdAt ?? this.createdAt,
@@ -31,7 +31,7 @@ class TranslationEntity {
 
   @override
   String toString() {
-    return 'TranslationEntity(id: $id, wordId: $wordId, wordTranslate: $wordTranslate, alternatives: $alternatives)';
+    return 'TranslationEntity(id: $id, word_id: $word_id, wordTranslate: $wordTranslate, alternatives: $alternatives)';
   }
 
   @override
@@ -40,7 +40,7 @@ class TranslationEntity {
 
     return other is TranslationEntity &&
         other.id == id &&
-        other.wordId == wordId &&
+        other.word_id == word_id &&
         other.wordTranslate == wordTranslate &&
         _listEquals(other.alternatives, alternatives);
   }
@@ -48,7 +48,7 @@ class TranslationEntity {
   @override
   int get hashCode {
     return id.hashCode ^
-        wordId.hashCode ^
+        word_id.hashCode ^
         wordTranslate.hashCode ^
         alternatives.hashCode;
   }

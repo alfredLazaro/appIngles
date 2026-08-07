@@ -17,7 +17,7 @@ class TranslationDao {
 
   // Insert multiple translations for a word
   Future<List<int>> insertTranslations(
-    int wordId,
+    int word_id,
     List<Map<String, dynamic>> translations,
   ) async {
     final db = await _databaseService.database;
@@ -26,7 +26,7 @@ class TranslationDao {
     await db.transaction((txn) async {
       for (final translation in translations) {
         final data = {
-          TranslationFields.wordId: wordId,
+          TranslationFields.word_id: word_id,
           TranslationFields.wordTranslate:
               translation[TranslationFields.wordTranslate],
           TranslationFields.alternatives:
@@ -45,27 +45,27 @@ class TranslationDao {
   }
 
   // Get translations for multiple word IDs (batch)
-  Future<List<Map<String, dynamic>>> getTranslationsByWordIds(
-    List<int> wordIds,
+  Future<List<Map<String, dynamic>>> getTranslationsByword_ids(
+    List<int> word_ids,
   ) async {
     final db = await _databaseService.database;
-    final placeholders = wordIds.map((_) => '?').join(',');
+    final placeholders = word_ids.map((_) => '?').join(',');
     return await db.query(
       DBTables.translation,
-      where: '${TranslationFields.wordId} IN ($placeholders)',
-      whereArgs: wordIds,
+      where: '${TranslationFields.word_id} IN ($placeholders)',
+      whereArgs: word_ids,
     );
   }
 
   // Get all translations for a specific word
-  Future<List<Map<String, dynamic>>> getTranslationsByWordId(
-    int wordId,
+  Future<List<Map<String, dynamic>>> getTranslationsByword_id(
+    int word_id,
   ) async {
     final db = await _databaseService.database;
     return await db.query(
       DBTables.translation,
-      where: '${TranslationFields.wordId} = ?',
-      whereArgs: [wordId],
+      where: '${TranslationFields.word_id} = ?',
+      whereArgs: [word_id],
     );
   }
 
@@ -106,12 +106,12 @@ class TranslationDao {
   }
 
   // Delete all translations for a specific word
-  Future<int> deleteTranslationsByWordId(int wordId) async {
+  Future<int> deleteTranslationsByword_id(int word_id) async {
     final db = await _databaseService.database;
     return await db.delete(
       DBTables.translation,
-      where: '${TranslationFields.wordId} = ?',
-      whereArgs: [wordId],
+      where: '${TranslationFields.word_id} = ?',
+      whereArgs: [word_id],
     );
   }
 
@@ -123,7 +123,7 @@ class TranslationDao {
 
   // Get translations with word details (JOIN query)
   Future<List<Map<String, dynamic>>> getTranslationsWithWordDetails(
-    int wordId,
+    int word_id,
   ) async {
     final db = await _databaseService.database;
     return await db.rawQuery('''
@@ -135,9 +135,9 @@ class TranslationDao {
         w.${WordFields.definition}
       FROM ${DBTables.translation} t
       INNER JOIN ${DBTables.word} w 
-        ON t.${TranslationFields.wordId} = w.${WordFields.id}
-      WHERE t.${TranslationFields.wordId} = ?
-    ''', [wordId]);
+        ON t.${TranslationFields.word_id} = w.${WordFields.id}
+      WHERE t.${TranslationFields.word_id} = ?
+    ''', [word_id]);
   }
 
   // Search translations by text (useful for finding words by translation)
@@ -154,13 +154,13 @@ class TranslationDao {
   }
 
   // Count translations for a word
-  Future<int> getTranslationCount(int wordId) async {
+  Future<int> getTranslationCount(int word_id) async {
     final db = await _databaseService.database;
     final result = await db.rawQuery('''
       SELECT COUNT(*) as count 
       FROM ${DBTables.translation}
-      WHERE ${TranslationFields.wordId} = ?
-    ''', [wordId]);
+      WHERE ${TranslationFields.word_id} = ?
+    ''', [word_id]);
     return Sqflite.firstIntValue(result) ?? 0;
   }
 

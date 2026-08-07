@@ -12,36 +12,36 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
 
   TranslationBloc({required this.translationRepository})
       : super(TranslationInitial()) {
-    on<LoadTranslationsByWordIdEvent>(_onLoadTranslationsByWordId);
+    on<LoadTranslationsByword_idEvent>(_onLoadTranslationsByword_id);
     on<LoadAllTranslationsEvent>(_onLoadAllTranslations);
     on<SearchTranslationsEvent>(_onSearchTranslations);
     on<AddTranslationEvent>(_onAddTranslation);
     on<AddBulkTranslationsEvent>(_onAddBulkTranslations);
     on<UpdateTranslationEvent>(_onUpdateTranslation);
     on<DeleteTranslationEvent>(_onDeleteTranslation);
-    on<DeleteTranslationsByWordIdEvent>(_onDeleteTranslationsByWordId);
+    on<DeleteTranslationsByword_idEvent>(_onDeleteTranslationsByword_id);
     on<GetTranslationCountEvent>(_onGetTranslationCount);
     on<GetTranslationByIdEvent>(_onGetTranslationById);
     on<GetTranslationsWithWordDetailsEvent>(_onGetTranslationsWithWordDetails);
   }
 
-  Future<void> _onLoadTranslationsByWordId(
-    LoadTranslationsByWordIdEvent event,
+  Future<void> _onLoadTranslationsByword_id(
+    LoadTranslationsByword_idEvent event,
     Emitter<TranslationState> emit,
   ) async {
     emit(TranslationLoading());
 
     try {
       final entities =
-          await translationRepository.getTranslationsByWordId(event.wordId);
+          await translationRepository.getTranslationsByword_id(event.word_id);
 
       emit(TranslationLoaded(
         translations: entities,
-        wordId: event.wordId,
+        word_id: event.word_id,
       ));
     } catch (e) {
       emit(TranslationError(
-        'Error loading translations for word ID ${event.wordId}: $e',
+        'Error loading translations for word ID ${event.word_id}: $e',
         failedEvent: event,
       ));
     }
@@ -97,14 +97,14 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
 
     try {
       final id = await translationRepository.insertTranslation(
-        event.wordId,
+        event.word_id,
         event.wordTranslate,
         event.alternatives,
       );
 
       final newTranslation = TranslationEntity(
         id: id,
-        wordId: event.wordId,
+        word_id: event.word_id,
         wordTranslate: event.wordTranslate,
         alternatives: event.alternatives,
         createdAt: DateTime.now(),
@@ -112,7 +112,7 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
 
       emit(TranslationAdded(newTranslation));
 
-      add(LoadTranslationsByWordIdEvent(event.wordId));
+      add(LoadTranslationsByword_idEvent(event.word_id));
     } catch (e) {
       emit(TranslationError(
         'Error adding translation: $e',
@@ -134,14 +134,14 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
             .where((item) => item.isNotEmpty)
             .toList();
         return TranslationEntity(
-          wordId: event.wordId,
+          word_id: event.word_id,
           wordTranslate: t['wordTranslate'] as String,
           alternatives: alternatives,
         );
       }).toList();
 
       final ids = await translationRepository.insertTranslations(
-        event.wordId,
+        event.word_id,
         entities,
       );
 
@@ -150,7 +150,7 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
         final original = entities[index];
         return TranslationEntity(
           id: ids[index],
-          wordId: original.wordId,
+          word_id: original.word_id,
           wordTranslate: original.wordTranslate,
           alternatives: original.alternatives,
           createdAt: DateTime.now(),
@@ -159,7 +159,7 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
 
       emit(TranslationsBulkAdded(newTranslations));
 
-      add(LoadTranslationsByWordIdEvent(event.wordId));
+      add(LoadTranslationsByword_idEvent(event.word_id));
     } catch (e) {
       emit(TranslationError(
         'Error adding bulk translations: $e',
@@ -196,7 +196,7 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
         if (updatedEntity != null) {
           emit(TranslationUpdated(updatedEntity));
 
-          add(LoadTranslationsByWordIdEvent(updatedEntity.wordId));
+          add(LoadTranslationsByword_idEvent(updatedEntity.word_id));
         }
       } else {
         emit(TranslationError(
@@ -236,7 +236,7 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
       if (affectedRows > 0) {
         emit(TranslationDeleted(event.id));
 
-        add(LoadTranslationsByWordIdEvent(translation.wordId));
+        add(LoadTranslationsByword_idEvent(translation.word_id));
       } else {
         emit(TranslationError(
           'Failed to delete translation',
@@ -251,21 +251,21 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
     }
   }
 
-  Future<void> _onDeleteTranslationsByWordId(
-    DeleteTranslationsByWordIdEvent event,
+  Future<void> _onDeleteTranslationsByword_id(
+    DeleteTranslationsByword_idEvent event,
     Emitter<TranslationState> emit,
   ) async {
     emit(TranslationLoading());
 
     try {
       final affectedRows =
-          await translationRepository.deleteTranslationsByWordId(event.wordId);
+          await translationRepository.deleteTranslationsByword_id(event.word_id);
 
       if (affectedRows > 0) {
-        emit(TranslationLoaded(translations: [], wordId: event.wordId));
+        emit(TranslationLoaded(translations: [], word_id: event.word_id));
       } else {
         emit(TranslationError(
-          'No translations found for word ID ${event.wordId}',
+          'No translations found for word ID ${event.word_id}',
           failedEvent: event,
         ));
       }
@@ -285,10 +285,10 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
 
     try {
       final count =
-          await translationRepository.getTranslationCount(event.wordId);
+          await translationRepository.getTranslationCount(event.word_id);
 
       emit(TranslationCountLoaded(
-        wordId: event.wordId,
+        word_id: event.word_id,
         count: count,
       ));
     } catch (e) {
@@ -333,7 +333,7 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
 
     try {
       final translations = await translationRepository
-          .getTranslationsWithWordDetails(event.wordId);
+          .getTranslationsWithWordDetails(event.word_id);
 
       final wordDetails = translations.isNotEmpty
           ? {
@@ -346,7 +346,7 @@ class TranslationBloc extends Bloc<TranslationEvent, TranslationState> {
       emit(TranslationDetailLoaded(
         translation: TranslationEntity(
           id: -1,
-          wordId: event.wordId,
+          word_id: event.word_id,
           wordTranslate: '',
         ),
         wordDetails: wordDetails,

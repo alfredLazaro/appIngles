@@ -42,9 +42,9 @@ class WordDetailBloc extends Bloc<WordDetailEvent, WordDetailState> {
     emit(const WordDetailLoading());
     try {
       final results = await Future.wait([
-        _wordRepository.getWordById(event.wordId),
-        _translationRepository.getTranslationsByWordId(event.wordId),
-        _imageRepository.getImagesByWordId(event.wordId),
+        _wordRepository.getWordById(event.word_id),
+        _translationRepository.getTranslationsByword_id(event.word_id),
+        _imageRepository.getImagesByword_id(event.word_id),
       ]);
       final word = results[0] as Word;
       final translations = results[1] as List<TranslationEntity>;
@@ -77,7 +77,7 @@ class WordDetailBloc extends Bloc<WordDetailEvent, WordDetailState> {
       }
 
       final reloadedTranslations =
-          await _translationRepository.getTranslationsByWordId(event.updatedWord.id!);
+          await _translationRepository.getTranslationsByword_id(event.updatedWord.id!);
 
       emit(loaded.copyWith(
         word: event.updatedWord,
@@ -94,7 +94,7 @@ class WordDetailBloc extends Bloc<WordDetailEvent, WordDetailState> {
     Emitter<WordDetailState> emit,
   ) async {
     try {
-      await _deleteWordUseCase.call(event.wordId);
+      await _deleteWordUseCase.call(event.word_id);
       emit(const WordDetailDeleted());
     } catch (e) {
       if (state is WordDetailLoaded) {
@@ -118,7 +118,7 @@ class WordDetailBloc extends Bloc<WordDetailEvent, WordDetailState> {
     try {
       await _saveWordImages(event.images, loaded.word.id!);
       final updatedImages =
-          await _imageRepository.getImagesByWordId(loaded.word.id!);
+          await _imageRepository.getImagesByword_id(loaded.word.id!);
       emit(loaded.copyWith(images: updatedImages, isSaving: false));
     } catch (e) {
       emit(loaded.copyWith(

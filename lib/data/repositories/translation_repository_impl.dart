@@ -13,18 +13,18 @@ class TranslationRepositoryImpl implements TranslationRepository {
       : _translationDao = translationDao;
 
   @override
-  Future<List<TranslationEntity>> getTranslationsByWordIds(
-    List<int> wordIds,
+  Future<List<TranslationEntity>> getTranslationsByword_ids(
+    List<int> word_ids,
   ) async {
-    final results = await _translationDao.getTranslationsByWordIds(wordIds);
+    final results = await _translationDao.getTranslationsByword_ids(word_ids);
     return _mapper.mapToTranslationEntityList(results);
   }
 
   @override
-  Future<List<TranslationEntity>> getTranslationsByWordId(
-    int wordId,
+  Future<List<TranslationEntity>> getTranslationsByword_id(
+    int word_id,
   ) async {
-    final results = await _translationDao.getTranslationsByWordId(wordId);
+    final results = await _translationDao.getTranslationsByword_id(word_id);
     return _mapper.mapToTranslationEntityList(results);
   }
 
@@ -51,12 +51,12 @@ class TranslationRepositoryImpl implements TranslationRepository {
 
   @override
   Future<int> insertTranslation(
-    int wordId,
+    int word_id,
     String wordTranslate,
     List<String> alternatives,
   ) async {
     final map = {
-      TranslationFields.wordId: wordId,
+      TranslationFields.word_id: word_id,
       TranslationFields.wordTranslate: wordTranslate,
       TranslationFields.alternatives: alternatives.join('|'),
     };
@@ -65,13 +65,13 @@ class TranslationRepositoryImpl implements TranslationRepository {
 
   @override
   Future<List<int>> insertTranslations(
-    int wordId,
+    int word_id,
     List<TranslationEntity> translations,
   ) async {
     final maps = translations
         .map((t) => _mapper.translationEntityToMap(t))
         .toList();
-    return await _translationDao.insertTranslations(wordId, maps);
+    return await _translationDao.insertTranslations(word_id, maps);
   }
 
   @override
@@ -96,19 +96,19 @@ class TranslationRepositoryImpl implements TranslationRepository {
   }
 
   @override
-  Future<int> deleteTranslationsByWordId(int wordId) async {
-    return await _translationDao.deleteTranslationsByWordId(wordId);
+  Future<int> deleteTranslationsByword_id(int word_id) async {
+    return await _translationDao.deleteTranslationsByword_id(word_id);
   }
 
   @override
-  Future<int> getTranslationCount(int wordId) async {
-    return await _translationDao.getTranslationCount(wordId);
+  Future<int> getTranslationCount(int word_id) async {
+    return await _translationDao.getTranslationCount(word_id);
   }
 
   @override
   Future<List<Map<String, dynamic>>> getTranslationsWithWordDetails(
-    int wordId,
+    int word_id,
   ) async {
-    return await _translationDao.getTranslationsWithWordDetails(wordId);
+    return await _translationDao.getTranslationsWithWordDetails(word_id);
   }
 }

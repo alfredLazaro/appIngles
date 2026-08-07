@@ -17,11 +17,11 @@ class ProgressDao {
     }
   }
 
-  Future<void> upsertInTransaction(Database txn, int wordId, int learn, String word, String now) async {
+  Future<void> upsertInTransaction(Database txn, int word_id, int learn, String word, String now) async {
     await txn.insert(
       'progress',
       {
-        'word_id': wordId,
+        'word_id': word_id,
         'word': word,
         'learn': learn,
         'updated_at': now,
@@ -30,12 +30,12 @@ class ProgressDao {
     );
   }
 
-  Future<void> upsert(int wordId, int learn, String word, String now) async {
+  Future<void> upsert(int word_id, int learn, String word, String now) async {
     try {
       final db = await dbHelper.database;
       await db.insert(
         'progress',
-        {'word_id': wordId, 'learn': learn, 'word': word, 'updated_at': now},
+        {'word_id': word_id, 'learn': learn, 'word': word, 'updated_at': now},
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
@@ -44,20 +44,20 @@ class ProgressDao {
     }
   }
 
-  Future<int?> getLearnByWordId(int wordId) async {
+  Future<int?> getLearnByword_id(int word_id) async {
     try {
       final db = await dbHelper.database;
       final rows = await db.query(
         'progress',
         columns: ['learn'],
         where: 'word_id = ?',
-        whereArgs: [wordId],
+        whereArgs: [word_id],
         limit: 1,
       );
       if (rows.isEmpty) return null;
       return rows.first['learn'] as int?;
     } catch (e) {
-      debugPrint('❌ ProgressDao.getLearnByWordId error: $e');
+      debugPrint('❌ ProgressDao.getLearnByword_id error: $e');
       return null;
     }
   }
@@ -72,13 +72,13 @@ class ProgressDao {
     }
   }
 
-  Future<void> updateFromServer(int wordId, int learn, String word, String updatedAt, String syncedAt) async {
+  Future<void> updateFromServer(int word_id, int learn, String word, String updatedAt, String syncedAt) async {
     try {
       final db = await dbHelper.database;
       await db.insert(
         'progress',
         {
-          'word_id': wordId,
+          'word_id': word_id,
           'word': word,
           'learn': learn,
           'updated_at': updatedAt,
@@ -122,11 +122,11 @@ class ProgressDao {
     }
   }
 
-  Future<bool> exists(int wordId) async {
+  Future<bool> exists(int word_id) async {
     try {
       final db = await dbHelper.database;
       final count = Sqflite.firstIntValue(
-        await db.rawQuery('SELECT COUNT(*) FROM progress WHERE word_id = ?', [wordId]),
+        await db.rawQuery('SELECT COUNT(*) FROM progress WHERE word_id = ?', [word_id]),
       );
       return (count ?? 0) > 0;
     } catch (e) {
