@@ -79,6 +79,8 @@ void setupDependencies() {
       wordBatchDao: sl<WordBatchDao>(),
       wordService: sl<WordService>(),
       mlKitTranslationService: sl<MlKitTranslationService>(),
+      imageDao: sl<ImageDao>(),
+      translationDao: sl<TranslationDao>(),
     ),
   );
 

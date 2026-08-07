@@ -20,12 +20,28 @@ class DatabaseService {
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, DbConst.databaseName);
-    return await openDatabase(
+    final db = await openDatabase(
       path,
       version: DbConst.version,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
+    await _cleanupOrphanedRows(db);
+    return db;
+  }
+
+  Future<void> _cleanupOrphanedRows(Database db) async {
+    await db.transaction((txn) async {
+      await txn.rawDelete(
+        'DELETE FROM Image WHERE ${ImageFields.wordId} '
+        'NOT IN (SELECT ${WordFields.id} FROM ${DBTables.word})',
+      );
+      await txn.rawDelete(
+        'DELETE FROM ${DBTables.translation} '
+        'WHERE ${TranslationFields.wordId} '
+        'NOT IN (SELECT ${WordFields.id} FROM ${DBTables.word})',
+      );
+    });
   }
 
   Future<void> _onCreate(Database db, int version) async {

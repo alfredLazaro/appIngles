@@ -12,6 +12,8 @@ import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/data/datasources/local/word_crud_dao.dart';
 import 'package:first_app/data/datasources/local/word_practice_dao.dart';
 import 'package:first_app/data/datasources/local/word_batch_dao.dart';
+import 'package:first_app/data/datasources/local/ImageDao.dart';
+import 'package:first_app/data/datasources/local/translation_dao.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
 import 'package:first_app/data/mappers/word_mapper.dart';
 import 'package:first_app/data/services/mlkit_translation_service.dart';
@@ -24,6 +26,8 @@ class WordRepositoryImpl implements WordRepository {
   final WordBatchDao _wordBatchDao;
   final WordService _wordService;
   final MlKitTranslationService _mlKitTranslationService;
+  final ImageDao _imageDao;
+  final TranslationDao _translationDao;
 
   WordRepositoryImpl({
     required WordCrudDao wordCrudDao,
@@ -31,11 +35,15 @@ class WordRepositoryImpl implements WordRepository {
     required WordBatchDao wordBatchDao,
     required WordService wordService,
     required MlKitTranslationService mlKitTranslationService,
+    required ImageDao imageDao,
+    required TranslationDao translationDao,
   })  : _wordCrudDao = wordCrudDao,
         _wordPracticeDao = wordPracticeDao,
         _wordBatchDao = wordBatchDao,
         _wordService = wordService,
-        _mlKitTranslationService = mlKitTranslationService;
+        _mlKitTranslationService = mlKitTranslationService,
+        _imageDao = imageDao,
+        _translationDao = translationDao;
 
   // ============ EXISTING METHODS ============
 
@@ -71,6 +79,8 @@ class WordRepositoryImpl implements WordRepository {
   @override
   Future<void> deleteWord(int wordId) async {
     try {
+      await _imageDao.deleteByWordId(wordId);
+      await _translationDao.deleteTranslationsByWordId(wordId);
       await _wordCrudDao.deleteWord(wordId);
     } catch (e) {
       throw Exception('Error al eliminar palabra: $e');
