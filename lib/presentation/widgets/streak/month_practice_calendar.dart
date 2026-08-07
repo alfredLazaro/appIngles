@@ -131,7 +131,7 @@ class _MonthPracticeCalendarState extends State<MonthPracticeCalendar> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _legendDot(scheme.primary),
+        _legendDot(Colors.green),
         const SizedBox(width: 4),
         const Text('Practicado', style: TextStyle(fontSize: 12)),
         const SizedBox(width: 16),
@@ -177,8 +177,8 @@ class _DayCell extends StatelessWidget {
         margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: practiced ? scheme.primary : null,
-          border: isToday && !practiced
+          color: practiced ? Colors.green : null,
+          border: isToday
               ? Border.all(color: scheme.outline, width: 1.5)
               : null,
         ),
@@ -189,7 +189,7 @@ class _DayCell extends StatelessWidget {
             fontSize: 13,
             fontWeight: isToday || practiced ? FontWeight.bold : FontWeight.normal,
             color: practiced
-                ? scheme.onPrimary
+                ? Colors.white
                 : isFuture
                     ? scheme.outlineVariant
                     : scheme.onSurface,
