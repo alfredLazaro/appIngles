@@ -330,7 +330,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
     // Create a TextEditingController for the input field
     final TextEditingController limitController = TextEditingController();
 
-    await showDialog(
+    final int? limit = await showDialog<int>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Cargar palabras recientes'),
@@ -359,25 +359,21 @@ class _WordLearningPageState extends State<WordLearningPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              limitController.dispose();
-              Navigator.pop(dialogContext);
-            },
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () {
               final input = limitController.text.trim();
 
-              int limit = AppLayout.defaultWordLoadLimit;
+              int value = AppLayout.defaultWordLoadLimit;
               if (input.isNotEmpty) {
-                limit = int.tryParse(input) ?? AppLayout.defaultWordLoadLimit;
+                value = int.tryParse(input) ?? AppLayout.defaultWordLoadLimit;
 
-                if (limit <= 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                if (value <= 0) {
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
                     const SnackBar(
-                      content:
-                          Text('Por favor ingresa un número válido mayor a 0'),
+                      content: Text('Por favor ingresa un número válido mayor a 0'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -385,19 +381,22 @@ class _WordLearningPageState extends State<WordLearningPage> {
                 }
               }
 
-              limitController.dispose();
-              Navigator.pop(dialogContext);
-
-              context.read<WordLearningBloc>().add(
-                    FetchWordsEvent(limit),
-                  );
-              _showSuccessMessage(limit);
+              Navigator.pop(dialogContext, value);
             },
             child: const Text('Cargar'),
           ),
         ],
       ),
     );
+
+    limitController.dispose();
+
+    if (!mounted || limit == null) return;
+
+    context.read<WordLearningBloc>().add(
+      FetchWordsEvent(limit),
+    );
+    _showSuccessMessage(limit);
   }
 
   void _showSuccessMessage(int? limit) {
@@ -417,7 +416,7 @@ class _WordLearningPageState extends State<WordLearningPage> {
     // Create a TextEditingController for the input field
     final TextEditingController limitController = TextEditingController();
 
-    await showDialog(
+    final int? limit = await showDialog<int>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Obtener imágenes recientes'),
@@ -446,25 +445,21 @@ class _WordLearningPageState extends State<WordLearningPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              limitController.dispose();
-              Navigator.pop(dialogContext);
-            },
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () async {
+            onPressed: () {
               final input = limitController.text.trim();
 
-              int limit = AppLayout.defaultWordLoadLimit;
+              int value = AppLayout.defaultWordLoadLimit;
               if (input.isNotEmpty) {
-                limit = int.tryParse(input) ?? AppLayout.defaultWordLoadLimit;
+                value = int.tryParse(input) ?? AppLayout.defaultWordLoadLimit;
 
-                if (limit <= 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                if (value <= 0) {
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
                     const SnackBar(
-                      content:
-                          Text('Por favor ingresa un número válido mayor a 0'),
+                      content: Text('Por favor ingresa un número válido mayor a 0'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -472,16 +467,19 @@ class _WordLearningPageState extends State<WordLearningPage> {
                 }
               }
 
-              limitController.dispose();
-              Navigator.pop(dialogContext);
-
-              await _copyLastImages(limit);
+              Navigator.pop(dialogContext, value);
             },
             child: const Text('Obtener'),
           ),
         ],
       ),
     );
+
+    limitController.dispose();
+
+    if (!mounted || limit == null) return;
+
+    await _copyLastImages(limit);
   }
 
   Future<void> _copyLastImages(int limit) async {
