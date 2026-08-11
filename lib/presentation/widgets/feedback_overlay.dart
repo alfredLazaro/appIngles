@@ -12,7 +12,7 @@ class FeedbackOverlay extends StatefulWidget {
     super.key,
     required this.text,
     required this.isCorrect,
-    this.displayDuration = const Duration(seconds: 2),
+    this.displayDuration = const Duration(seconds: 1),
     this.fadeDuration = AppDurations.matchingFade,
     required this.onDismiss,
   });
@@ -49,11 +49,11 @@ class _FeedbackOverlayState extends State<FeedbackOverlay> {
         duration: widget.fadeDuration,
         child: Container(
           width: 170,
-          height: 170,
+          height: 130,
           decoration: BoxDecoration(
             color: widget.isCorrect
-                ? AppColors.successLight.withValues(alpha: 0.9)
-                : AppColors.errorLight.withValues(alpha: 0.9),
+                ? AppColors.successLight.withValues(alpha: 0.5)
+                : AppColors.errorLight.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
