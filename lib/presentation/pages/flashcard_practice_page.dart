@@ -6,7 +6,7 @@ import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/bloc/practice/practice_event.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
-import 'package:first_app/presentation/widgets/feedback_overlay.dart';
+import 'package:first_app/presentation/widgets/dialogs/feedback_overlay.dart';
 import 'package:first_app/presentation/widgets/practice_results_widget.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';

@@ -59,7 +59,7 @@ class PracticeResultsWidget extends StatelessWidget {
           children: [
             Icon(
               Icons.emoji_events,
-              size: 80,
+              size: 60,
               color: isPerfect ? Colors.amber : Colors.grey,
             ),
             const SizedBox(height: 24),
