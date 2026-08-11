@@ -9,7 +9,7 @@ import 'package:first_app/presentation/bloc/word_detail/word_detail_bloc.dart';
 import 'package:first_app/presentation/bloc/word_detail/word_detail_event.dart';
 import 'package:first_app/presentation/bloc/word_detail/word_detail_state.dart';
 import 'package:first_app/presentation/widgets/dialogs/delete_confirmation_dialog.dart';
-import 'package:first_app/presentation/widgets/author_info_button.dart';
+import 'package:first_app/presentation/widgets/flashcard/author_info_button.dart';
 import 'package:first_app/presentation/widgets/learn_progress_indicator.dart';
 import 'package:first_app/presentation/widgets/modals/image_search_dialog.dart';
 import 'package:first_app/presentation/widgets/translation_section.dart';

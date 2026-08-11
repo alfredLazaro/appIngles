@@ -11,7 +11,7 @@ import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dar
 import 'package:first_app/presentation/bloc/word_list/word_list_bloc.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
 import 'package:first_app/presentation/pages/auth_page.dart';
-import 'package:first_app/presentation/widgets/auth_gate.dart';
+import 'package:first_app/presentation/widgets/auth/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

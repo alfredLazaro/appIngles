@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/flashcard_image.dart';
-import 'package:first_app/presentation/widgets/author_info_button.dart';
+import 'package:first_app/presentation/widgets/flashcard/author_info_button.dart';
 
 class FlashcardImageWidget extends StatelessWidget {
   final List<FlashcardImage> images;
