@@ -3,7 +3,7 @@ import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/domain/entities/image_search_result.dart';
 import 'package:first_app/domain/usecases/image/search_images.dart';
-import 'package:first_app/presentation/widgets/image_selection_grid.dart';
+import 'package:first_app/presentation/widgets/modals/image_selection_grid.dart';
 
 class ImageSearchDialog extends StatefulWidget {
   final String query;

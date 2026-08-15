@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/entities/image_search_result.dart';
-import 'package:first_app/presentation/widgets/image_selection_grid.dart';
+import 'package:first_app/presentation/widgets/modals/image_selection_grid.dart';
 import 'package:logger/logger.dart';
 
 class CombinedWordDialog extends StatefulWidget {

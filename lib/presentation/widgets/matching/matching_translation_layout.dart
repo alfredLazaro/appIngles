@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/presentation/bloc/matching/matching_state.dart';
-import 'package:first_app/presentation/widgets/matching_tile.dart';
-import 'package:first_app/presentation/widgets/matching_animation_controller.dart';
+import 'package:first_app/presentation/widgets/matching/matching_tile.dart';
+import 'package:first_app/presentation/widgets/matching/matching_animation_controller.dart';
 
 class MatchingTranslationLayout extends StatelessWidget {
   final MatchingRoundReady state;
