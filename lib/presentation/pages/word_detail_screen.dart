@@ -12,7 +12,7 @@ import 'package:first_app/presentation/widgets/dialogs/delete_confirmation_dialo
 import 'package:first_app/presentation/widgets/flashcard/author_info_button.dart';
 import 'package:first_app/presentation/widgets/learn_progress_indicator.dart';
 import 'package:first_app/presentation/widgets/modals/image_search_dialog.dart';
-import 'package:first_app/presentation/widgets/translation_section.dart';
+import 'package:first_app/presentation/widgets/translation/translation_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

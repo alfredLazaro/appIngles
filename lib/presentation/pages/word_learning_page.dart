@@ -15,7 +15,7 @@ import 'package:first_app/core/utils/clipboard_helper.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
 import 'package:first_app/presentation/bloc/auth/auth_bloc.dart';
 import 'package:first_app/presentation/bloc/auth/auth_state.dart';
-import 'package:first_app/presentation/widgets/app_drawer.dart';
+import 'package:first_app/presentation/widgets/auth/app_drawer.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_bloc.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_event.dart';
 import 'package:first_app/presentation/bloc/word_learning/word_learning_state.dart';

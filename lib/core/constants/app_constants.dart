@@ -53,7 +53,7 @@ class AppLayout {
   static const int defaultWordLoadLimit = 9;
   static const int maxPracticeSelection = 30;
   static const int defaultPracticeCount = 10;
-  static const List<int> practiceQuickSelect = [10, 15, 30, 50];
+  static const List<int> practiceQuickSelect = [10, 15, 30];
   static const List<int> audioPlayOptions = [0, 1, 3, -1];
   static const int defaultAudioPlays = 1;
 

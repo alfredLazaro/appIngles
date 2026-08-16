@@ -8,7 +8,7 @@ import 'package:first_app/presentation/bloc/word_list/word_list_event.dart';
 import 'package:first_app/presentation/bloc/word_list/word_list_state.dart';
 import 'package:first_app/presentation/widgets/ListaCards.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
-import 'package:first_app/presentation/widgets/app_drawer.dart';
+import 'package:first_app/presentation/widgets/auth/app_drawer.dart';
 
 class WordListPage extends StatelessWidget {
   const WordListPage({super.key});

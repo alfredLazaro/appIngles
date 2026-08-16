@@ -166,7 +166,6 @@ class _PracticeSelectionModalState extends State<PracticeSelectionModal> {
                     if (widget.totalWords >= AppLayout.practiceQuickSelect[0]) _buildQuickButton(AppLayout.practiceQuickSelect[0]),
                     if (widget.totalWords >= AppLayout.practiceQuickSelect[1]) _buildQuickButton(AppLayout.practiceQuickSelect[1]),
                     if (widget.totalWords >= AppLayout.practiceQuickSelect[2]) _buildQuickButton(AppLayout.practiceQuickSelect[2]),
-                    if (widget.totalWords >= AppLayout.practiceQuickSelect[3]) _buildQuickButton(AppLayout.practiceQuickSelect[3]),
                   ],
                 ),
                 const SizedBox(height: 24),
