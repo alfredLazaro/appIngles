@@ -6,13 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/constants/app_constants.dart';
 
 class TranslationTextInputWidget extends StatefulWidget {
-  final int word_id;
+  final int wordId;
   final VoidCallback? onTranslationsAdded;
   final bool showExamples;
 
   const TranslationTextInputWidget({
     super.key,
-    required this.word_id,
+    required this.wordId,
     this.onTranslationsAdded,
     this.showExamples = true,
   });
@@ -246,7 +246,7 @@ class _TranslationTextInputWidgetState
     // Dispatch event to BLoC
     context.read<TranslationBloc>().add(
           AddBulkTranslationsEvent(
-            word_id: widget.word_id,
+            wordId: widget.wordId,
             translations: translations,
           ),
         );

@@ -113,7 +113,7 @@ class _TranslationBulkInsertDialogState
     // Get bloc from widget or context
     final bloc = widget.bloc ?? context.read<TranslationBloc>();
     bloc.add(AddBulkTranslationsEvent(
-      word_id: widget.word_id,
+      wordId: widget.word_id,
       translations: translations,
     ));
   }
@@ -338,7 +338,7 @@ class _TranslationBulkInsertWidgetState
     }
 
     context.read<TranslationBloc>().add(AddBulkTranslationsEvent(
-          word_id: widget.word_id,
+          wordId: widget.word_id,
           translations: translations,
         ));
   }

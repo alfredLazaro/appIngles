@@ -8,7 +8,6 @@ import 'package:first_app/data/datasources/local/daily_activity_dao.dart';
 import 'package:first_app/data/datasources/local/DataBaseHelper.dart';
 import 'package:first_app/data/datasources/remote/progress_service.dart';
 import 'package:first_app/data/models/image_model.dart';
-import 'package:first_app/data/models/outbox_event_model.dart';
 import 'package:first_app/domain/entities/outbox_event.dart';
 import 'package:first_app/domain/repositories/sync_repository.dart';
 import 'package:sqflite/sqflite.dart';
