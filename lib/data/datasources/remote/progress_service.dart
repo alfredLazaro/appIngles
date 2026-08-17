@@ -44,6 +44,25 @@ class ProgressService {
     );
     return response.data as List<dynamic>;
   }
+
+  Future<void> pushDailyActivity(
+    List<Map<String, dynamic>> batch,
+    String token,
+  ) async {
+    await _dio.put(
+      '/daily-activity',
+      data: batch,
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+  }
+
+  Future<List<dynamic>> pullDailyActivity(String token) async {
+    final response = await _dio.get(
+      '/daily-activity',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    return response.data as List<dynamic>;
+  }
   //solo para admin por si crece la lista de palabras en el futuro 
   Future<List<dynamic>> getAllWords(String token) async {
     final response = await _dio.get(

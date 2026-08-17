@@ -65,7 +65,8 @@ void setupDependencies() {
   sl.registerLazySingleton<ProgressDao>(() => ProgressDao());
   sl.registerLazySingleton<OutboxDao>(() => OutboxDao());
   sl.registerLazySingleton<UserDao>(() => UserDao());
-  sl.registerLazySingleton<DailyActivityDao>(() => DailyActivityDao());
+  sl.registerLazySingleton<DailyActivityDao>(
+      () => DailyActivityDao(outboxDao: sl<OutboxDao>()));
 
   sl.registerLazySingleton<WordService>(() => WordService());
   sl.registerLazySingleton<ImageService>(() => ImageService());
@@ -130,6 +131,7 @@ void setupDependencies() {
       progressService: sl<ProgressService>(),
       imageDao: sl<ImageDao>(),
       translationDao: sl<TranslationDao>(),
+      dailyActivityDao: sl<DailyActivityDao>(),
     ),
   );
 

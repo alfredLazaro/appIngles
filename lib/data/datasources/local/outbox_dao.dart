@@ -37,6 +37,22 @@ class OutboxDao {
     }
   }
 
+  Future<List<OutboxEventModel>> selectByIds(List<int> ids) async {
+    try {
+      if (ids.isEmpty) return [];
+      final db = await dbHelper.database;
+      final placeholders = ids.map((_) => '?').join(',');
+      final rows = await db.rawQuery(
+        'SELECT * FROM outbox WHERE id IN ($placeholders)',
+        ids,
+      );
+      return rows.map((r) => OutboxEventModel.fromMap(r)).toList();
+    } catch (e) {
+      debugPrint('❌ OutboxDao.selectByIds error: $e');
+      return [];
+    }
+  }
+
   Future<void> markInFlight(List<int> ids) async {
     try {
       final db = await dbHelper.database;
@@ -99,7 +115,7 @@ class OutboxDao {
 
   /// Encola o colapsa (si ya existe un pending para la misma entidad)
   Future<void> enqueueInTransaction(
-    Database txn,
+    DatabaseExecutor txn,
     String entityType,
     int entityId,
     Map<String, dynamic> payload,

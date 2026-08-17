@@ -4,20 +4,26 @@ import 'package:first_app/data/datasources/local/user_dao.dart';
 import 'package:first_app/data/datasources/local/progress_dao.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/datasources/local/translation_dao.dart';
+import 'package:first_app/data/datasources/local/daily_activity_dao.dart';
 import 'package:first_app/data/datasources/local/DataBaseHelper.dart';
 import 'package:first_app/data/datasources/remote/progress_service.dart';
 import 'package:first_app/data/models/image_model.dart';
+import 'package:first_app/data/models/outbox_event_model.dart';
 import 'package:first_app/domain/entities/outbox_event.dart';
 import 'package:first_app/domain/repositories/sync_repository.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SyncRepositoryImpl implements SyncRepository {
+  static const String _activityEntityType = 'daily_activity';
+
   final OutboxDao _outboxDao;
   final UserDao _userDao;
   final ProgressDao _progressDao;
   final ProgressService _progressService;
   final ImageDao _imageDao;
   final TranslationDao _translationDao;
+  final DailyActivityDao _dailyActivityDao;
+
   SyncRepositoryImpl({
     required OutboxDao outboxDao,
     required UserDao userDao,
@@ -25,12 +31,14 @@ class SyncRepositoryImpl implements SyncRepository {
     required ProgressService progressService,
     required ImageDao imageDao,
     required TranslationDao translationDao,
+    required DailyActivityDao dailyActivityDao,
   })  : _outboxDao = outboxDao,
         _userDao = userDao,
         _progressDao = progressDao,
         _progressService = progressService,
         _imageDao = imageDao,
-        _translationDao = translationDao;
+        _translationDao = translationDao,
+        _dailyActivityDao = dailyActivityDao;
 
   @override
   Future<int> countPending() => _outboxDao.countPending();
@@ -79,34 +87,89 @@ class SyncRepositoryImpl implements SyncRepository {
         return false;
       }
 
-      final batch = rows.map((r) {
-        final payload = r.payloadAsMap;
-        return {
-          'word_id': r.entityId,
-          'word': payload['word'] ?? '',
-          'learn': payload['learn'],
-          'updated_at': payload['updated_at'],
-        };
-      }).toList();
+      final progressIds = <int>[];
+      final progressBatch = <Map<String, dynamic>>[];
+      final activityIds = <int>[];
+      final activityBatch = <Map<String, dynamic>>[];
 
-      try {
-        await _progressService.pushProgress(batch, token);
-        await _outboxDao.deleteByIds(ids);
+      for (final r in rows) {
+        final payload = r.payloadAsMap;
+        if (r.entityType == _activityEntityType) {
+          activityIds.add(r.id!);
+          activityBatch.add({
+            'user_id': payload['user_id'],
+            'date': payload['date'],
+          });
+        } else {
+          progressIds.add(r.id!);
+          progressBatch.add({
+            'word_id': r.entityId,
+            'word': payload['word'] ?? '',
+            'learn': payload['learn'],
+            'updated_at': payload['updated_at'],
+          });
+        }
+      }
+
+      var allOk = true;
+
+      if (progressBatch.isNotEmpty) {
+        allOk = await _pushProgress(progressIds, progressBatch, token) && allOk;
+      }
+
+      if (activityBatch.isNotEmpty) {
+        allOk = await _pushDailyActivity(activityIds, activityBatch, token) && allOk;
+      }
+
+      if (allOk) {
         await _setLastSyncTime(DateTime.now());
         await pullAndReconcile();
-        return true;
-      } catch (e) {
-        final attempt = rows.first.attempts + 1;
-        if (attempt >= rows.first.maxAttempts) {
-          await _outboxDao.markFailed(ids);
-        } else {
-          await _outboxDao.markForRetry(ids, attempt, _calcBackoff(attempt));
-        }
-        return false;
       }
+      return allOk;
     } catch (e) {
       debugPrint('❌ SyncRepositoryImpl.sync error: $e');
       return false;
+    }
+  }
+
+  Future<bool> _pushProgress(
+    List<int> ids,
+    List<Map<String, dynamic>> batch,
+    String token,
+  ) async {
+    try {
+      await _progressService.pushProgress(batch, token);
+      await _outboxDao.deleteByIds(ids);
+      return true;
+    } catch (e) {
+      await _markForRetryOrFail(ids);
+      return false;
+    }
+  }
+
+  Future<bool> _pushDailyActivity(
+    List<int> ids,
+    List<Map<String, dynamic>> batch,
+    String token,
+  ) async {
+    try {
+      await _progressService.pushDailyActivity(batch, token);
+      await _outboxDao.deleteByIds(ids);
+      return true;
+    } catch (e) {
+      await _markForRetryOrFail(ids);
+      return false;
+    }
+  }
+
+  Future<void> _markForRetryOrFail(List<int> ids) async {
+    final rows = await _outboxDao.selectByIds(ids);
+    if (rows.isEmpty) return;
+    final attempt = rows.first.attempts + 1;
+    if (attempt >= rows.first.maxAttempts) {
+      await _outboxDao.markFailed(ids);
+    } else {
+      await _outboxDao.markForRetry(ids, attempt, _calcBackoff(attempt));
     }
   }
 
@@ -144,8 +207,33 @@ class SyncRepositoryImpl implements SyncRepository {
           }
         }
       }
+
+      await _pullAndMergeDailyActivity(token, userId);
     } catch (e) {
       debugPrint('❌ SyncRepositoryImpl.pullAndReconcile error: $e');
+    }
+  }
+
+  Future<void> _pullAndMergeDailyActivity(String token, int userId) async {
+    try {
+      final activities = await _progressService.pullDailyActivity(token);
+      if (activities.isEmpty) return;
+      final dates = <DateTime>{};
+      for (final item in activities) {
+        final date = item['date'] as String?;
+        if (date == null || date.length < 10) continue;
+        final parts = date.split('-');
+        dates.add(DateTime(
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+          int.parse(parts[2]),
+        ));
+      }
+      if (dates.isNotEmpty) {
+        await _dailyActivityDao.mergeDates(userId, dates);
+      }
+    } catch (e) {
+      debugPrint('❌ SyncRepositoryImpl._pullAndMergeDailyActivity error: $e');
     }
   }
 

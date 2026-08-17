@@ -39,6 +39,7 @@ Extra: `lib/docs/` holds markdown notes (`app-constants.md`, `refactor-results.m
 - 8 tables: `Word`, `Image`, `Translation`, `progress`, `outbox`, `users`, `app_preferences`, `daily_activity` with foreign keys (CASCADE deletes)
 - Singleton `DatabaseService` in `lib/data/datasources/local/DataBaseHelper.dart`; constants (name/version/columns) in `lib/data/datasources/local/db_constants.dart`
 - Streak/practice days come from `daily_activity` (user_id + date), written when a practice finishes; `progress.updated_at` is NOT used for streaks.
+- `daily_activity` syncs via outbox like `progress`: enqueued in `DailyActivityDao.record()` (`entity_type='daily_activity'`, `entity_id` = days-since-epoch, payload `{user_id, date}`) and dispatched in `SyncRepositoryImpl.sync()`. Contract (server not in this repo): `PUT /daily-activity` body `[{user_id, date}]` and `GET /daily-activity` returning the user's activity dates; `pullAndReconcile()` merges them locally via `mergeDates`.
 
 ## External APIs
 
