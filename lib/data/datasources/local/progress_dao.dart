@@ -103,25 +103,6 @@ class ProgressDao {
     }
   }
 
-  Future<Set<DateTime>> getPracticeDates() async {
-    try {
-      final db = await dbHelper.database;
-      final rows = await db.rawQuery(
-          "SELECT DISTINCT date(updated_at) AS d FROM progress WHERE updated_at IS NOT NULL");
-      return rows.map((r) {
-        final parts = (r['d'] as String).split('-');
-        return DateTime(
-          int.parse(parts[0]),
-          int.parse(parts[1]),
-          int.parse(parts[2]),
-        );
-      }).toSet();
-    } catch (e) {
-      debugPrint('❌ ProgressDao.getPracticeDates error: $e');
-      return {};
-    }
-  }
-
   Future<bool> exists(int word_id) async {
     try {
       final db = await dbHelper.database;

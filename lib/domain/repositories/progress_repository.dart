@@ -8,4 +8,5 @@ abstract class ProgressRepository {
   Future<List<Progress>> getAll();
   Future<List<Progress>> getWithLearnGreaterThanZero();
   Future<Set<DateTime>> getPracticeDates();
+  Future<void> recordPracticeActivity();
 }

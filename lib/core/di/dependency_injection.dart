@@ -10,6 +10,7 @@ import 'package:first_app/data/datasources/local/translation_dao.dart';
 import 'package:first_app/data/datasources/local/progress_dao.dart';
 import 'package:first_app/data/datasources/local/outbox_dao.dart';
 import 'package:first_app/data/datasources/local/user_dao.dart';
+import 'package:first_app/data/datasources/local/daily_activity_dao.dart';
 import 'package:first_app/data/datasources/remote/datamuse_service.dart';
 import 'package:first_app/data/datasources/remote/dictionary_service.dart';
 import 'package:first_app/data/datasources/remote/pexels_service.dart';
@@ -64,6 +65,7 @@ void setupDependencies() {
   sl.registerLazySingleton<ProgressDao>(() => ProgressDao());
   sl.registerLazySingleton<OutboxDao>(() => OutboxDao());
   sl.registerLazySingleton<UserDao>(() => UserDao());
+  sl.registerLazySingleton<DailyActivityDao>(() => DailyActivityDao());
 
   sl.registerLazySingleton<WordService>(() => WordService());
   sl.registerLazySingleton<ImageService>(() => ImageService());
@@ -109,6 +111,8 @@ void setupDependencies() {
       progressDao: sl<ProgressDao>(),
       wordBatchDao: sl<WordBatchDao>(),
       wordPracticeDao: sl<WordPracticeDao>(),
+      dailyActivityDao: sl<DailyActivityDao>(),
+      userDao: sl<UserDao>(),
     ),
   );
 

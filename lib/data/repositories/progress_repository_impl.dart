@@ -2,6 +2,8 @@ import 'package:first_app/data/datasources/local/progress_dao.dart';
 import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/local/word_practice_dao.dart';
 import 'package:first_app/data/datasources/local/DataBaseHelper.dart';
+import 'package:first_app/data/datasources/local/daily_activity_dao.dart';
+import 'package:first_app/data/datasources/local/user_dao.dart';
 import 'package:first_app/domain/entities/progress.dart';
 import 'package:first_app/domain/repositories/progress_repository.dart';
 
@@ -9,14 +11,20 @@ class ProgressRepositoryImpl implements ProgressRepository {
   final ProgressDao _progressDao;
   final WordBatchDao _wordBatchDao;
   final WordPracticeDao _wordPracticeDao;
+  final DailyActivityDao _dailyActivityDao;
+  final UserDao _userDao;
 
   ProgressRepositoryImpl({
     required ProgressDao progressDao,
     required WordBatchDao wordBatchDao,
     required WordPracticeDao wordPracticeDao,
+    required DailyActivityDao dailyActivityDao,
+    required UserDao userDao,
   })  : _progressDao = progressDao,
         _wordBatchDao = wordBatchDao,
-        _wordPracticeDao = wordPracticeDao;
+        _wordPracticeDao = wordPracticeDao,
+        _dailyActivityDao = dailyActivityDao,
+        _userDao = userDao;
 
   @override
   Future<Map<int, int>> getAllLearnCounts() async {
@@ -80,6 +88,19 @@ class ProgressRepositoryImpl implements ProgressRepository {
 
   @override
   Future<Set<DateTime>> getPracticeDates() async {
-    return await _progressDao.getPracticeDates();
+    final userId = await _userDao.getUserId();
+    if (userId == null) return {};
+    return await _dailyActivityDao.getPracticeDates(userId);
+  }
+
+  @override
+  Future<void> recordPracticeActivity() async {
+    final userId = await _userDao.getUserId();
+    if (userId == null) return;
+    final now = DateTime.now();
+    final date = '${now.year.toString().padLeft(4, '0')}-'
+        '${now.month.toString().padLeft(2, '0')}-'
+        '${now.day.toString().padLeft(2, '0')}';
+    await _dailyActivityDao.record(userId, date);
   }
 }

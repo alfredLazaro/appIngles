@@ -6,6 +6,7 @@ import 'package:first_app/domain/entities/match_round.dart';
 import 'package:first_app/domain/repositories/word_repository.dart';
 import 'package:first_app/domain/repositories/image_repository.dart';
 import 'package:first_app/domain/repositories/translation_repository.dart';
+import 'package:first_app/domain/repositories/progress_repository.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:logger/logger.dart';
@@ -16,6 +17,7 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
   final WordRepository _wordRepository;
   final ImageRepository _imageRepository;
   final TranslationRepository _translationRepository;
+  final ProgressRepository _progressRepository;
   final SyncService? _syncService;
   final ConnectivityService _connectivityService;
 
@@ -23,11 +25,13 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     required WordRepository wordRepository,
     required ImageRepository imageRepository,
     required TranslationRepository translationRepository,
+    required ProgressRepository progressRepository,
     required ConnectivityService connectivityService,
     SyncService? syncService,
   })  : _wordRepository = wordRepository,
         _imageRepository = imageRepository,
         _translationRepository = translationRepository,
+        _progressRepository = progressRepository,
         _connectivityService = connectivityService,
         _syncService = syncService,
         super(PracticeInitial()) {
@@ -203,6 +207,7 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
     try {
       await _wordRepository
           .batchUpdateLearnCounts(event.result.learnCountUpdates);
+      await _progressRepository.recordPracticeActivity();
       _syncService?.onPracticeCompleted();
       emit(PracticeCompleted(event.result));
     } catch (e) {

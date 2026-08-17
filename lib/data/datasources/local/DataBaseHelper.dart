@@ -128,9 +128,24 @@ class DatabaseService {
         value TEXT NOT NULL
       )
     ''');
+    await _createDailyActivityTable(db);
   }
 
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {}
+  Future<void> _createDailyActivityTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS ${DBTables.daily_activity}(
+        ${DailyActivityFields.user_id} INTEGER NOT NULL,
+        ${DailyActivityFields.date} TEXT NOT NULL,
+        PRIMARY KEY (${DailyActivityFields.user_id}, ${DailyActivityFields.date}  )
+      )
+    ''');
+  }
+  
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 3) {
+      await _createDailyActivityTable(db);
+    }
+  }
 
   Future<void> close() async {
     final db = await _instance.database;

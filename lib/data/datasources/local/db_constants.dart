@@ -1,6 +1,6 @@
 class DbConst {
   static const String databaseName = "database.db";
-  static const int version = 2;
+  static const int version = 3;
 }
 
 class DBTables {
@@ -10,6 +10,7 @@ class DBTables {
   static const String progress = 'progress';
   static const String outbox = 'outbox';
   static const String users = 'users';
+  static const String daily_activity = 'daily_activity';
 }
 
 class WordFields {
@@ -70,4 +71,8 @@ class UserFields {
   static const String token = 'token';
   static const String createdAt = 'created_at';
   static const String updatedAt = 'updated_at';
+}
+class DailyActivityFields {
+  static const String user_id = 'user_id';
+  static const String date = 'date';
 }
