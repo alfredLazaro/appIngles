@@ -178,7 +178,6 @@ class _ListaCardsState extends State<ListaCards> {
               ],
             );
           }
-
           return const SizedBox.shrink();
         },
       ),
