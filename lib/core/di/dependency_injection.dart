@@ -203,7 +203,9 @@ void setupDependencies() {
 
   // === Services ===
   sl.registerLazySingleton<ConnectivityService>(() => ConnectivityService());
-  sl.registerLazySingleton<ITtsService>(() => FallbackTtsService());
+  sl.registerLazySingleton<ITtsService>(
+    () => FallbackTtsService(connectivity: sl<ConnectivityService>()),
+  );
   sl.registerLazySingleton<ISpeechToTextService>(() => SpeechToTextService());
 
   // === Use cases (shared) ===

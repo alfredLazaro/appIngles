@@ -1,4 +1,5 @@
 
+import 'package:first_app/core/services/connectivity_service.dart';
 import 'package:first_app/core/services/edge_tts_service.dart';
 import 'package:first_app/core/services/tts_service.dart';
 import 'package:first_app/domain/services/tts_service_interface.dart';
@@ -8,14 +9,21 @@ class FallbackTtsService implements ITtsService {
   FallbackTtsService({
     ITtsService? primary,
     ITtsService? fallback,
+    ConnectivityService? connectivity,
+    this.primaryTimeout = const Duration(milliseconds: 1800),
     this.retryAfter = const Duration(seconds: 30),
   })  : _primary = primary ?? EdgeTtsService(),
-        _fallback = fallback ?? TtsService();
+        _fallback = fallback ?? TtsService(),
+        _connectivity = connectivity;
 
   final Logger _logger = Logger();
   final ITtsService _primary;
   final ITtsService _fallback;
+  final ConnectivityService? _connectivity;
+  final Duration primaryTimeout;
   final Duration retryAfter;
+
+  static const _probeTimeout = Duration(seconds: 1);
 
   DateTime? _primaryDownSince;
   bool _usingFallback = false;
@@ -24,6 +32,14 @@ class FallbackTtsService implements ITtsService {
     final downSince = _primaryDownSince;
     return downSince != null &&
         DateTime.now().difference(downSince) < retryAfter;
+  }
+
+  Future<bool> get _isOnline async {
+    final connectivity = _connectivity;
+    if (connectivity == null) return true;
+    return connectivity
+        .hasInternet()
+        .timeout(_probeTimeout, onTimeout: () => true);
   }
 
   @override
@@ -52,10 +68,16 @@ class FallbackTtsService implements ITtsService {
     final clean = text.trim();
     if (clean.isEmpty) return;
 
-    if (!_shouldSkipPrimary) {
+    var skipPrimary = _shouldSkipPrimary;
+    if (!skipPrimary && !await _isOnline) {
+      _primaryDownSince = DateTime.now();
+      skipPrimary = true;
+    }
+
+    if (!skipPrimary) {
       try {
         _logger.i('TTS -> EdgeTtsService (primario)');
-        await _primary.speak(clean).timeout(const Duration(seconds: 5));
+        await _primary.speak(clean).timeout(primaryTimeout);
         _primaryDownSince = null;
         _usingFallback = false;
         return;
