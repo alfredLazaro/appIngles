@@ -29,7 +29,7 @@ class DailyActivityDao {
 
       await db.transaction((txn) async {
         await txn.insert(
-          DBTables.daily_activity,
+          DBTables.dailyActivity,
           {
             DailyActivityFields.user_id: userId,
             DailyActivityFields.date: date,
@@ -60,7 +60,7 @@ class DailyActivityDao {
               '${d.month.toString().padLeft(2, '0')}-'
               '${d.day.toString().padLeft(2, '0')}';
           await txn.insert(
-            DBTables.daily_activity,
+            DBTables.dailyActivity,
             {
               DailyActivityFields.user_id: userId,
               DailyActivityFields.date: date,
@@ -79,7 +79,7 @@ class DailyActivityDao {
     try {
       final db = await dbHelper.database;
       final rows = await db.rawQuery(
-        'SELECT DISTINCT ${DailyActivityFields.date} FROM ${DBTables.daily_activity} '
+        'SELECT DISTINCT ${DailyActivityFields.date} FROM ${DBTables.dailyActivity} '
         'WHERE ${DailyActivityFields.user_id} = ?',
         [userId],
       );

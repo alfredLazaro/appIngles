@@ -133,7 +133,7 @@ class DatabaseService {
 
   Future<void> _createDailyActivityTable(Database db) async {
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS ${DBTables.daily_activity}(
+      CREATE TABLE IF NOT EXISTS ${DBTables.dailyActivity}(
         ${DailyActivityFields.user_id} INTEGER NOT NULL,
         ${DailyActivityFields.date} TEXT NOT NULL,
         PRIMARY KEY (${DailyActivityFields.user_id}, ${DailyActivityFields.date}  )

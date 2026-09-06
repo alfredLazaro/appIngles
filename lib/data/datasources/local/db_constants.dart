@@ -10,7 +10,7 @@ class DBTables {
   static const String progress = 'progress';
   static const String outbox = 'outbox';
   static const String users = 'users';
-  static const String daily_activity = 'daily_activity';
+  static const String dailyActivity = 'daily_activity';
 }
 
 class WordFields {
