@@ -6,8 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/constants/app_constants.dart';
 import 'package:first_app/domain/services/tts_service_interface.dart';
 import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_bloc.dart';
+import 'package:first_app/presentation/widgets/dialogs/feedback_overlay.dart';
 
-class SentenceBuilderWidget extends StatelessWidget {
+class SentenceBuilderWidget extends StatefulWidget {
   final int sentenceId;
   final String originalSentence;
   final ITtsService ttsService;
@@ -20,25 +21,24 @@ class SentenceBuilderWidget extends StatelessWidget {
   });
 
   @override
+  State<SentenceBuilderWidget> createState() => _SentenceBuilderWidgetState();
+}
+
+class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
+  bool _feedbackDismissed = false;
+
+  @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => SentencePracticeBloc()
         ..add(InitializeSentenceEvent(
-          sentenceId: sentenceId,
-          originalSentence: originalSentence,
+          sentenceId: widget.sentenceId,
+          originalSentence: widget.originalSentence,
         )),
       child: BlocConsumer<SentencePracticeBloc, SentencePracticeState>(
         listener: (context, state) {
-          if (state is SentencePracticeLoaded && state.showResult) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.isCorrect ? '¡Correcto! ✅' : 'Incorrecto ❌',
-                ),
-                backgroundColor: state.isCorrect ? Colors.green : Colors.red,
-                duration: AppDurations.snackbar,
-              ),
-            );
+          if (state is SentencePracticeLoaded && !state.showResult) {
+            _feedbackDismissed = false;
           }
         },
         builder: (context, state) {
@@ -78,6 +78,16 @@ class SentenceBuilderWidget extends StatelessWidget {
 
           // Show correct answer if wrong
           if (state.showResult && !state.isCorrect) _buildCorrectAnswer(state),
+
+          // Feedback overlay
+          if (state.showResult && !_feedbackDismissed)
+            Positioned.fill(
+              child: FeedbackOverlay(
+                text: state.isCorrect ? '¡Correcto!' : 'Incorrecto',
+                isCorrect: state.isCorrect,
+                onDismiss: () => setState(() => _feedbackDismissed = true),
+              ),
+            ),
         ],
       ),
     );
@@ -101,7 +111,7 @@ class SentenceBuilderWidget extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.volume_up, size: 28),
               color: Colors.blue,
-              onPressed: () => ttsService.speak(originalSentence),
+              onPressed: () => widget.ttsService.speak(widget.originalSentence),
             ),
           ],
         ),
