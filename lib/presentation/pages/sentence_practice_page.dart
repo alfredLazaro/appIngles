@@ -29,6 +29,7 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
   int get totalSentences => widget.sentences.length;
   int _currentIndex = 0;
   bool _isCompleted = false;
+  final Map<int, bool> _sentenceResults = {};
 
   @override
   void initState() {
@@ -49,14 +50,13 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
   @override
   Widget build(BuildContext context) {
     if (_isCompleted) {
+      final (correctCount, learnCountUpdates) = _buildResult();
       return PracticeResultsWidget(
         practiceType: PracticeType.sentence,
         totalItems: widget.sentences.length,
-        correctItems: widget.sentences.length,
+        correctItems: correctCount,
         words: _sentencesAsWords(),
-        learnCountUpdates: {
-          for (final s in widget.sentences) s.id: s.learnCount + 1,
-        },
+        learnCountUpdates: learnCountUpdates,
         onFinish: () => Navigator.pop(context),
       );
     }
@@ -103,6 +103,12 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
                         sentenceId: sentence.id,
                         originalSentence: sentence.sentence,
                         ttsService: _ttsService,
+                        onResultChanged: (id, isCorrect) {
+                          if (!mounted) return;
+                          setState(() {
+                            _sentenceResults[id] = isCorrect;
+                          });
+                        },
                       );
                     },
                   ),
@@ -136,21 +142,30 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
   }
 
   void _finishPractice() {
-    final learnCountUpdates = <int, int>{
-      for (final s in widget.sentences)
-        s.id: s.learnCount + 1,
-    };
+    final (correctCount, learnCountUpdates) = _buildResult();
     context.read<PracticeBloc>().add(
           FinishPracticeEvent(PracticeResult(
             type: PracticeType.sentence,
             learnCountUpdates: learnCountUpdates,
             totalItems: widget.sentences.length,
-            correctItems: widget.sentences.length,
+            correctItems: correctCount,
           )),
         );
     setState(() {
       _isCompleted = true;
     });
+  }
+
+  (int, Map<int, int>) _buildResult() {
+    int correctCount = 0;
+    final learnCountUpdates = <int, int>{};
+    for (final s in widget.sentences) {
+      if (_sentenceResults[s.id] ?? false) {
+        correctCount++;
+        learnCountUpdates[s.id] = s.learnCount + 1;
+      }
+    }
+    return (correctCount, learnCountUpdates);
   }
 
   List<FlashcardWord> _sentencesAsWords() {

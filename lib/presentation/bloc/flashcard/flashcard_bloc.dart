@@ -14,6 +14,8 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   List<FlashcardSession> _sessions = [];
   int _currentIndex = 0;
   final Map<int, int> _scores = {};
+  final Set<int> _touchedWordIds = {};
+  final Map<int, bool> _answerResults = {};
   Map<int, List<FlashcardImage>> _imagesMap = {};
 
   FlashcardBloc({
@@ -92,6 +94,8 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     _sessions = _generateSessions(event.words, event.batchSize);
     _currentIndex = 0;
     _scores.clear();
+    _touchedWordIds.clear();
+    _answerResults.clear();
     _imagesMap = event.imagesMap;
 
     for (final word in event.words) {
@@ -106,7 +110,11 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
 
     final nextIndex = _currentIndex + 1;
     if (nextIndex >= _sessions.length) {
-      emit(FlashcardCompleted(scores: Map.from(_scores)));
+      emit(FlashcardCompleted(
+        scores: Map.from(_scores),
+        touchedWordIds: Set.from(_touchedWordIds),
+        answerResults: Map.from(_answerResults),
+      ));
       return;
     }
 
@@ -140,6 +148,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final newCount = currentState.learnCount + increment;
 
       _scores[currentState.word.id] = newCount;
+      _touchedWordIds.add(currentState.word.id);
       emit(currentState.copyWith(
           learnCount: newCount, scores: Map.from(_scores)));
     }
@@ -155,6 +164,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
           .toInt();
 
       _scores[currentState.word.id] = newCount;
+      _touchedWordIds.add(currentState.word.id);
       emit(currentState.copyWith(
           learnCount: newCount, scores: Map.from(_scores)));
     }
@@ -165,6 +175,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final currentState = state as FlashcardLoaded;
 
       _scores[currentState.word.id] = 0;
+      _touchedWordIds.add(currentState.word.id);
       emit(currentState.copyWith(learnCount: 0, scores: Map.from(_scores)));
     }
   }
@@ -177,6 +188,9 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
           _validateWordAnswer(event.userAnswer, currentState.word.word);
 
       _speakText(currentState.word.word);
+
+      _answerResults[currentState.word.id] = isCorrect;
+      _touchedWordIds.add(currentState.word.id);
 
       if (isCorrect) {
         final newCount = currentState.learnCount + 3;
@@ -242,6 +256,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final masteryLevel = event.masteryLevel ?? 5;
 
       _scores[currentState.word.id] = masteryLevel;
+      _touchedWordIds.add(currentState.word.id);
       emit(currentState.copyWith(
           learnCount: masteryLevel, scores: Map.from(_scores)));
     }
@@ -252,6 +267,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final currentState = state as FlashcardLoaded;
 
       _scores[currentState.word.id] = 0;
+      _touchedWordIds.add(currentState.word.id);
       emit(currentState.copyWith(learnCount: 0, scores: Map.from(_scores)));
     }
   }
@@ -263,6 +279,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final newCount =
           (currentState.learnCount - 1).clamp(0, double.infinity).toInt();
       _scores[word_id] = newCount;
+      _touchedWordIds.add(word_id);
       emit(currentState.copyWith(
           learnCount: newCount,
           isAnswerRevealed: true,

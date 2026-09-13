@@ -12,12 +12,14 @@ class SentenceBuilderWidget extends StatefulWidget {
   final int sentenceId;
   final String originalSentence;
   final ITtsService ttsService;
+  final void Function(int sentenceId, bool isCorrect) onResultChanged;
 
   const SentenceBuilderWidget({
     super.key,
     required this.sentenceId,
     required this.originalSentence,
     required this.ttsService,
+    required this.onResultChanged,
   });
 
   @override
@@ -39,6 +41,9 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
         listener: (context, state) {
           if (state is SentencePracticeLoaded && !state.showResult) {
             _feedbackDismissed = false;
+          }
+          if (state is SentencePracticeLoaded && state.showResult) {
+            widget.onResultChanged(state.word_id, state.isCorrect);
           }
         },
         builder: (context, state) {

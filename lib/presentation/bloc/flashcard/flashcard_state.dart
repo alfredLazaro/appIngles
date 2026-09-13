@@ -29,11 +29,17 @@ class FlashcardInitial extends FlashcardState {
 
 class FlashcardCompleted extends FlashcardState {
   final Map<int, int> scores;
+  final Set<int> touchedWordIds;
+  final Map<int, bool> answerResults;
 
-  const FlashcardCompleted({required this.scores});
+  const FlashcardCompleted({
+    required this.scores,
+    this.touchedWordIds = const {},
+    this.answerResults = const {},
+  });
 
   @override
-  List<Object?> get props => [scores];
+  List<Object?> get props => [scores, touchedWordIds, answerResults];
 }
 
 class FlashcardLoaded extends FlashcardState {

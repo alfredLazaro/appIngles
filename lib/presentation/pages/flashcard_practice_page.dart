@@ -119,15 +119,26 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
     super.dispose();
   }
 
-  void _submitResult(Map<int, int> scores) {
+  void _submitResult(FlashcardCompleted state) {
+    final (correctCount, learnCountUpdates) = _flashcardResult(state);
     final result = PracticeResult(
       type: PracticeType.flashcard,
-      learnCountUpdates: scores,
+      learnCountUpdates: learnCountUpdates,
       totalItems: widget.words.length,
-      correctItems: scores.values.where((s) => s > 0).length,
+      correctItems: correctCount,
     );
 
     context.read<PracticeBloc>().add(FinishPracticeEvent(result));
+  }
+
+  (int, Map<int, int>) _flashcardResult(FlashcardCompleted state) {
+    final learnCountUpdates = <int, int>{};
+    for (final id in state.touchedWordIds) {
+      final score = state.scores[id];
+      if (score != null) learnCountUpdates[id] = score;
+    }
+    final correctCount = state.answerResults.values.where((v) => v).length;
+    return (correctCount, learnCountUpdates);
   }
 
   Color _getModeColor(FlashcardMode mode) {
@@ -161,7 +172,7 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
       child: BlocConsumer<FlashcardBloc, FlashcardState>(
         listener: (context, state) {
           if (state is FlashcardCompleted) {
-            _submitResult(state.scores);
+            _submitResult(state);
           } else if (state is FlashcardLoaded &&
               state.isAnswerCorrect != _lastIsAnswerCorrect) {
             _lastIsAnswerCorrect = state.isAnswerCorrect;
@@ -172,12 +183,14 @@ class _FlashcardPracticePageState extends State<FlashcardPracticePage> {
         },
         builder: (context, state) {
           if (state is FlashcardCompleted) {
+            final (correctCount, learnCountUpdates) =
+                _flashcardResult(state);
             return PracticeResultsWidget(
               practiceType: PracticeType.flashcard,
               totalItems: widget.words.length,
-              correctItems: state.scores.values.where((s) => s > 0).length,
+              correctItems: correctCount,
               words: widget.words,
-              learnCountUpdates: state.scores,
+              learnCountUpdates: learnCountUpdates,
               onFinish: () => Navigator.pop(context),
               accentColor: Theme.of(context).colorScheme.secondary,
             );
