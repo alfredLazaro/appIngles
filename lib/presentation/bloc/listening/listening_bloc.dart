@@ -12,6 +12,8 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
   List<FlashcardWord> _words = [];
   final Map<int, int> _scores = {};
   int _currentIndex = 0;
+  int _maxAudioPlays = 0;
+  int _audioPlayedCount = 0;
 
   ListeningBloc({
     required ValidateWordAnswer validateWordAnswer,
@@ -28,7 +30,12 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
     on<FinishListening>(_onFinish);
   }
 
-  ListeningLoaded _buildLoaded(int index, {String userAnswer = '', bool? isCorrect, bool hasSubmitted = false}) {
+  ListeningLoaded _buildLoaded(
+    int index, {
+    String userAnswer = '',
+    bool? isCorrect,
+    bool hasSubmitted = false,
+  }) {
     final word = _words[index];
     return ListeningLoaded(
       words: _words,
@@ -39,18 +46,17 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
       learnCount: _scores[word.id] ?? word.learnCount,
       scores: Map.from(_scores),
       maxAudioPlays: _maxAudioPlays,
-      audioPlayedCount: 0,
+      audioPlayedCount: _audioPlayedCount,
       hasSubmitted: hasSubmitted,
     );
   }
-
-  int _maxAudioPlays = 0;
 
   void _onInitialize(InitializeListening event, Emitter<ListeningState> emit) {
     _words = event.words;
     _currentIndex = 0;
     _scores.clear();
     _maxAudioPlays = event.maxAudioPlays;
+    _audioPlayedCount = 0;
 
     for (final word in _words) {
       _scores[word.id] = word.learnCount;
@@ -75,7 +81,12 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
     final state = this.state;
     if (state is! ListeningLoaded) return;
 
+    if (_maxAudioPlays > 0 && _audioPlayedCount >= _maxAudioPlays) return;
+
     _speakText(state.currentWord.word);
+    _audioPlayedCount += 1;
+
+    emit(state.copyWith(audioPlayedCount: _audioPlayedCount));
   }
 
   void _onSubmitAnswer(
@@ -86,18 +97,19 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
     if (state is! ListeningLoaded || state.hasSubmitted) return;
 
     final isCorrect = _validateWordAnswer(event.answer, state.currentWord.word);
-    final word_id = state.currentWord.id;
+    final wordId = state.currentWord.id;
 
     if (isCorrect) {
-      _scores[word_id] = (_scores[word_id] ?? 0) + 3;
+      _scores[wordId] = (_scores[wordId] ?? 0) + 3;
     } else {
-      _scores[word_id] = ((_scores[word_id] ?? 0) - 1).clamp(0, double.infinity).toInt();
+      _scores[wordId] =
+          ((_scores[wordId] ?? 0) - 1).clamp(0, double.infinity).toInt();
     }
 
     emit(state.copyWith(
       userAnswer: event.answer,
       isCorrect: isCorrect,
-      learnCount: _scores[word_id],
+      learnCount: _scores[wordId],
       scores: Map.from(_scores),
       hasSubmitted: true,
     ));
@@ -111,6 +123,7 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
     if (nextIndex >= _words.length) return;
 
     _currentIndex = nextIndex;
+    _audioPlayedCount = 0;
     emit(_buildLoaded(nextIndex));
   }
 
@@ -122,6 +135,7 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
     if (prevIndex < 0) return;
 
     _currentIndex = prevIndex;
+    _audioPlayedCount = 0;
     emit(_buildLoaded(prevIndex));
   }
 
@@ -130,8 +144,9 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
     if (state is! ListeningLoaded) return;
 
     if (!state.hasSubmitted) {
-      final word_id = state.currentWord.id;
-      _scores[word_id] = ((_scores[word_id] ?? 0) - 1).clamp(0, double.infinity).toInt();
+      final wordId = state.currentWord.id;
+      _scores[wordId] =
+          ((_scores[wordId] ?? 0) - 1).clamp(0, double.infinity).toInt();
     }
 
     final nextIndex = _currentIndex + 1;
@@ -141,6 +156,7 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
     }
 
     _currentIndex = nextIndex;
+    _audioPlayedCount = 0;
     emit(_buildLoaded(nextIndex));
   }
 
