@@ -1,3 +1,4 @@
+import 'package:first_app/domain/entities/learn_decay_candidate.dart';
 import 'package:first_app/domain/entities/progress.dart';
 
 abstract class ProgressRepository {
@@ -9,4 +10,5 @@ abstract class ProgressRepository {
   Future<List<Progress>> getWithLearnGreaterThanZero();
   Future<Set<DateTime>> getPracticeDates();
   Future<void> recordPracticeActivity();
+  Future<List<LearnDecayCandidate>> getDecayCandidates();
 }

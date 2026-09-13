@@ -105,6 +105,85 @@ class WordBatchDao {
     }
   }
 
+  /// Actualiza learn counts por decaimiento: Word + progress (sin tocar updated_at) + outbox
+  Future<void> applyDecayUpdates(Map<int, int> updates) async {
+    try {
+      final db = await dbHelper.database;
+      final now = DateTime.now().toIso8601String();
+
+      await db.transaction((txn) async {
+        for (final entry in updates.entries) {
+          final wordId = entry.key;
+          final newLearn = entry.value;
+
+          await txn.update(
+            'Word',
+            {'learn': newLearn, 'updated_at': now},
+            where: 'id = ?',
+            whereArgs: [wordId],
+          );
+
+          final wordRows = await txn.query(
+            'Word', columns: ['word'], where: 'id = ?', whereArgs: [wordId],
+          );
+          final wordText = wordRows.isNotEmpty
+              ? (wordRows.first['word'] as String)
+              : '';
+
+          final existingProgress = await txn.query(
+            'progress',
+            columns: ['updated_at'],
+            where: 'word_id = ?',
+            whereArgs: [wordId],
+          );
+          final existingUpdatedAt =
+              existingProgress.isNotEmpty ? existingProgress.first['updated_at'] as String : now;
+
+          await txn.insert(
+            'progress',
+            {'word_id': wordId, 'word': wordText, 'learn': newLearn, 'updated_at': existingUpdatedAt},
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+
+          final existingOutbox = await txn.query(
+            'outbox',
+            where: "entity_type = 'progress' AND entity_id = ? AND status = 'pending'",
+            whereArgs: [wordId],
+          );
+
+          final payload = '{"word": "$wordText", "learn": $newLearn, "updated_at": "$now"}';
+
+          if (existingOutbox.isEmpty) {
+            await txn.insert('outbox', {
+              'entity_type': 'progress',
+              'entity_id': wordId,
+              'operation': 'upsert',
+              'payload': payload,
+              'status': 'pending',
+              'created_at': now,
+              'updated_at': now,
+            });
+          } else {
+            await txn.update(
+              'outbox',
+              {
+                'payload': payload,
+                'updated_at': now,
+                'attempts': 0,
+                'next_retry_at': null,
+              },
+              where: "entity_type = 'progress' AND entity_id = ? AND status = 'pending'",
+              whereArgs: [wordId],
+            );
+          }
+        }
+      });
+    } catch (e) {
+      _logError('applyDecayUpdates', e, {'updatesCount': updates.length});
+      rethrow;
+    }
+  }
+
   Future<List<Map<String, dynamic>>> getAllWordsWithImages() async {
     try {
       final db = await dbHelper.database;

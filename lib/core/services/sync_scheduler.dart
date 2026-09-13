@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:first_app/core/services/learn_decay_service.dart';
 import 'package:first_app/core/services/sync_service.dart';
 
 class SyncScheduler extends StatefulWidget {
   final Widget child;
   final SyncService syncService;
+  final LearnDecayService learnDecayService;
 
   const SyncScheduler({
     super.key,
     required this.child,
     required this.syncService,
+    required this.learnDecayService,
   });
 
   @override
@@ -21,6 +24,7 @@ class _SyncSchedulerState extends State<SyncScheduler>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    widget.learnDecayService.runCheck();
     widget.syncService.trySync();
   }
 
@@ -33,6 +37,7 @@ class _SyncSchedulerState extends State<SyncScheduler>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      widget.learnDecayService.runCheck();
       widget.syncService.onAppResumed();
     }
   }

@@ -79,6 +79,7 @@ class MatchRound extends Equatable {
                 id: wd.id,
                 word: wd.word,
                 definition: wd.definition,
+                learnCount: wd.learnCount,
                 sentence: '',
               ))
           .toList();

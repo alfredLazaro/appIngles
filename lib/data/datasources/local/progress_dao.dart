@@ -72,6 +72,24 @@ class ProgressDao {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getDecayCandidates() async {
+    try {
+      final db = await dbHelper.database;
+      return await db.rawQuery('''
+        SELECT w.id AS word_id, w.learn,
+          COALESCE(
+            (SELECT p.updated_at FROM progress p WHERE p.word_id = w.id ORDER BY p.updated_at DESC LIMIT 1),
+            w.updated_at
+          ) AS last_practiced
+        FROM Word w
+        WHERE w.learn > 15 AND w.learn < 95
+      ''');
+    } catch (e) {
+      debugPrint('❌ ProgressDao.getDecayCandidates error: $e');
+      return [];
+    }
+  }
+
   Future<void> updateFromServer(int word_id, int learn, String word, String updatedAt, String syncedAt) async {
     try {
       final db = await dbHelper.database;

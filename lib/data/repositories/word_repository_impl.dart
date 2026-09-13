@@ -205,9 +205,9 @@ class WordRepositoryImpl implements WordRepository {
   }
 
   @override
-  Future<List<WordDef>> gettWordDefForPractice(int limit) async {
+  Future<List<WordDef>> getWordDefForPractice(int limit) async {
     try {
-      final maps = await _wordPracticeDao.gettWordDefForPractice(limit);
+      final maps = await _wordPracticeDao.getWordDefForPractice(limit);
       return WordMapper.toWordDefList(maps);
     } catch (e) {
       throw Exception('Error al obtener oraciones para practicar: $e');

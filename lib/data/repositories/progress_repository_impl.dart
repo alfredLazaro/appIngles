@@ -4,6 +4,7 @@ import 'package:first_app/data/datasources/local/word_practice_dao.dart';
 import 'package:first_app/data/datasources/local/DataBaseHelper.dart';
 import 'package:first_app/data/datasources/local/daily_activity_dao.dart';
 import 'package:first_app/data/datasources/local/user_dao.dart';
+import 'package:first_app/domain/entities/learn_decay_candidate.dart';
 import 'package:first_app/domain/entities/progress.dart';
 import 'package:first_app/domain/repositories/progress_repository.dart';
 
@@ -102,5 +103,15 @@ class ProgressRepositoryImpl implements ProgressRepository {
         '${now.month.toString().padLeft(2, '0')}-'
         '${now.day.toString().padLeft(2, '0')}';
     await _dailyActivityDao.record(userId, date);
+  }
+
+  @override
+  Future<List<LearnDecayCandidate>> getDecayCandidates() async {
+    final maps = await _progressDao.getDecayCandidates();
+    return maps.map((m) => LearnDecayCandidate(
+      wordId: m['word_id'] as int,
+      learn: m['learn'] as int,
+      lastPracticed: DateTime.parse(m['last_practiced'] as String),
+    )).toList();
   }
 }

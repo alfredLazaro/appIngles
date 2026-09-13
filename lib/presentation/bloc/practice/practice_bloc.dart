@@ -137,8 +137,8 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
 
   Future<FlashcardPracticeData> _loadFlashcardPractice(int count) async {
     final words = await _wordRepository.getWordsForPractice(count);
-    final word_ids = words.map((w) => w.id).toList();
-    final images = await _imageRepository.getImagesByword_ids(word_ids);
+    final wordIds = words.map((w) => w.id).toList();
+    final images = await _imageRepository.getImagesByword_ids(wordIds);
     return FlashcardPracticeData(
       words: words,
       imagesMap: images,
@@ -147,9 +147,9 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
 
   Future<MatchingPracticeData> _loadMatchingPractice(int count) async {
     final words = await _wordRepository.getWordsForPractice(count);
-    final word_ids = words.map((w) => w.id).toList();
+    final wordIds = words.map((w) => w.id).toList();
     final translations =
-        await _translationRepository.getTranslationsByword_ids(word_ids);
+        await _translationRepository.getTranslationsByword_ids(wordIds);
     final rounds = MatchRound.generateRounds(
       allWords: words,
       allTranslations: translations,
@@ -170,7 +170,7 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
   }
 
   Future<MatchingDefPracticeData> _loadMatchingDefPractice(int count) async {
-    final wordDefs = await _wordRepository.gettWordDefForPractice(count);
+    final wordDefs = await _wordRepository.getWordDefForPractice(count);
     final rounds = MatchRound.generateDefRounds(allWords: wordDefs);
     final flashcardWords = wordDefs
         .map((wd) => FlashcardWord(
@@ -178,6 +178,7 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
               word: wd.word,
               definition: wd.definition,
               sentence: '',
+              learnCount: wd.learnCount,
             ))
         .toList();
     Logger log = Logger();
@@ -191,7 +192,7 @@ class PracticeBloc extends Bloc<PracticeEvent, PracticeState> {
 
   Future<ListeningPracticeData> _loadListeningPractice(
     int count, {
-    int maxAudioPlays = 0,
+    int maxAudioPlays = 1,
   }) async {
     final words = await _wordRepository.getWordsForPractice(count);
     return ListeningPracticeData(

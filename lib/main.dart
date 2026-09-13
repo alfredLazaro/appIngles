@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first_app/core/di/dependency_injection.dart';
+import 'package:first_app/core/services/learn_decay_service.dart';
 import 'package:first_app/core/services/sync_scheduler.dart';
 import 'package:first_app/core/services/sync_service.dart';
 import 'package:first_app/presentation/bloc/auth/auth_bloc.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return SyncScheduler(
       syncService: sl<SyncService>(),
+      learnDecayService: sl<LearnDecayService>(),
       child: MultiBlocProvider(
         providers: [
           BlocProvider<AuthBloc>(

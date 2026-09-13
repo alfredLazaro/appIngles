@@ -1,10 +1,12 @@
 import 'package:first_app/core/services/connectivity_service.dart';
 import 'package:first_app/core/services/fallback_tts_service.dart';
+import 'package:first_app/core/services/learn_decay_service.dart';
 import 'package:first_app/core/services/speech_to_text_service.dart';
 import 'package:first_app/core/services/sync_service.dart';
+import 'package:first_app/data/datasources/local/app_preferences_dao.dart';
+import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/local/word_crud_dao.dart';
 import 'package:first_app/data/datasources/local/word_practice_dao.dart';
-import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/data/datasources/local/ImageDao.dart';
 import 'package:first_app/data/datasources/local/translation_dao.dart';
 import 'package:first_app/data/datasources/local/progress_dao.dart';
@@ -64,6 +66,7 @@ void setupDependencies() {
   sl.registerLazySingleton<TranslationDao>(() => TranslationDao());
   sl.registerLazySingleton<ProgressDao>(() => ProgressDao());
   sl.registerLazySingleton<OutboxDao>(() => OutboxDao());
+  sl.registerLazySingleton<AppPreferencesDao>(() => AppPreferencesDao());
   sl.registerLazySingleton<UserDao>(() => UserDao());
   sl.registerLazySingleton<DailyActivityDao>(
       () => DailyActivityDao(outboxDao: sl<OutboxDao>()));
@@ -207,6 +210,12 @@ void setupDependencies() {
     () => FallbackTtsService(connectivity: sl<ConnectivityService>()),
   );
   sl.registerLazySingleton<ISpeechToTextService>(() => SpeechToTextService());
+  sl.registerLazySingleton<LearnDecayService>(
+    () => LearnDecayService(
+      progressRepository: sl(),
+      wordBatchDao: sl(),
+    ),
+  );
 
   // === Use cases (shared) ===
   sl.registerLazySingleton<ValidateWordAnswer>(() => ValidateWordAnswer());

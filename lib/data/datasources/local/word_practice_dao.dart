@@ -118,12 +118,12 @@ class WordPracticeDao {
     }
   }
 
-  Future<List<Map<String, dynamic>>> gettWordDefForPractice(int limit) async {
+  Future<List<Map<String, dynamic>>> getWordDefForPractice(int limit) async {
     try {
       final db = await dbHelper.database;
       final List<Map<String, dynamic>> maps = await db.query(
         'Word',
-        columns: ['id', 'word', 'definition'],
+        columns: ['id', 'word', 'definition', 'learn'],
         orderBy: 'learn ASC, id DESC',
         limit: limit,
       );

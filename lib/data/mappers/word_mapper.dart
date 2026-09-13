@@ -55,6 +55,7 @@ class WordMapper {
       id: map['id'],
       word: map['word'] ?? '',
       definition: map['definition'] ?? '',
+      learnCount: map['learn'] ?? 0,
     );
   }
 
