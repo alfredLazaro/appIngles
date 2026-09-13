@@ -58,7 +58,6 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
           for (final s in widget.sentences) s.id: s.learnCount + 1,
         },
         onFinish: () => Navigator.pop(context),
-        showDetailList: false,
       );
     }
 

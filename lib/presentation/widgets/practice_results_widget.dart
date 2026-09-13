@@ -56,6 +56,10 @@ class PracticeResultsWidget extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
+          mainAxisAlignment: showDetailList && words.isNotEmpty
+              ? MainAxisAlignment.start
+              : MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Icon(
               Icons.emoji_events,
@@ -65,6 +69,7 @@ class PracticeResultsWidget extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               isPerfect ? '¡Perfecto!' : 'Práctica completada',
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -73,6 +78,7 @@ class PracticeResultsWidget extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               '$correctItems de $totalItems aciertos',
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
                 color: Colors.grey,
@@ -81,6 +87,7 @@ class PracticeResultsWidget extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               '${percentage.toStringAsFixed(0)}%',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
