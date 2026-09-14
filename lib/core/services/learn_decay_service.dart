@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:first_app/data/datasources/local/app_preferences_dao.dart';
 import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/domain/repositories/progress_repository.dart';

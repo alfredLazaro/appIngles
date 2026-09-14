@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:first_app/domain/services/tts_service_interface.dart';
 import 'package:flutter_edge_tts/flutter_edge_tts.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -16,6 +19,10 @@ class EdgeTtsService implements ITtsService {
     'en-US': 'en-US-AriaNeural',
     'en-GB': 'en-GB-SoniaNeural',
   };
+
+  int _generation = 0;
+  Completer<void>? _cancelSignal;
+  StreamSubscription<EdgeTtsStreamEvent>? _activeSub;
 
   @override
   Future<void> initialize({
@@ -39,13 +46,79 @@ class EdgeTtsService implements ITtsService {
   Future<void> speak(String text) async {
     final clean = text.trim();
     if (clean.isEmpty) return;
-    final result = await _tts.synthesize(clean, prosody: _prosody);
-    await _player.stop();
-    await _player.play(BytesSource(result.audioBytes));
+
+    await _cancelCurrent();
+    _cancelSignal = Completer<void>();
+    final generation = _generation;
+
+    final bytes = BytesBuilder(copy: false);
+    final done = Completer<Uint8List>();
+
+    late final StreamSubscription<EdgeTtsStreamEvent> sub;
+    sub = _tts.synthesizeStream(clean, prosody: _prosody).listen(
+      (event) {
+        if (event is EdgeTtsAudioChunkEvent) {
+          bytes.add(event.chunk);
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (!done.isCompleted) {
+          done.completeError(error, stackTrace);
+        }
+      },
+      onDone: () {
+        if (done.isCompleted) return;
+        final audio = bytes.takeBytes();
+        if (audio.isEmpty) {
+          done.completeError(
+            const EdgeTtsException(
+              'empty_audio',
+              'No audio bytes were returned by the synthesis request.',
+            ),
+          );
+        } else {
+          done.complete(audio);
+        }
+      },
+      cancelOnError: true,
+    );
+    _activeSub = sub;
+
+    try {
+      await Future.any([done.future, _cancelSignal!.future]);
+      if (generation != _generation) return;
+      final audio = await done.future;
+      await _player.stop();
+      await _player.play(BytesSource(audio));
+    } on Object {
+      if (generation != _generation) return;
+      rethrow;
+    } finally {
+      if (identical(_activeSub, sub)) {
+        _activeSub = null;
+      }
+    }
   }
 
   @override
-  Future<void> stop() => _player.stop();
+  Future<void> cancelInFlight() => _cancelCurrent();
+
+  Future<void> _cancelCurrent() async {
+    _generation++;
+    final signal = _cancelSignal;
+    if (signal != null && !signal.isCompleted) {
+      signal.complete();
+    }
+    final sub = _activeSub;
+    if (sub != null) {
+      _activeSub = null;
+      await sub.cancel();
+    }
+    await _player.stop();
+  }
+
+  @override
+  Future<void> stop() => _cancelCurrent();
 
   @override
   Future<bool> get isSpeaking async => _player.state == PlayerState.playing;
@@ -58,6 +131,14 @@ class EdgeTtsService implements ITtsService {
 
   @override
   void dispose() {
+    _generation++;
+    final signal = _cancelSignal;
+    if (signal != null && !signal.isCompleted) {
+      signal.complete();
+    }
+    final sub = _activeSub;
+    _activeSub = null;
+    sub?.cancel();
     _tts.close();
     _player.dispose();
   }

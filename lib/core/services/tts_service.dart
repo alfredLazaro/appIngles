@@ -58,6 +58,10 @@ class TtsService implements ITtsService {
     }
   }
 
+  /// Cancela cualquier síntesis en vuelo (no-op en el motor local)
+  @override
+  Future<void> cancelInFlight() => stop();
+
   /// Detiene la reproducción actual
   @override
   Future<void> stop() async {

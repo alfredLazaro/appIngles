@@ -82,6 +82,7 @@ class FallbackTtsService implements ITtsService {
         _usingFallback = false;
         return;
       } catch (_) {
+        await _primary.cancelInFlight();
         _primaryDownSince = DateTime.now();
       }
     }
@@ -90,6 +91,12 @@ class FallbackTtsService implements ITtsService {
     _logger.i('TTS -> TtsService (fallback)');
     await _fallback.speak(clean);
   }
+
+  @override
+  Future<void> cancelInFlight() => Future.wait([
+        _primary.cancelInFlight(),
+        _fallback.cancelInFlight(),
+      ]).then((_) {});
 
   @override
   Future<void> stop() async {

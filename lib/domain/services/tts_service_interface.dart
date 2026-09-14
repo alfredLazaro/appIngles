@@ -6,6 +6,7 @@ abstract class ITtsService {
     double volume = 1.0,
   });
   Future<void> speak(String text);
+  Future<void> cancelInFlight();
   Future<void> stop();
   Future<bool> get isSpeaking;
   Future<void> setLanguage(String language);

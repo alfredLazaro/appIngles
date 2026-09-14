@@ -1,4 +1,3 @@
-import "dart:developer";
 import "package:flutter/widgets.dart";
 import "package:sqflite/sqflite.dart";
 import "package:first_app/data/datasources/local/DataBaseHelper.dart";
