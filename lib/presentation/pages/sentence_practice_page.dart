@@ -1,11 +1,14 @@
 import 'package:first_app/core/di/dependency_injection.dart';
+import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/domain/entities/sentence_model.dart';
 import 'package:first_app/presentation/bloc/practice/practice_bloc.dart';
 import 'package:first_app/presentation/bloc/practice/practice_data.dart';
 import 'package:first_app/presentation/bloc/practice/practice_event.dart';
+import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_bloc.dart';
+import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_event.dart';
+import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_state.dart';
 import 'package:first_app/presentation/pages/practice_selection_page.dart';
 import 'package:first_app/presentation/widgets/controlers/page_navegation_controls.dart';
-import 'package:first_app/domain/entities/flashcard_word.dart';
 import 'package:first_app/presentation/widgets/practice_results_widget.dart';
 import 'package:first_app/presentation/widgets/sentence/sentence_builder.dart';
 import 'package:flutter/material.dart';
@@ -25,51 +28,88 @@ class SentencePracticePage extends StatefulWidget {
 
 class _SentencePracticePageState extends State<SentencePracticePage> {
   final ITtsService _ttsService = sl<ITtsService>();
-  final PageController _pageController = PageController();
+  late final SentencePracticeBloc _bloc;
+  bool _resultSubmitted = false;
+
   int get totalSentences => widget.sentences.length;
-  int _currentIndex = 0;
-  bool _isCompleted = false;
-  final Map<int, bool> _sentenceResults = {};
 
   @override
   void initState() {
     super.initState();
     _ttsService.initialize();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _speakCurrentSentence();
-    });
+    _bloc = SentencePracticeBloc()
+      ..add(InitializeSentencesEvent(sentences: widget.sentences));
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _bloc.close();
     _ttsService.stop();
     super.dispose();
   }
 
+  void _submitResult(SentencePracticeCompleted state) {
+    if (_resultSubmitted) return;
+    _resultSubmitted = true;
+
+    final result = PracticeResult(
+      type: PracticeType.sentence,
+      learnCountUpdates: state.learnCountUpdates,
+      totalItems: state.totalItems,
+      correctItems: state.correctItems,
+    );
+    context.read<PracticeBloc>().add(FinishPracticeEvent(result));
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_isCompleted) {
-      final (correctCount, learnCountUpdates) = _buildResult();
-      return PracticeResultsWidget(
-        practiceType: PracticeType.sentence,
-        totalItems: widget.sentences.length,
-        correctItems: correctCount,
-        words: _sentencesAsWords(),
-        learnCountUpdates: learnCountUpdates,
-        onFinish: () => Navigator.pop(context),
-      );
-    }
+    return BlocProvider<SentencePracticeBloc>.value(
+      value: _bloc,
+      child: BlocConsumer<SentencePracticeBloc, SentencePracticeState>(
+        listener: (context, state) {
+          if (state is SentencePracticeCompleted) {
+            _submitResult(state);
+          } else if (state is SentencePracticeLoaded) {
+            _ttsService.speak(state.originalSentence);
+          }
+        },
+        builder: (context, state) {
+          if (state is SentencePracticeCompleted) {
+            return PracticeResultsWidget(
+              practiceType: PracticeType.sentence,
+              totalItems: state.totalItems,
+              correctItems: state.correctItems,
+              words: _sentencesAsWords(),
+              learnCountUpdates: state.learnCountUpdates,
+              onFinish: () => Navigator.pop(context),
+            );
+          }
 
+          if (state is! SentencePracticeLoaded) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          return _buildPractice(context, state);
+        },
+      ),
+    );
+  }
+
+  Widget _buildPractice(
+    BuildContext context,
+    SentencePracticeLoaded state,
+  ) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ordenar Oraciones (${_currentIndex + 1}/$totalSentences)'),
+        title: Text('Ordenar Oraciones (${state.currentIndex + 1}/$totalSentences)'),
         actions: [
           Center(
             child: Padding(
               padding: const EdgeInsets.only(right: 16),
               child: Text(
-                '${((_currentIndex + 1) / totalSentences * 100).toInt()}%',
+                '${((state.currentIndex + 1) / totalSentences * 100).toInt()}%',
                 style:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
@@ -82,90 +122,28 @@ class _SentencePracticePageState extends State<SentencePracticePage> {
           : Column(
               children: [
                 LinearProgressIndicator(
-                  value: (_currentIndex + 1) / totalSentences,
+                  value: (state.currentIndex + 1) / totalSentences,
                   minHeight: 6,
                 ),
                 Expanded(
-                  child: PageView.builder(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: totalSentences,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentIndex = index;
-                      });
-                      _speakCurrentSentence();
-                    },
-                    itemBuilder: (context, index) {
-                      final sentence = widget.sentences[index];
-                      return SentenceBuilderWidget(
-                        key: ValueKey(sentence.id),
-                        sentenceId: sentence.id,
-                        originalSentence: sentence.sentence,
-                        ttsService: _ttsService,
-                        onResultChanged: (id, isCorrect) {
-                          if (!mounted) return;
-                          setState(() {
-                            _sentenceResults[id] = isCorrect;
-                          });
-                        },
-                      );
-                    },
+                  child: SentenceBuilderWidget(
+                    key: ValueKey(state.sentenceId),
+                    ttsService: _ttsService,
                   ),
                 ),
                 PageNavigationControls(
-                  currentIndex: _currentIndex,
-                  totalPages: widget.sentences.length,
+                  currentIndex: state.currentIndex,
+                  totalPages: totalSentences,
                   onPrevious: () {
-                    _pageController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
+                    _bloc.add(const PreviousSentenceEvent());
                   },
-                  onNext: _currentIndex < widget.sentences.length - 1
-                      ? () {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      : () => _finishPractice(),
+                  onNext: state.currentIndex < totalSentences - 1
+                      ? () => _bloc.add(const NextSentenceEvent())
+                      : () => _bloc.add(const FinishSentenceEvent()),
                 ),
               ],
             ),
     );
-  }
-
-  void _speakCurrentSentence() {
-    if (widget.sentences.isEmpty) return;
-    _ttsService.speak(widget.sentences[_currentIndex].sentence);
-  }
-
-  void _finishPractice() {
-    final (correctCount, learnCountUpdates) = _buildResult();
-    context.read<PracticeBloc>().add(
-          FinishPracticeEvent(PracticeResult(
-            type: PracticeType.sentence,
-            learnCountUpdates: learnCountUpdates,
-            totalItems: widget.sentences.length,
-            correctItems: correctCount,
-          )),
-        );
-    setState(() {
-      _isCompleted = true;
-    });
-  }
-
-  (int, Map<int, int>) _buildResult() {
-    int correctCount = 0;
-    final learnCountUpdates = <int, int>{};
-    for (final s in widget.sentences) {
-      if (_sentenceResults[s.id] ?? false) {
-        correctCount++;
-        learnCountUpdates[s.id] = s.learnCount + 1;
-      }
-    }
-    return (correctCount, learnCountUpdates);
   }
 
   List<FlashcardWord> _sentencesAsWords() {

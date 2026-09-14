@@ -1,21 +1,18 @@
 // sentence_practice_event.dart
 import 'package:equatable/equatable.dart';
+import 'package:first_app/domain/entities/sentence_model.dart';
 
 abstract class SentencePracticeEvent extends Equatable {
   const SentencePracticeEvent();
 }
 
-class InitializeSentenceEvent extends SentencePracticeEvent {
-  final int sentenceId;
-  final String originalSentence;
+class InitializeSentencesEvent extends SentencePracticeEvent {
+  final List<SentenceModel> sentences;
 
-  const InitializeSentenceEvent({
-    required this.sentenceId,
-    required this.originalSentence,
-  });
+  const InitializeSentencesEvent({required this.sentences});
 
   @override
-  List<Object> get props => [sentenceId, originalSentence];
+  List<Object> get props => [sentences];
 }
 
 class AddWordToSentenceEvent extends SentencePracticeEvent {
@@ -54,11 +51,23 @@ class ResetSentenceEvent extends SentencePracticeEvent {
   List<Object> get props => [];
 }
 
-class NavigateToSentenceEvent extends SentencePracticeEvent {
-  final int index;
-
-  const NavigateToSentenceEvent(this.index);
+class NextSentenceEvent extends SentencePracticeEvent {
+  const NextSentenceEvent();
 
   @override
-  List<Object> get props => [index];
+  List<Object> get props => [];
+}
+
+class PreviousSentenceEvent extends SentencePracticeEvent {
+  const PreviousSentenceEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+class FinishSentenceEvent extends SentencePracticeEvent {
+  const FinishSentenceEvent();
+
+  @override
+  List<Object> get props => [];
 }

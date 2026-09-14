@@ -9,17 +9,11 @@ import 'package:first_app/presentation/bloc/sentence_practice/sentence_practice_
 import 'package:first_app/presentation/widgets/dialogs/feedback_overlay.dart';
 
 class SentenceBuilderWidget extends StatefulWidget {
-  final int sentenceId;
-  final String originalSentence;
   final ITtsService ttsService;
-  final void Function(int sentenceId, bool isCorrect) onResultChanged;
 
   const SentenceBuilderWidget({
     super.key,
-    required this.sentenceId,
-    required this.originalSentence,
     required this.ttsService,
-    required this.onResultChanged,
   });
 
   @override
@@ -28,32 +22,28 @@ class SentenceBuilderWidget extends StatefulWidget {
 
 class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
   bool _feedbackDismissed = false;
+  int? _trackedSentenceId;
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => SentencePracticeBloc()
-        ..add(InitializeSentenceEvent(
-          sentenceId: widget.sentenceId,
-          originalSentence: widget.originalSentence,
-        )),
-      child: BlocConsumer<SentencePracticeBloc, SentencePracticeState>(
-        listener: (context, state) {
-          if (state is SentencePracticeLoaded && !state.showResult) {
-            _feedbackDismissed = false;
-          }
-          if (state is SentencePracticeLoaded && state.showResult) {
-            widget.onResultChanged(state.word_id, state.isCorrect);
-          }
-        },
-        builder: (context, state) {
-          if (state is! SentencePracticeLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return BlocConsumer<SentencePracticeBloc, SentencePracticeState>(
+      listener: (context, state) {
+        if (state is! SentencePracticeLoaded) return;
+        if (state.sentenceId != _trackedSentenceId) {
+          _trackedSentenceId = state.sentenceId;
+          _feedbackDismissed = false;
+        }
+        if (!state.showResult) {
+          _feedbackDismissed = false;
+        }
+      },
+      builder: (context, state) {
+        if (state is! SentencePracticeLoaded) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          return _buildContent(context, state);
-        },
-      ),
+        return _buildContent(context, state);
+      },
     );
   }
 
@@ -65,7 +55,7 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
           Column(
             children: [
               // Audio hint card
-              _buildAudioHint(context),
+              _buildAudioHint(context, state),
               const SizedBox(height: 12),
 
               // User sentence area
@@ -82,7 +72,8 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
           ),
 
           // Show correct answer if wrong
-          if (state.showResult && !state.isCorrect) _buildCorrectAnswer(state),
+          if (state.showResult && !state.isCorrect)
+            _buildCorrectAnswer(state),
 
           // Feedback overlay
           if (state.showResult && !_feedbackDismissed)
@@ -98,7 +89,10 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
     );
   }
 
-  Widget _buildAudioHint(BuildContext context) {
+  Widget _buildAudioHint(
+    BuildContext context,
+    SentencePracticeLoaded state,
+  ) {
     return Card(
       color: Colors.blue.shade50,
       child: Padding(
@@ -116,7 +110,8 @@ class _SentenceBuilderWidgetState extends State<SentenceBuilderWidget> {
             IconButton(
               icon: const Icon(Icons.volume_up, size: 28),
               color: Colors.blue,
-              onPressed: () => widget.ttsService.speak(widget.originalSentence),
+              onPressed: () =>
+                  widget.ttsService.speak(state.originalSentence),
             ),
           ],
         ),

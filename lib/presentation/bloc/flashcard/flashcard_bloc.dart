@@ -193,7 +193,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       _touchedWordIds.add(currentState.word.id);
 
       if (isCorrect) {
-        final newCount = currentState.learnCount + 3;
+        final newCount = currentState.learnCount + 9;
         _scores[currentState.word.id] = newCount;
         emit(currentState.copyWith(
             learnCount: newCount,
