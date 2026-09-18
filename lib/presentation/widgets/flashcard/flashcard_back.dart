@@ -123,7 +123,7 @@ class FlashcardBack extends StatelessWidget {
                       fontSize: (constraints.maxHeight * 0.03).clamp(11.0, 16.0),
                       iconSize: (constraints.maxHeight * 0.04).clamp(16.0, 24.0),
                       onLearned: () {
-                          context.read<FlashcardBloc>().add(IncrementLearnCount());
+                          context.read<FlashcardBloc>().add(const IncrementLearnCount());
                           context.read<FlashcardBloc>().add(NextFlashcard());
                         },
                     ),

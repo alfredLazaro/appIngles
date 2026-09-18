@@ -100,7 +100,7 @@ class ListeningBloc extends Bloc<ListeningEvent, ListeningState> {
     final wordId = state.currentWord.id;
 
     if (isCorrect) {
-      _scores[wordId] = (_scores[wordId] ?? 0) + 4;
+      _scores[wordId] = (_scores[wordId] ?? 0) + 10;
     } else {
       _scores[wordId] =
           ((_scores[wordId] ?? 0) - 1).clamp(0, double.infinity).toInt();

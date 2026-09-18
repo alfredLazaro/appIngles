@@ -193,7 +193,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       _touchedWordIds.add(currentState.word.id);
 
       if (isCorrect) {
-        final newCount = currentState.learnCount + 9;
+        final newCount = currentState.learnCount + 18;
         _scores[currentState.word.id] = newCount;
         emit(currentState.copyWith(
             learnCount: newCount,
@@ -212,7 +212,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         });
       } else {
         final newCount =
-            (currentState.learnCount - 1).clamp(0, double.infinity).toInt();
+            (currentState.learnCount - 4).clamp(0, double.infinity).toInt();
         _scores[currentState.word.id] = newCount;
         emit(currentState.copyWith(
             learnCount: newCount,

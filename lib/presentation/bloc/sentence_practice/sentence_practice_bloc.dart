@@ -8,8 +8,8 @@ import 'sentence_practice_state.dart';
 
 class SentencePracticeBloc
     extends Bloc<SentencePracticeEvent, SentencePracticeState> {
-  static const int _correctPoints = 4;
-  static const int _wrongPoints = 1;
+  static const int _correctPoints = 6;
+  static const int _wrongPoints = 2;
 
   late List<SentenceModel> _sentences;
   final Map<int, int> _scores = {};

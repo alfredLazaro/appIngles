@@ -96,7 +96,7 @@ class MatchingBloc extends Bloc<MatchingEvent, MatchingState> {
 
     if (isCorrect) {
       final current = _learnCounts[wordId] ?? 0;
-      _learnCounts[wordId] = current + 3;
+      _learnCounts[wordId] = current + 5;
 
       final newMatchedWord = Set<int>.from(state.matchedWordIndices)..add(wIdx);
       final newMatchedTranslations =
