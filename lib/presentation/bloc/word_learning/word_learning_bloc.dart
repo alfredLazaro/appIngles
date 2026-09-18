@@ -186,22 +186,22 @@ catchError((e) {
         updatedAt: DateTime.now(),
       );
 
-      final word_id = await _saveWord(word);
+      final wordId = await _saveWord(word);
       final savedImages = await _saveWordImages(
         event.selectedImages,
-        word_id,
+        wordId,
       );
 
       if (event.translation != null &&
           event.translation!['translatedText'] != null) {
         await _translationRepository.insertTranslation(
-          word_id,
+          wordId,
           event.translation!['translatedText'] as String,
           event.selectedAlternatives,
         );
       }
 
-      emit(WordSaved(word_id: word_id, imagesCount: savedImages.length));
+      emit(WordSaved(word_id: wordId, imagesCount: savedImages.length));
 
       add(LoadRecentWordsEvent());
     } catch (e) {

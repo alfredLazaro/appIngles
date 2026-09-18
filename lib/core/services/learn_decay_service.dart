@@ -2,12 +2,13 @@ import 'package:first_app/data/datasources/local/app_preferences_dao.dart';
 import 'package:first_app/data/datasources/local/word_batch_dao.dart';
 import 'package:first_app/domain/repositories/progress_repository.dart';
 import 'package:first_app/core/utils/learn_decay_calculator.dart';
+import 'package:logger/logger.dart';
 
 class LearnDecayService {
   final ProgressRepository _progressRepository;
   final WordBatchDao _wordBatchDao;
   final AppPreferencesDao _preferencesDao;
-
+  final logger = Logger();
   LearnDecayService({
     required ProgressRepository progressRepository,
     required WordBatchDao wordBatchDao,
@@ -31,7 +32,7 @@ class LearnDecayService {
       }
       await _preferencesDao.setString(_lastRunKey, todayStr);
     } catch (e) {
-      print('❌ LearnDecayService error: $e');
+      logger.e('❌ LearnDecayService error: $e');
     }
   }
 

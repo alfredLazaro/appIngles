@@ -82,7 +82,7 @@ class ProgressDao {
             w.updated_at
           ) AS last_practiced
         FROM Word w
-        WHERE w.learn > 15 AND w.learn < 95
+        WHERE w.learn > 25 AND w.learn < 90
       ''');
     } catch (e) {
       debugPrint('❌ ProgressDao.getDecayCandidates error: $e');
